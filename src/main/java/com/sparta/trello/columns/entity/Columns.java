@@ -1,5 +1,6 @@
 package com.sparta.trello.columns.entity;
 
+import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
 
@@ -13,6 +14,7 @@ public class Columns extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
+
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum category;
 }
