@@ -16,3 +16,4 @@ public class Columns extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum category;
 }
+
