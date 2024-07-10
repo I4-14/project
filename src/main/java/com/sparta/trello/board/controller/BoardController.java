@@ -25,12 +25,12 @@ public class BoardController {
      *      get
      *      /api/boards
      * */
-    @GetMapping
+    @GetMapping("/boards")
     public ResponseEntity<ApiResponse<List<BoardResponseDto>>> getBoardlist(@RequestParam(value = "page",defaultValue = "1") int page,
                                @RequestParam(value = "sortBy",defaultValue = "createdAt") String sortBy) {
         List<BoardResponseDto> boardList = boardService.getBoardList(page-1,sortBy);
         ApiResponse<List<BoardResponseDto>> response = new ApiResponse<>("보드 목록 조회 성공", "200",boardList);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -43,6 +43,7 @@ public class BoardController {
      *      }
      * */
     // todo @AuthenticationPrincipal으로 유저 정보도 같이 전달
+    @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardResponseDto>> createBoard(@RequestBody BoardRequestDto boardRequestDto) {
         BoardResponseDto boardResponseDto = boardService.createBoard(boardRequestDto,temUser);
         ApiResponse<BoardResponseDto> response = new ApiResponse<>("보드 생성 성공","201",boardResponseDto);
@@ -59,6 +60,12 @@ public class BoardController {
      *          "description": "보드설명"
      *      }
      * */
+    @PutMapping("/boards/{boardId}")
+    public ResponseEntity<ApiResponse<BoardResponseDto>> updateBoard(@PathVariable("boardId") Long boardId, @RequestBody BoardRequestDto boardRequestDto) {
+        BoardResponseDto boardResponseDto = boardService.updateBoard(boardId,boardRequestDto);
+        ApiResponse<BoardResponseDto> response = new ApiResponse<>("보드 수정 성공","200",boardResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 
 
@@ -69,7 +76,6 @@ public class BoardController {
      *      /api/boards/{id}
      *
      * */
-
 
     /**
      *      보드 초대

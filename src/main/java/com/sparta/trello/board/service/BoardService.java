@@ -6,6 +6,7 @@ import com.sparta.trello.board.dto.BoardRequestDto;
 import com.sparta.trello.board.dto.BoardResponseDto;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,7 @@ public class BoardService {
         return boardList;
     }
 
+    @Transactional
     public BoardResponseDto createBoard(BoardRequestDto boardRequestDto, User user) {
         // 유저 role이 manager인지 확인
         if (user.getRole().equals(Role.MANAGER)){
@@ -42,5 +44,16 @@ public class BoardService {
         }
     }
 
-
+    @Transactional
+    public BoardResponseDto updateBoard(Long boardId, BoardRequestDto boardRequestDto) {
+        Board boardEntity = boardRepository.findById(boardId).orElse(null);
+        if (boardEntity != null) {
+            boardEntity.update(boardRequestDto);
+            boardRepository.save(boardEntity);
+            return new BoardResponseDto(boardEntity);
+        }else{
+            // todo board가 없는 경우 예외처리
+            return null;
+        }
+    }
 }

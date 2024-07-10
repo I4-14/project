@@ -5,10 +5,12 @@ import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "boards")
 @Getter
+@Setter
 @NoArgsConstructor
 public class Board extends Timestamped {
     @Id
@@ -23,5 +25,10 @@ public class Board extends Timestamped {
         this.title = boardRequestDto.getTitle();
         this.description = boardRequestDto.getDescription();
 
+    }
+
+    public void update(BoardRequestDto boardRequestDto) {
+        this.title = boardRequestDto.getTitle();
+        this.description = boardRequestDto.getDescription();
     }
 }
