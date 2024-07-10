@@ -20,15 +20,15 @@ public class UserDetailsImpl implements UserDetails {
     public User getUser() {
         return user;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Role role = user.getRole();
         String authority = role.getAuthority();
 
-//        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
-//        Collection<GrantedAuthority> authorities = new ArrayList<>();
-//        authorities.add(simpleGrantedAuthority);
+        // 해당 주석은 기능이 잘 수행되는 것이 확인 되면 삭제하도록 하겠습니다
+        // SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
+        // Collection<GrantedAuthority> authorities = new ArrayList<>();
+        // authorities.add(simpleGrantedAuthority);
 
         return Collections.singleton(new SimpleGrantedAuthority(authority));
     }

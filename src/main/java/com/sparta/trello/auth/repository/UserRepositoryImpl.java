@@ -1,7 +1,6 @@
 package com.sparta.trello.auth.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.trello.auth.entity.QUser;
 import com.sparta.trello.auth.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
