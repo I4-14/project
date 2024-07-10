@@ -1,6 +1,5 @@
 package com.sparta.trello.columns.entity;
 
-import com.sparta.trello.board.entity.Board;
 import jakarta.persistence.*;
 
 @Entity
