@@ -54,7 +54,7 @@ public class BoardController {
     /**
      *      보드 수정
      *      put
-     *      /api/boards/{id}
+     *      /api/boards/{boardId}
      *      {
      *          ”title” : “보드제목”,
      *          "description": "보드설명"
@@ -73,9 +73,15 @@ public class BoardController {
     /**
      *      보드 삭제
      *      delete
-     *      /api/boards/{id}
+     *      /api/boards/{boardId}
      *
      * */
+    @DeleteMapping("/boards/{boardId}")
+    public ResponseEntity<ApiResponse> deleteBoard(@PathVariable("boardId") Long boardId) {
+        boardService.deleteBoard(boardId,temUser);
+        ApiResponse response = new ApiResponse("보드 삭제 성공","204",null);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    }
 
     /**
      *      보드 초대

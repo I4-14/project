@@ -56,4 +56,18 @@ public class BoardService {
             return null;
         }
     }
+
+    public void deleteBoard(Long boardId, User temUser) {
+        Board boardEntity = boardRepository.findById(boardId).orElse(null);
+        if (boardEntity != null) {
+            if (temUser.getRole().equals(Role.MANAGER)) {
+                boardRepository.delete(boardEntity);
+            }else{
+                // todo 매니저가 아닌경우 예외처리
+
+            }
+
+        }
+
+    }
 }
