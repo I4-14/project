@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -23,7 +25,13 @@ public class BoardController {
      *      get
      *      /api/boards
      * */
-
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<BoardResponseDto>>> getBoardlist(@RequestParam(value = "page",defaultValue = "1") int page,
+                               @RequestParam(value = "sortBy",defaultValue = "createdAt") String sortBy) {
+        List<BoardResponseDto> boardList = boardService.getBoardList(page-1,sortBy);
+        ApiResponse<List<BoardResponseDto>> response = new ApiResponse<>("보드 목록 조회 성공", "200",boardList);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     /**
      *      보드 생성
