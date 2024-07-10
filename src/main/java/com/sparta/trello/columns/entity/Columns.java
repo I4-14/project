@@ -1,5 +1,6 @@
 package com.sparta.trello.columns.entity;
 
+import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
 
