@@ -10,10 +10,6 @@ public class Columns {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "board_id")
-    private Board boardId;
-
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum category;
 }
