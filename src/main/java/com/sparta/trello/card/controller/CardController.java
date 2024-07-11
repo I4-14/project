@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,11 +58,11 @@ public class CardController {
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
-//  @PostMapping("/cards/{cardId}/position")
-//  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestParam int newPosition) {
-//    CardResponseDto responseDto = cardService.moveCardToPosition(cardId, newPosition);
-//    return new ResponseEntity<>(responseDto, HttpStatus.OK);
-//  }
+  @PostMapping("/cards/{cardId}/position")
+  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestParam int newPosition) {
+    CardResponseDto responseDto = cardService.moveCardToPosition(cardId, newPosition);
+    return new ResponseEntity<>(responseDto, HttpStatus.OK);
+  }
 
   @DeleteMapping("/cards/{id}")
   public ResponseEntity<String> deleteCard(@PathVariable Long id) {

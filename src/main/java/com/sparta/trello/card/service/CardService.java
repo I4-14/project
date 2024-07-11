@@ -54,25 +54,26 @@ public class CardService {
     return new CardResponseDto(card);
   }
 
-//  @Transactional
-//  public CardResponseDto moveCardToPosition(Long cardId, int newPosition) {
-//    Card card = findCardById(cardId);
-//    List<Card> cards = cardRepository.findAll();
-//
-//    int currentPosition = cards.indexOf(card);
-//    int changePosition = newPosition - 1;
-//
-//    if (newPosition < 0 || newPosition >= cards.size()) {
-//      throw new IllegalArgumentException("잘못된 카드 위치번호 입니다.");
-//    }
-//
-//    if (currentPosition != newPosition) {
-//      cards.remove(currentPosition);
-//      cards.add(newPosition, card);
-//      updateCardIndex(cards);
-//    }
-//    return new CardResponseDto(card);
-//  }
+  @Transactional
+  public CardResponseDto moveCardToPosition(Long cardId, int newPosition) {
+    Card card = findCardById(cardId);
+    // 컬럼 구별 필요
+    List<Card> cards = cardRepository.findAll();
+
+    int currentPosition = cards.indexOf(card);
+    int changePosition = newPosition - 1;
+
+    if (newPosition < 0 || newPosition >= cards.size()) {
+      throw new IllegalArgumentException("잘못된 카드 위치번호 입니다.");
+    }
+
+    if (currentPosition != newPosition) {
+      cards.remove(currentPosition);
+      cards.add(changePosition, card);
+      updateCardIndex(cards);
+    }
+    return new CardResponseDto(card);
+  }
 
   @Transactional
   public void deleteCard(Long id) {
@@ -91,9 +92,9 @@ public class CardService {
     return cardRepository.findCardById(id);
   }
 
-//  private void updateCardIndex(List<Card> cards) {
-//    for (int i=0; i < cards.size(); i++) {
-//      cards.get(i).setPosition(i + 1);
-//    }
-//  }
+  private void updateCardIndex(List<Card> cards) {
+    for (int i=0; i < cards.size(); i++) {
+      cards.get(i).setPosition(i + 1);
+    }
+  }
 }
