@@ -3,12 +3,12 @@ package com.sparta.trello.board.entity;
 import com.sparta.trello.board.dto.BoardRequestDto;
 import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "boards")
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
