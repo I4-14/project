@@ -28,8 +28,10 @@ public class JwtUtil {
     public static final String AUTHORIZATION_KEY = "auth";
 
     // 토큰 만료시간
-    private final long ACCESS_TOKEN_TIME = 60 * 30 * 1000L; // 30분
-    private final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 14 * 1000L; // 14일
+    @Value("${jwt.time.access}")
+    private Long ACCESS_TOKEN_TIME;
+    @Value("${jwt.time.refresh}")
+    private Long REFRESH_TOKEN_TIME;
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -48,32 +50,28 @@ public class JwtUtil {
         return new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
     }
 
-    // Access 토큰 생성
-    public String createToken(String username, Role role) {
+    // 토큰 생성 메서드
+    private String createToken(String username, Role role, Long tokenTime) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(username)  // 사용자 식별값
-                        .claim(AUTHORIZATION_KEY, role)  // 사용자 권한
-                        .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))  // 만료 시간
+                        .claim(AUTHORIZATION_KEY, role)
+                        .setExpiration(new Date(date.getTime() + tokenTime))  // 만료 시간
                         .setIssuedAt(date)  // 발급일
-                        .signWith(key, signatureAlgorithm)  // 암호화 알고리즘
+                        .signWith(getSigningKey(), signatureAlgorithm)  // 암호화 알고리즘
                         .compact();
     }
 
-    // Refresh 토큰 생성
-    public String createRefreshToken(String username, Role role) { // 리프레시 토큰 생성
-        Date date = new Date();
+    // Access 토큰 생성
+    public String createAccessToken(String username, Role role) {
+        return createToken(username, role, ACCESS_TOKEN_TIME);
+    }
 
-        return BEARER_PREFIX +
-                Jwts.builder()
-                        .setSubject(username)  // 사용자 식별값
-                        .claim(AUTHORIZATION_KEY, role)  // 사용자 권한
-                        .setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))  // 만료 시간
-                        .setIssuedAt(date)  // 발급일
-                        .signWith(key, signatureAlgorithm)  // 암호화 알고리즘
-                        .compact();
+    // Refresh 토큰 생성
+    public String createRefreshToken(String username, Role role) {
+        return createToken(username, role, REFRESH_TOKEN_TIME);
     }
 
     // 토큰 유효성 검증
@@ -100,15 +98,39 @@ public class JwtUtil {
     // header 에서 JWT 가져오기
     public String getJwtFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        return substringToken(bearerToken);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return substringToken(bearerToken);
+        }
+        throw new IllegalArgumentException("Invalid or missing Authorization header");
+    }
+
+    public String getTokenFromRequest(HttpServletRequest req) {
+        return req.getHeader(AUTHORIZATION_HEADER);
     }
 
     // JWT 토큰의 Bearer 접두사 제거 후 반환
     public String substringToken(String token) {
-        if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
-            return token.substring(7); // "Bearer " 접두사 제거
-        }
-        throw new IllegalArgumentException("Not Found Token");
+        return token.substring(BEARER_PREFIX.length()); // "Bearer " 접두사 제거
+    }
+
+    //  JWT 토큰이 만료되었는지 확인
+    public Boolean isTokenExpired(String token) {
+        Claims claims = getUserInfoFromToken(token);
+        Date date = claims.getExpiration();
+        return date.before(new Date());
+    }
+
+    // JWT Refresh 토큰이 만료되었는지 확인
+    public Boolean isRefreshTokenExpired(String refreshToken) {
+        String reToken = refreshToken.substring(BEARER_PREFIX.length());
+        Claims claims = getUserInfoFromToken(reToken);
+        Date date = claims.getExpiration();
+        return date.before(new Date());
+    }
+
+    public String getRefreshJwtFromHeader(HttpServletRequest request) {
+        String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
+        return substringToken(refreshToken);
     }
 
 }
