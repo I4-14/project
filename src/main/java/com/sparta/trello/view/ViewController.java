@@ -39,4 +39,9 @@ public class ViewController {
     public String inviteUserPage() {
         return "inviteUser";
     }
+
+    @GetMapping("/user/invitation")
+    public String invitaionPage() {
+        return "invitationList";
+    }
 }
