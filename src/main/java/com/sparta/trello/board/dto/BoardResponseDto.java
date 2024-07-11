@@ -7,9 +7,11 @@ import lombok.Getter;
 public class BoardResponseDto {
     private String title;
     private String description;
+    private Long id;
 
     public BoardResponseDto(Board board) {
         this.title = board.getTitle();
         this.description = board.getDescription();
+        this.id = board.getId();
     }
 }
