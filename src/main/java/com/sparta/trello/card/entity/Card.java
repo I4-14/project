@@ -56,7 +56,7 @@ public class Card extends Timestamped {
   @Column(name= "card_status")
   private CategoryEnum cardStatus;
 
-  @OneToMany(mappedBy = "card_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<Comment> comments = new ArrayList<>();
 
 }
