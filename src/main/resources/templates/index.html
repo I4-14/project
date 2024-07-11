@@ -123,10 +123,12 @@
             .then(response => response.json())
             .then(data => {
                 const boardsGrid = document.getElementById('boardsGrid');
+
                 data.data.forEach(board => {
+                    console.log(board);
                     const card = document.createElement('a');
                     card.classList.add('board-card');
-                    card.href = `board-details.html?id=${board.id}`;
+                    card.href = `http://localhost:8080/api/main?id=${board.id}`;
                     card.setAttribute('data-id', board.id); // ID 값을 data-id 속성에 저장
                     card.innerHTML = `
             <h2 class="board-title">${board.title}</h2>
