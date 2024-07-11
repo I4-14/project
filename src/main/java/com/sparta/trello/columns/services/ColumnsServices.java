@@ -40,7 +40,13 @@ public class ColumnsServices {
         return createResponseDto("컬럼 수정성공", HttpStatus.OK, responseData);
     }
     public ColumnsResponseDto deleteColumns(Long columnId) {
+        Long maxOrderNum = columnsRepository.findMaxOrderNum().orElse(0L);
         Columns columns = findById(columnId);
+
+        Long currentOrderNum = columns.getOrderNum();
+        List<Columns> betweenColumns = columnsRepository.findByBetweenColumnIdAndInFrontOfId(currentOrderNum - 1, maxOrderNum);
+        betweenColumns.forEach(Columns::subtractOrderNum);
+
         columnsRepository.delete(columns);
         return createResponseDto("컬럼 삭제성공", HttpStatus.NO_CONTENT);
     }
@@ -50,6 +56,7 @@ public class ColumnsServices {
         Columns columns = findById(columnId);
         Long orginalOrderNum = columns.getOrderNum();
         Long destinationOrderNum = columnsRepository.findOrderNumById(inFrontofId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컬럼입니다."));
+
         if(orginalOrderNum > destinationOrderNum) {
             List<Columns> betweenColumns = columnsRepository.findByBetweenColumnIdAndInFrontOfId(destinationOrderNum, orginalOrderNum - 1);
             betweenColumns.forEach(Columns::addOrderNum);
@@ -61,6 +68,7 @@ public class ColumnsServices {
         } else {
             throw new IllegalArgumentException("서로 같은 컬럼을 선택했습니다.");
         }
+
         return createResponseDto("순서 변경성공", HttpStatus.OK);
     }
 
