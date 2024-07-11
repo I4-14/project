@@ -115,7 +115,7 @@
         <!-- Invited users will be dynamically added here -->
     </div>
 
-    <button class="back-btn" onclick="window.location.href='https://websim.ai/kanban-board'">Back to Board</button>
+    <button class="back-btn" >Back to Board</button>
 </div>
 
 <script>
@@ -147,7 +147,9 @@
             invitedUsersContainer.appendChild(userElement);
         });
     }
-
+    document.querySelector('.back-btn').addEventListener('click', function() {
+        window.history.back();
+    });
     function removeUser(index) {
         invitedUsers.splice(index, 1);
         updateInvitedUsersList();
