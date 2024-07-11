@@ -4,12 +4,16 @@ import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "boardWorkspace")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class BoardWorkspace extends Timestamped {
     @Id
@@ -23,6 +27,9 @@ public class BoardWorkspace extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
+
+    @Enumerated(value = EnumType.STRING)
+    private InvitationEnum status;
 
     public BoardWorkspace(User user, Board board) {
         this.user = user;
