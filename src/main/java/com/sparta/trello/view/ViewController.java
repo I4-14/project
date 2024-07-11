@@ -3,6 +3,7 @@ package com.sparta.trello.view;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/api")
@@ -22,8 +23,13 @@ public class ViewController {
         return "index";
     }
 
-    @GetMapping("create/board")
+    @GetMapping("/create/board")
     public String createBoardPage() {
         return "createBoard";
+    }
+
+    @GetMapping("/main")
+    public String mainPage(@RequestParam Long id) {
+        return "main";
     }
 }
