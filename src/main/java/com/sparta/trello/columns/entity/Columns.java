@@ -23,6 +23,7 @@ public class Columns extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
+
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum category;
 
