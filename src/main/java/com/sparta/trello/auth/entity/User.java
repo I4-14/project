@@ -1,12 +1,13 @@
 package com.sparta.trello.auth.entity;
 
+import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
 @Getter
 @Table(name = "user")
-public class User {
+public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

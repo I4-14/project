@@ -5,7 +5,7 @@ import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "column")
+@Table(name = "columns")
 public class Columns extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
