@@ -20,4 +20,8 @@ public class ColumnsController {
     public ColumnsResponseDto updateColumns(@PathVariable("id") Long id, @RequestBody ColumnsRequestDto requestDto) {
         return columnsServices.updateColumns(id, requestDto);
     }
+    @DeleteMapping("/columns/{id}")
+    public ColumnsResponseDto deleteColumns(@PathVariable("id") Long id) {
+        return columnsServices.deleteColumns(id);
+    }
 }

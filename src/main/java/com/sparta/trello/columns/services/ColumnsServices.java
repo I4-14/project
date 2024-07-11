@@ -35,6 +35,11 @@ public class ColumnsServices {
         ResponseData responseData = new ResponseData(columns.getCategory());
         return createResponseDto("컬럼 수정성공", HttpStatus.OK, responseData);
     }
+    public ColumnsResponseDto deleteColumns(Long columnId) {
+        Columns columns = findById(columnId);
+        columnsRepository.delete(columns);
+        return createResponseDto("컬럼 삭제성공", HttpStatus.NO_CONTENT);
+    }
 
     public Columns findById(Long id) {
         return columnsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컬럼입니다."));
@@ -45,6 +50,12 @@ public class ColumnsServices {
                 .msg(msg)
                 .statuscode(status.value())
                 .data(responseData)
+                .build();
+    }
+    public ColumnsResponseDto createResponseDto(String msg, HttpStatus status) {
+        return ColumnsResponseDto.builder()
+                .msg(msg)
+                .statuscode(status.value())
                 .build();
     }
 }
