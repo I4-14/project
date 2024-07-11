@@ -1,8 +1,8 @@
 package com.sparta.trello.card.controller;
 
-import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardResponseDto;
+import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.card.service.CardService;
@@ -25,41 +25,47 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CardController {
 
-  private CardService cardService;
+  private final CardService cardService;
 
-  @GetMapping("/{id}/cards")
-  public ResponseEntity<List<CardResponseDto>> getAllCards(@PathVariable Long id) {
-    List<CardResponseDto> cardList = cardService.getAllCards(id);
+  @GetMapping("/cards")
+  public ResponseEntity<List<CardResponseDto>> getAllCards(@RequestBody CardSearchCondDto searchCond) {
+    List<CardResponseDto> cardList = cardService.getAllCards(searchCond);
     return new ResponseEntity<>(cardList, HttpStatus.OK);
   }
 
-  @GetMapping("/{id}/cards/{cardId}")
-  public ResponseEntity<CardResponseDto> getCardDetailsById(@PathVariable Long cardId, @PathVariable Long id) {
-    CardResponseDto responseDto = cardService.getCardDetailsById(id);
+  @GetMapping("/cards/{cardId}")
+  public ResponseEntity<CardResponseDto> getCardDetailsById(@PathVariable Long cardId) {
+    CardResponseDto responseDto = cardService.getCardDetailsById(cardId);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
   @PostMapping("/{id}/cards")
-  public ResponseEntity<CardResponseDto> createCard(@PathVariable Long id, @Valid @RequestBody CardCreateRequestDto requestDto, User user) {
-    CardResponseDto responseDto = cardService.createCard(id, requestDto, user);
+  public ResponseEntity<CardResponseDto> createCard(@PathVariable Long id, @Valid @RequestBody CardCreateRequestDto requestDto) {
+    CardResponseDto responseDto = cardService.createCard(id, requestDto);
     return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
   }
 
   @PutMapping("/cards/{cardId}")
-  public ResponseEntity<CardResponseDto> updateCard(@PathVariable Long cardId, @RequestBody CardUpdateRequestDto requestDto, User user) {
-    CardResponseDto responseDto = cardService.updateCard(cardId, requestDto, user);
+  public ResponseEntity<CardResponseDto> updateCard(@PathVariable Long cardId, @RequestBody CardUpdateRequestDto requestDto) {
+    CardResponseDto responseDto = cardService.updateCard(cardId, requestDto);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
-  @PutMapping("/{id}/cards/{cardId}")
-  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long id, @PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto, User user) {
-    CardResponseDto responseDto = cardService.updateCardStatus(id, cardId, requestDto, user);
+  @PostMapping("/cards/{cardId}")
+  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto) {
+    CardResponseDto responseDto = cardService.updateCardStatus(cardId, requestDto);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
+
+//  @PostMapping("/cards/{cardId}/position")
+//  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestParam int newPosition) {
+//    CardResponseDto responseDto = cardService.moveCardToPosition(cardId, newPosition);
+//    return new ResponseEntity<>(responseDto, HttpStatus.OK);
+//  }
 
   @DeleteMapping("/cards/{id}")
-  public ResponseEntity<String> deleteCard(@PathVariable Long id, User user) {
-  cardService.deleteCard(id, user);
+  public ResponseEntity<String> deleteCard(@PathVariable Long id) {
+  cardService.deleteCard(id);
   return new ResponseEntity<>("카드 삭제 성공", HttpStatus.OK);
   }
 

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CardUpdateCardStatusRequestDto {
-
-  private Long columnId;
+public class CardSearchCondDto {
+//  private String username;
   private String cardStatus;
+
 }
