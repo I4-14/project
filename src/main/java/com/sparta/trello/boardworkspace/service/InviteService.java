@@ -2,6 +2,7 @@ package com.sparta.trello.boardworkspace.service;
 
 import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.auth.repository.UserRepository;
+import com.sparta.trello.boardworkspace.dto.InvitationListDto;
 import com.sparta.trello.boardworkspace.dto.InviteRequestDto;
 import com.sparta.trello.boardworkspace.dto.InviteResponseDto;
 import com.sparta.trello.board.entity.Board;
@@ -12,6 +13,8 @@ import com.sparta.trello.boardworkspace.repository.BoardWorkspaceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +42,9 @@ public class InviteService {
         BoardWorkspace workspaceEntity = boardWorkspaceRepository.save(boardWorkspace);
 
         return new InviteResponseDto(workspaceEntity.getUser().getUsername());
+    }
+
+    public List<InvitationListDto> getInvitationList(Long userId) {
+        return boardWorkspaceRepository.findAllBoardWorkspacesByUserId(userId);
     }
 }
