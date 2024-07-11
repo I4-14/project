@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ColumnsServices {
@@ -20,9 +22,11 @@ public class ColumnsServices {
     private final BoardRepository boardRepository;
     public ColumnsResponseDto createColumns(Long boardId, ColumnsRequestDto requestDto) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 보드입니다."));
+        Long maxOrderNum = columnsRepository.findMaxOrderNum().orElse(0L);
         Columns columns = Columns.builder()
                 .board(board)
                 .category(CategoryEnum.valueOf(requestDto.getCategory()))
+                .orderNum(maxOrderNum + 1L)
                 .build();
         columnsRepository.save(columns);
         ResponseData responseData = new ResponseData(columns.getCategory());
@@ -39,6 +43,25 @@ public class ColumnsServices {
         Columns columns = findById(columnId);
         columnsRepository.delete(columns);
         return createResponseDto("컬럼 삭제성공", HttpStatus.NO_CONTENT);
+    }
+
+    @Transactional
+    public ColumnsResponseDto changeOrderNum(Long columnId, Long inFrontofId) {
+        Columns columns = findById(columnId);
+        Long orginalOrderNum = columns.getOrderNum();
+        Long destinationOrderNum = columnsRepository.findOrderNumById(inFrontofId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컬럼입니다."));
+        if(orginalOrderNum > destinationOrderNum) {
+            List<Columns> betweenColumns = columnsRepository.findByBetweenColumnIdAndInFrontOfId(destinationOrderNum, orginalOrderNum - 1);
+            betweenColumns.forEach(Columns::addOrderNum);
+            columns.updateOrderNum(destinationOrderNum);
+        } else if(orginalOrderNum < destinationOrderNum) {
+            List<Columns> betweenColumns = columnsRepository.findByBetweenColumnIdAndInFrontOfId(orginalOrderNum + 1, destinationOrderNum - 1);
+            betweenColumns.forEach(Columns::subtractOrderNum);
+            columns.updateOrderNum(destinationOrderNum - 1);
+        } else {
+            throw new IllegalArgumentException("서로 같은 컬럼을 선택했습니다.");
+        }
+        return createResponseDto("순서 변경성공", HttpStatus.OK);
     }
 
     public Columns findById(Long id) {

@@ -24,4 +24,8 @@ public class ColumnsController {
     public ColumnsResponseDto deleteColumns(@PathVariable("id") Long id) {
         return columnsServices.deleteColumns(id);
     }
+    @PostMapping("/columns/{id}/order/{destinationId}")
+    public ColumnsResponseDto changeOrderColumns(@PathVariable("id") Long id, @PathVariable("destinationId") Long destinationId) {
+        return columnsServices.changeOrderNum(id, destinationId);
+    }
 }

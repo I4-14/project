@@ -27,8 +27,20 @@ public class Columns extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum category;
 
+    @Column(name = "ordernum")
+    private Long orderNum;
+
     public void updateComment(ColumnsRequestDto requestDto) {
         this.category = CategoryEnum.valueOf(requestDto.getCategory());
+    }
+    public void updateOrderNum(Long orderNum) {
+        this.orderNum = orderNum;
+    }
+    public void subtractOrderNum() {
+        this.orderNum--;
+    }
+    public void addOrderNum() {
+        this.orderNum++;
     }
 }
 
