@@ -1,11 +1,12 @@
 package com.sparta.trello.board.service;
 
-import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.entity.User;
+import com.sparta.trello.auth.repository.UserRepository;
 import com.sparta.trello.board.dto.BoardRequestDto;
 import com.sparta.trello.board.dto.BoardResponseDto;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
+import com.sparta.trello.boardworkspace.repository.BoardWorkspaceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
+    private final BoardWorkspaceRepository boardWorkspaceRepository;
 
     private int PAGE_SIZE = 5;
 
@@ -32,16 +35,11 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto boardRequestDto, User user) {
-        // 유저 role이 manager인지 확인
-        if (user.getRole().equals(Role.MANAGER)){
-            Board boardEntity = new Board(boardRequestDto);
-            Board savedBoard = boardRepository.save(boardEntity);
-            return new BoardResponseDto(savedBoard);
-        }else{
-            // todo 예외 처리 manager만 보드를 생성할 수 있습니다.
-            return null;
-        }
+    public BoardResponseDto createBoard(BoardRequestDto boardRequestDto) {
+        Board boardEntity = new Board(boardRequestDto);
+        Board savedBoard = boardRepository.save(boardEntity);
+        return new BoardResponseDto(savedBoard);
+
     }
 
     @Transactional
@@ -51,23 +49,28 @@ public class BoardService {
             boardEntity.update(boardRequestDto);
             boardRepository.save(boardEntity);
             return new BoardResponseDto(boardEntity);
-        }else{
+        } else {
             // todo board가 없는 경우 예외처리
             return null;
         }
     }
 
-    public void deleteBoard(Long boardId, User temUser) {
+
+
+    public boolean deleteBoard(Long boardId, User temUser) {
         Board boardEntity = boardRepository.findById(boardId).orElse(null);
+        System.out.println("boardEntity = " + boardEntity);
         if (boardEntity != null) {
-            if (temUser.getRole().equals(Role.MANAGER)) {
-                boardRepository.delete(boardEntity);
-            }else{
-                // todo 매니저가 아닌경우 예외처리
+            boardRepository.delete(boardEntity);
+            System.out.println(true);
+            return true;
 
-            }
-
+        }else{
+            System.out.println("false = " + false);
+            return false;
         }
 
     }
+
+
 }
