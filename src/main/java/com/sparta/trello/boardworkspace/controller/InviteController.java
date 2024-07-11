@@ -50,11 +50,25 @@ public class InviteController {
 
     /**
      *
-     * 초대에 응답하기
+     * 초대에 승락하기
      */
 
-    @PostMapping("/invite/workspace/{workspaceId}")
-    public ResponseEntity<ApiResponse<InviteResponseDto>> respondToInvitation (@PathVariable("workspaceId") Long workspaceId, @RequestParam String status) {
-        return null;
+    @PutMapping("/accept/invite/{workspaceId}")
+    public ResponseEntity<ApiResponse<InviteResponseDto>> acceptToInvitation (@PathVariable("workspaceId") Long workspaceId) {
+        inviteService.acceptInvitation(workspaceId);
+        ApiResponse response = new ApiResponse("보드 초대 승락", "201", null);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    /**
+     * 초대에 거절하기
+     *
+     */
+
+    @PutMapping("/reject/invite/{workspaceId}")
+    public ResponseEntity<ApiResponse<InviteResponseDto>> rejectToInvitation (@PathVariable("workspaceId") Long workspaceId) {
+        inviteService.rejectInvitation(workspaceId);
+        ApiResponse response = new ApiResponse("보드 초대 거절", "201", null);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

@@ -47,4 +47,25 @@ public class InviteService {
     public List<InvitationListDto> getInvitationList(Long userId) {
         return boardWorkspaceRepository.findAllBoardWorkspacesByUserId(userId);
     }
+
+    @Transactional
+    public void acceptInvitation(Long workspaceId) {
+        BoardWorkspace boardWorkspace = boardWorkspaceRepository.findById(workspaceId).orElse(null);
+        if (boardWorkspace != null) {
+            boardWorkspace.editStatus(InvitationEnum.ACCEPTED);
+            boardWorkspaceRepository.save(boardWorkspace);
+        }else{
+            // todo 초대받은 기록이 없음
+        }
+    }
+    @Transactional
+    public void rejectInvitation(Long workspaceId) {
+        BoardWorkspace boardWorkspace = boardWorkspaceRepository.findById(workspaceId).orElse(null);
+        if (boardWorkspace != null) {
+            boardWorkspace.editStatus(InvitationEnum.DECLINED);
+            boardWorkspaceRepository.save(boardWorkspace);
+        }else{
+            // todo 초대받은 기록이 없음
+        }
+    }
 }
