@@ -104,16 +104,16 @@ public class ColumnsServices {
         List<CardResponseDto> cardResponseDtos = new ArrayList<>();
         List<CategoryAndCardsResponseData> columns = new ArrayList<>();
         for (int i = 0; i < columnList.size(); i++) {
-            cards.addAll(board.getColumnsList().get(i).getCards().stream().sorted(Comparator.comparing(Card::getPosition)).toList());
+            cards.addAll(columnList.get(i).getCards().stream().sorted(Comparator.comparing(Card::getPosition)).toList());
             cardResponseDtos = cards.stream().map(card -> new CardResponseDto(card)).toList();
-            columns.add(new CategoryAndCardsResponseData(board.getColumnsList().get(i), cardResponseDtos));
+            columns.add(new CategoryAndCardsResponseData(columnList.get(i), cardResponseDtos));
             cards = new ArrayList<>();
             cardResponseDtos = new ArrayList<>();
         }
-        List<ColumnsListResponseData> columnsList = new ArrayList<>();
+        List<ColumnsListResponseData> columnsListData = new ArrayList<>();
         for (int i = 0; i < columns.size(); i++) {
-            columnsList.add(new ColumnsListResponseData(columns.get(i)));
+            columnsListData.add(new ColumnsListResponseData(columns.get(i)));
         }
-        return new ColumnsListResponseDto(columnsList);
+        return new ColumnsListResponseDto(columnsListData);
     }
 }

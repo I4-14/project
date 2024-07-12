@@ -141,7 +141,7 @@
     <div class="board" id="board">
 
     </div>
-    <button class="add-column-btn">+ Add Column</button>
+    <button class="add-column-btn" onclick="window.location.href = `/api/board/[[${id}]]/column`">+ Add Column</button>
   </div>
 
   <div id="taskModal" class="modal">
@@ -206,7 +206,7 @@
                   <div id="columns${columns.column.id}">
 
                   </div>
-                  <button class="add-card-btn" onclick="window.location.href = '/api/create/card/${columns.column.id}'">+ Add Card</button>
+                  <button class="add-card-btn" onclick="window.location.href = '/api/columns/${columns.column.id}/create/card'">+ Add Card</button>
                 </div>
                 `
         $('#board').append(column_html);
@@ -254,30 +254,29 @@
 
     // Add new column functionality
     document.querySelector('.add-column-btn').addEventListener('click', () => {
-      window.location.href = `/api/board/[[${id}]]/column`
-      // const board = document.querySelector('.board');
-      // const newColumn = document.createElement('div');
-      // newColumn.className = 'column';
-      // newColumn.innerHTML = `
-      //   <div class="column-header">New Column</div>
-      //   <button class="add-card-btn">+ Add Card</button>
-      // `;
-      // board.insertBefore(newColumn, document.querySelector('.add-column-btn'));
-      //
-      // // Add event listeners to the new column
-      // newColumn.addEventListener('dragover', (e) => {
-      //   e.preventDefault();
-      // });
-      //
-      // newColumn.addEventListener('drop', (e) => {
-      //   e.preventDefault();
-      //   if (draggedTask) {
-      //     e.target.closest('.column').insertBefore(draggedTask, e.target.closest('.column').querySelector('.add-card-btn'));
-      //   }
-      // });
-      //
-      // // Add event listener to the new add-card button
-      // newColumn.querySelector('.add-card-btn').addEventListener('click', addNewCard);
+      const board = document.querySelector('.board');
+      const newColumn = document.createElement('div');
+      newColumn.className = 'column';
+      newColumn.innerHTML = `
+        <div class="column-header">New Column</div>
+        <button class="add-card-btn">+ Add Card</button>
+      `;
+      board.insertBefore(newColumn, document.querySelector('.add-column-btn'));
+
+      // Add event listeners to the new column
+      newColumn.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      newColumn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedTask) {
+          e.target.closest('.column').insertBefore(draggedTask, e.target.closest('.column').querySelector('.add-card-btn'));
+        }
+      });
+
+      // Add event listener to the new add-card button
+      newColumn.querySelector('.add-card-btn').addEventListener('click', addNewCard);
     });
 
     // Add new card functionality
