@@ -113,6 +113,17 @@ public class JwtUtil {
         return token.substring(BEARER_PREFIX.length()); // "Bearer " 접두사 제거
     }
 
+    // JWT 토큰에서 권한 가져오기
+    public Role getRoleFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return Role.valueOf(claims.get(AUTHORIZATION_KEY).toString());
+    }
+
     //  JWT 토큰이 만료되었는지 확인
     public Boolean isTokenExpired(String token) {
         Claims claims = getUserInfoFromToken(token);
