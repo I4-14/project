@@ -36,8 +36,8 @@ public class CardController {
   }
 
   @GetMapping("/cards/{cardId}")
-  public ResponseEntity<CardDetailsResponseDto> getCardDetailsById(@PathVariable Long cardId) {
-    CardDetailsResponseDto responseDto = cardService.getCardDetailsById(cardId);
+  public ResponseEntity<CardDetailsResponseDto> getCardDetailsById(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId) {
+    CardDetailsResponseDto responseDto = cardService.getCardDetailsById(page - 1, amount, cardId);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 

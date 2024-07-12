@@ -10,8 +10,14 @@ import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.repository.CardRepository;
 import com.sparta.trello.columns.entity.Columns;
 import com.sparta.trello.columns.services.ColumnsServices;
+import com.sparta.trello.comment.dto.CommentResponseDto;
+import com.sparta.trello.comment.entity.Comment;
+import com.sparta.trello.comment.repository.CommentRepository;
+import com.sparta.trello.comment.service.CommentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +27,18 @@ public class CardService {
 
   private final CardRepository cardRepository;
   private final ColumnsServices columnsServices;
+  private final CommentService commentService;
+  private final CommentRepository commentRepository;
 
   public List<CardResponseDto> getAllCards(CardSearchCondDto searchCond) {
     List<CardResponseDto> cardList = cardRepository.findCardsInColumn(searchCond);
     return cardList;
   }
 
-  public CardDetailsResponseDto getCardDetailsById(Long cardId) {
+  public CardDetailsResponseDto getCardDetailsById(int page, int amount, Long cardId) {
     Card card = findCardById(cardId);
-   return new CardDetailsResponseDto(card);
+    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
+   return new CardDetailsResponseDto(card, commentDtos);
   }
 
   @Transactional
