@@ -91,6 +91,15 @@ public class AuthService {
                 () -> new IllegalArgumentException("아이디를 다시 확인해주세요.")
         );
 
+        if (!user.isExist()) {
+            throw new IllegalArgumentException("탈퇴한 사용자입니다.");
+        }
+
+        // 이미 로그아웃 상태인지 확인
+        if (finduser.getRefreshToken() == null || finduser.getRefreshToken().isEmpty()) {
+            throw new IllegalArgumentException("이미 로그아웃 상태입니다.");
+        }
+
         finduser.updateRefresh("");
         userRepository.save(finduser);
     }
@@ -101,6 +110,10 @@ public class AuthService {
         User finduser = userRepository.findByUsername(user.getUsername()).orElseThrow(
                 () -> new IllegalArgumentException("아이디를 다시 확인해주세요.")
         );
+
+        if (!user.isExist()) {
+            throw new IllegalArgumentException("탈퇴한 사용자입니다.");
+        }
 
         finduser.updateRefresh("");
         finduser.updateStatus(UserStatus.LEAVE);
