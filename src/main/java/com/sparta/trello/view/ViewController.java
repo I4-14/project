@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/api")
 public class ViewController {
-    @GetMapping("/user/signup")
+    @GetMapping("/auth/signup")
     public String signupPage() {
         return "signup";
     }
 
-    @GetMapping("/user/login")
+    @GetMapping("/auth/login")
     public String loginPage() {
         return "login";
     }
