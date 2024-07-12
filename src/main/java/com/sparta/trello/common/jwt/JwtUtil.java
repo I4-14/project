@@ -1,4 +1,4 @@
-package com.sparta.trello.jwt;
+package com.sparta.trello.common.jwt;
 
 import com.sparta.trello.auth.entity.Role;
 import io.jsonwebtoken.*;
@@ -111,6 +111,17 @@ public class JwtUtil {
     // JWT 토큰의 Bearer 접두사 제거 후 반환
     public String substringToken(String token) {
         return token.substring(BEARER_PREFIX.length()); // "Bearer " 접두사 제거
+    }
+
+    // JWT 토큰에서 권한 가져오기
+    public Role getRoleFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return Role.valueOf(claims.get(AUTHORIZATION_KEY).toString());
     }
 
     //  JWT 토큰이 만료되었는지 확인

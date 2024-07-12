@@ -1,6 +1,7 @@
 package com.sparta.trello.card.controller;
 
 import com.sparta.trello.card.dto.CardCreateRequestDto;
+import com.sparta.trello.card.dto.CardDetailsResponseDto;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
@@ -35,8 +36,8 @@ public class CardController {
   }
 
   @GetMapping("/cards/{cardId}")
-  public ResponseEntity<CardResponseDto> getCardDetailsById(@PathVariable Long cardId) {
-    CardResponseDto responseDto = cardService.getCardDetailsById(cardId);
+  public ResponseEntity<CardDetailsResponseDto> getCardDetailsById(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId) {
+    CardDetailsResponseDto responseDto = cardService.getCardDetailsById(page - 1, amount, cardId);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
@@ -52,16 +53,16 @@ public class CardController {
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
-  @PostMapping("/cards/{cardId}")
+  @PutMapping("/cards/{cardId}/status")
   public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto) {
     CardResponseDto responseDto = cardService.updateCardStatus(cardId, requestDto);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
-  @PostMapping("/cards/{cardId}/position")
-  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestParam int newPosition) {
-    CardResponseDto responseDto = cardService.moveCardToPosition(cardId, newPosition);
-    return new ResponseEntity<>(responseDto, HttpStatus.OK);
+  @PutMapping("/cards/{cardId}/position")
+  public ResponseEntity<String> moveCardToPosition(@PathVariable Long cardId, @RequestParam int newPosition) {
+    cardService.moveCardToPosition(cardId, newPosition - 1);
+    return new ResponseEntity<>("순서이동 성공",HttpStatus.OK);
   }
 
   @DeleteMapping("/cards/{id}")

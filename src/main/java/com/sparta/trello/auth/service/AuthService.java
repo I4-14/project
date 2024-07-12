@@ -8,9 +8,10 @@ import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.auth.entity.UserStatus;
 import com.sparta.trello.auth.repository.UserRepository;
-import com.sparta.trello.jwt.JwtUtil;
+import com.sparta.trello.common.jwt.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
+    @Value("${manager.token.key}")
+    private String MANAGER_TOKEN;
+
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
@@ -34,12 +38,21 @@ public class AuthService {
             throw new IllegalArgumentException("이미 중복된 사용자가 존재합니다.");
         }
 
+        // 사용자 권한 확인
+        Role role = Role.USER;
+        if (requestDto.isManager()) {
+            if (!MANAGER_TOKEN.equals(requestDto.getManagerToken())) {
+                throw new IllegalArgumentException("잘못된 암호입니다.");
+            }
+            role = Role.MANAGER;
+        }
+
         User user = User.builder()
                 .username(username)
                 .password(password)
                 .name(requestDto.getName())
                 .userStatus(UserStatus.NORMAL)
-                .role(Role.USER)
+                .role(role)
                 .refreshToken("")
                 .build();
 
@@ -66,7 +79,6 @@ public class AuthService {
         String refreshToken = jwtUtil.createRefreshToken(user.getUsername(), user.getRole());
 
         user.updateRefresh(refreshToken);
-        userRepository.save(user);
 
         return new LoginResponseDto(accessToken, refreshToken);
     }
@@ -78,8 +90,16 @@ public class AuthService {
                 () -> new IllegalArgumentException("아이디를 다시 확인해주세요.")
         );
 
+        if (!user.isExist()) {
+            throw new IllegalArgumentException("탈퇴한 사용자입니다.");
+        }
+
+        // 이미 로그아웃 상태인지 확인
+        if (finduser.getRefreshToken() == null || finduser.getRefreshToken().isEmpty()) {
+            throw new IllegalArgumentException("이미 로그아웃 상태입니다.");
+        }
+
         finduser.updateRefresh("");
-        userRepository.save(finduser);
     }
 
     // 회원탈퇴
@@ -89,9 +109,11 @@ public class AuthService {
                 () -> new IllegalArgumentException("아이디를 다시 확인해주세요.")
         );
 
+        if (!user.isExist()) {
+            throw new IllegalArgumentException("탈퇴한 사용자입니다.");
+        }
+
         finduser.updateRefresh("");
         finduser.updateStatus(UserStatus.LEAVE);
-
-        userRepository.save(finduser);
     }
 }

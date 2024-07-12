@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardSearchCondDto {
+
 //  private String username;
   private String cardStatus;
 

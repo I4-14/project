@@ -39,7 +39,7 @@ public class Card extends Timestamped {
 
   private String title;
   private String content;
-  private Integer position;
+  private int position;
 
   @Column(name = "dueto_date")
   private String dueDate;
@@ -56,7 +56,7 @@ public class Card extends Timestamped {
   @Column(name= "card_status")
   private CategoryEnum cardStatus;
 
-  @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Comment> comments = new ArrayList<>();
 
   public Card(CardCreateRequestDto requestDto, Columns column) {
@@ -77,6 +77,10 @@ public class Card extends Timestamped {
   public void updateCardStatus(Columns column, CardUpdateCardStatusRequestDto requestDto) {
     this.columns = column;
     this.cardStatus = CategoryEnum.valueOf(requestDto.getCardStatus());
+  }
+
+  public void updatePosition(int newPosition) {
+    this.position = newPosition;
   }
 
 //  public boolean checkUser(User user) {

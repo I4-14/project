@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
+import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.entity.QCard;
 import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.QColumns;
@@ -35,7 +36,19 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
     return cardList;
   }
 
-  private BooleanExpression isWhere (CardSearchCondDto searchCond){
+  public List<Card> findByColumnIdOrderByPositionAsc(Long id) {
+    QCard card = QCard.card;
+
+    List<Card> cards = queryFactory
+        .selectFrom(card)
+        .where(card.columns.id.eq(id))
+        .orderBy(card.position.asc())
+        .fetch();
+
+    return cards;
+  }
+
+  private BooleanExpression isWhere (CardSearchCondDto searchCond) {
     BooleanExpression result = null;
 //    if(!searchCond.getUsername().isEmpty()){
 //      return result = card.user.name.eq(searchCond.getUsername());
