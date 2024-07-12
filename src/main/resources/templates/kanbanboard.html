@@ -141,7 +141,7 @@
     <div class="board" id="board">
 
     </div>
-    <button class="add-column-btn" onclick="window.location.href = `/api/board/[[${id}]]/column`">+ Add Column</button>
+    <button class="add-column-btn" th:onclick="|window.location.href = '@{/api/board/{id}/column(id=${id})}'|">+ Add Column</button>
   </div>
 
   <div id="taskModal" class="modal">
