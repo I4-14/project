@@ -2,11 +2,14 @@ package com.sparta.trello.auth.entity;
 
 import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "user")
+@NoArgsConstructor
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +34,26 @@ public class User extends Timestamped {
 
     @Column(name = "refresh_token",nullable = false)
     private String refreshToken; // 리프레시 토큰
+
+    @Builder
+    public User(String username, String password, String name, Role role, UserStatus userStatus, String refreshToken) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+        this.userStatus = userStatus;
+        this.refreshToken = refreshToken;
+    }
+
+    public void updateRefresh(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void updateStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public boolean isExist() {
+        return this.userStatus == UserStatus.NORMAL;
+    }
 }
