@@ -1,5 +1,8 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="https://websim.ai"/>
     <title>KanbanFlow - Login</title>
     <style>
@@ -91,7 +94,7 @@
 <body>
 <div class="login-container">
     <h1>Login to KanbanFlow</h1>
-    <form id="login-form" action="http://localhost:8080/user/login" method="POST">
+    <form id="login-form">
         <div class="form-group">
             <label for="username">Username or Email:</label>
             <input type="text" id="username" name="username" required>
@@ -102,66 +105,57 @@
         </div>
         <div id="error-message" class="error-message"></div>
         <button type="submit" class="submit-btn">Log In</button>
-        <div class="forgot-password">
-            <a href="https://websim.ai/kanbanflow/forgot-password">Forgot password?</a>
-        </div>
     </form>
     <div class="signup-link">
-        Don't have an account? <a href="https://websim.ai/kanbanflow/signup">Sign up</a>
+        Don't have an account? <a href="http://localhost:8080/api/auth/signup">Sign up</a>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script>
-    const form = document.getElementById('login-form');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const errorMessage = document.getElementById('error-message');
+    $(document).ready(function() {
+        $('#login-form').submit(function(e) {
+            e.preventDefault();
 
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+            var username = $('#username').val();
+            var password = $('#password').val();
 
-        if (usernameInput.value.trim() === '' || passwordInput.value.trim() === '') {
-            errorMessage.textContent = 'Please enter both username and password.';
-            errorMessage.style.display = 'block';
-            return;
-        }
+            if (!username || !password) {
+                $('#error-message').text('Please enter both username and password.');
+                $('#error-message').show();
+                return;
+            }
 
-        const data = {
-            username: usernameInput.value,
-            password: passwordInput.value
-        };
+            var data = {
+                username: username,
+                password: password
+            };
 
-        fetch('http://localhost:8080/user/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Response from server:', data);
-                if (data.msg == '로그인 성공') {
-                    alert('Sign up successful! Redirecting to login page...'+data);
-                }else{
-                    alert('Sign up failed: ' + data.msg);
-                    errorMessage.textContent = 'Invalid username or password. Please try again.';
-                    errorMessage.style.display = 'block';
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:8080/api/auth/login',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response, status, xhr) {
+                    console.log('Response from server:', response);
+                    var token = xhr.getResponseHeader('Authorization');
+
+                    // 쿠키에 토큰 저장 (사이트 전역에서 사용 가능하도록 path 설정)
+                    Cookies.set('Authorization', response.accessToken, { path: '/' });
+                    Cookies.set('RefreshToken', response.refreshToken, { path: '/' });
+
+                    // 새로운 페이지로 이동하며 헤더에 토큰을 포함시키기
+                    window.location.href = 'http://localhost:8080/api/index';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Login failed: ' + jqXHR.responseJSON.msg);
+                    $('#error-message').text('Invalid username or password. Please try again.');
+                    $('#error-message').show();
                 }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
             });
-
+        });
     });
 
-    // Clear error message when user starts typing
-    usernameInput.addEventListener('input', clearErrorMessage);
-    passwordInput.addEventListener('input', clearErrorMessage);
-
-    function clearErrorMessage() {
-        errorMessage.style.display = 'none';
-    }
 </script>
 </body>
 </html>
