@@ -1,7 +1,5 @@
 package com.sparta.trello.auth.dto;
 
-import com.sparta.trello.auth.entity.Role;
-import com.sparta.trello.auth.entity.UserStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
@@ -20,6 +18,6 @@ public class SignupRequestDto {
     @NotBlank(message = "이름은 필수 입력 사항입니다.")
     private String name;
 
-    private Role role;
-
+    private boolean manager = false;
+    private String managerToken = "";
 }

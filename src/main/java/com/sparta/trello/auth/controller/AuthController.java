@@ -6,6 +6,7 @@ import com.sparta.trello.auth.dto.SignupRequestDto;
 import com.sparta.trello.auth.dto.SignupResponseDto;
 import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.auth.service.AuthService;
+import com.sparta.trello.common.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,30 +26,48 @@ public class AuthController {
 
     // 회원가입 API
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto) {
+    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody SignupRequestDto requestDto) {
         SignupResponseDto responseDto = authService.signup(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        ApiResponse response = ApiResponse.builder()
+                .msg("회원가입 성공")
+                .statuscode(String.valueOf(HttpStatus.CREATED.value()))
+                .data(responseDto)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 로그인 API
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto requestDto) {
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequestDto requestDto) {
         LoginResponseDto responseDto = authService.login(requestDto);
-        return ResponseEntity.ok().body(responseDto);
+        ApiResponse response = ApiResponse.builder()
+                .msg("로그인 성공")
+                .statuscode(String.valueOf(HttpStatus.OK.value()))
+                .data(responseDto)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 로그아웃 API
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<ApiResponse> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         authService.logout(userDetails.getUser());
-        return new ResponseEntity<>(HttpStatus.OK);
+        ApiResponse response = ApiResponse.builder()
+                .msg("로그아웃 성공")
+                .statuscode(String.valueOf(HttpStatus.OK.value()))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 회원탈퇴 API
     @PostMapping("/withdraw")
-    public ResponseEntity<?> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<ApiResponse> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         authService.withdraw(userDetails.getUser());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        ApiResponse response = ApiResponse.builder()
+                .msg("회원탈퇴 성공")
+                .statuscode(String.valueOf(HttpStatus.NO_CONTENT.value()))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
