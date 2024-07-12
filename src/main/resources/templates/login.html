@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="https://websim.ai"/>
+    <title>KanbanFlow - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 350px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .signup-link a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .forgot-password a {
+            color: #888;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+            color: #ff0000;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>Login to KanbanFlow</h1>
+    <form id="login-form">
+        <div class="form-group">
+            <label for="username">Username or Email:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div id="error-message" class="error-message"></div>
+        <button type="submit" class="submit-btn">Log In</button>
+    </form>
+    <div class="signup-link">
+        Don't have an account? <a href="http://localhost:8080/api/auth/signup">Sign up</a>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#login-form').submit(function(e) {
+            e.preventDefault();
+
+            var username = $('#username').val();
+            var password = $('#password').val();
+
+            if (!username || !password) {
+                $('#error-message').text('Please enter both username and password.');
+                $('#error-message').show();
+                return;
+            }
+
+            var data = {
+                username: username,
+                password: password
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:8080/api/auth/login',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response, status, xhr) {
+                    console.log('Response from server:', response);
+                    var token = xhr.getResponseHeader('Authorization');
+
+                    // 쿠키에 토큰 저장 (사이트 전역에서 사용 가능하도록 path 설정)
+                    Cookies.set('Authorization', response.accessToken, { path: '/' });
+                    Cookies.set('RefreshToken', response.refreshToken, { path: '/' });
+
+                    // 새로운 페이지로 이동하며 헤더에 토큰을 포함시키기
+                    window.location.href = 'http://localhost:8080/api/index';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Login failed: ' + jqXHR.responseJSON.msg);
+                    $('#error-message').text('Invalid username or password. Please try again.');
+                    $('#error-message').show();
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

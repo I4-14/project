@@ -1,0 +1,217 @@
+<html><head><base href="https://websim.ai"/><title>KanbanFlow - Sign Up</title><style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .signup-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 350px;
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        background-color: #45a049;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .login-link a {
+        color: #4CAF50;
+        text-decoration: none;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        color: #ff0000;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .admin-section {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+
+    .admin-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .admin-check input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+    #admin-token {
+        margin-top: 10px;
+    }
+</style></head><body>
+<div class="signup-container">
+    <h1>Sign Up for KanbanFlow</h1>
+    <form id="signup-form">
+        <div class="form-group">
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id" required>
+            <div id="id-error" class="error-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <div id="name-error" class="error-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <div id="password-error" class="error-message"></div>
+        </div>
+        <div class="admin-section">
+            <div class="admin-check">
+                <input id="admin-check" type="checkbox" name="admin" onclick="onclickAdmin()">
+                <label for="admin-check">관리자</label>
+            </div>
+            <input id="admin-token" type="password" name="adminToken" placeholder="관리자 암호" class="login-input-box" style="display:none">
+        </div>
+        <button type="submit" class="submit-btn">Sign Up</button>
+    </form>
+    <div class="login-link">
+        Already have an account? <a href="http://localhost:8080/api/auth/login">Log in</a>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('signup-form');
+    const idInput = document.getElementById('id');
+    const nameInput = document.getElementById('name');
+    const passwordInput = document.getElementById('password');
+    const adminCheck = document.getElementById('admin-check');
+    const adminToken = document.getElementById('admin-token');
+
+    function onclickAdmin() {
+        if (adminCheck.checked) {
+            adminToken.style.display = 'block';
+        } else {
+            adminToken.style.display = 'none';
+        }
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        let isValid = true;
+
+        // ID validation
+        if (idInput.value.length < 3) {
+            document.getElementById('id-error').textContent = 'ID must be at least 3 characters long';
+            document.getElementById('id-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('id-error').style.display = 'none';
+        }
+
+        // Name validation
+        if (nameInput.value.length < 2) {
+            document.getElementById('name-error').textContent = 'Name must be at least 2 characters long';
+            document.getElementById('name-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('name-error').style.display = 'none';
+        }
+
+        // Password validation
+        if (passwordInput.value.length < 8) {
+            document.getElementById('password-error').textContent = 'Password must be at least 8 characters long';
+            document.getElementById('password-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('password-error').style.display = 'none';
+        }
+
+        if (isValid) {
+            const data = {
+                username: idInput.value,
+                password: passwordInput.value,
+                name: nameInput.value,
+                admin: adminCheck.checked,
+                adminToken: adminToken.value
+            };
+
+            fetch('http://localhost:8080/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response from server:', data);
+                    if (data.msg == '회원가입 성공') {
+                        alert('Sign up successful! Redirecting to login page...');
+                        window.location.href = "http://localhost:8080/user/login"
+                    }else{
+                        alert('Sign up failed: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+</script>
+</body></html>
