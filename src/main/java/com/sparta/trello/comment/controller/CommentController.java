@@ -33,7 +33,7 @@ public class CommentController {
 
   @GetMapping("/{cardId}/comments")
   public ResponseEntity<List<CommentResponseDto>> getComments(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId) {
-    return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(cardId));
+    return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(page - 1, amount, cardId));
   }
 
 }
