@@ -1,4 +1,4 @@
-package com.sparta.trello.jwt;
+package com.sparta.trello.common.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.trello.common.ApiResponse;

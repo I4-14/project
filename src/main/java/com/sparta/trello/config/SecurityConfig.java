@@ -1,9 +1,9 @@
 package com.sparta.trello.config;
 
 import com.sparta.trello.auth.security.UserDetailsServiceImpl;
-import com.sparta.trello.jwt.AccessDeniedHandlerImpl;
-import com.sparta.trello.jwt.JwtAuthorizationFilter;
-import com.sparta.trello.jwt.JwtUtil;
+import com.sparta.trello.common.jwt.AccessDeniedHandlerImpl;
+import com.sparta.trello.common.jwt.JwtAuthorizationFilter;
+import com.sparta.trello.common.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

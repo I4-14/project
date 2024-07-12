@@ -1,4 +1,4 @@
-package com.sparta.trello.jwt;
+package com.sparta.trello.common.jwt;
 
 import com.sparta.trello.auth.entity.Role;
 import io.jsonwebtoken.*;

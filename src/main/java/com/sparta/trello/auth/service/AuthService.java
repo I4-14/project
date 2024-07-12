@@ -8,7 +8,7 @@ import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.auth.entity.UserStatus;
 import com.sparta.trello.auth.repository.UserRepository;
-import com.sparta.trello.jwt.JwtUtil;
+import com.sparta.trello.common.jwt.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
