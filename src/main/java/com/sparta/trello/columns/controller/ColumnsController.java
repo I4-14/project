@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class ColumnsController {
     private final ColumnsServices columnsServices;
     @GetMapping("/boards/{id}")
-    public ColumnsListResponseDto getColumnsAndCardList(@PathVariable("id") Long id) {
-        return columnsServices.getColumnsAndCardList(id);
+    public ColumnsListResponseDto getColumnsList(@PathVariable("id") Long id) {
+        return columnsServices.getColumnsList(id);
     }
     @PostMapping("/boards/{id}/columns")
     public ColumnsResponseDto createColumns(@PathVariable("id") Long id, @RequestBody ColumnsRequestDto requestDto) {

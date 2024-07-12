@@ -2,11 +2,9 @@ package com.sparta.trello.columns.services;
 
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
+import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.entity.Card;
-import com.sparta.trello.columns.dto.ColumnsListResponseDto;
-import com.sparta.trello.columns.dto.ColumnsRequestDto;
-import com.sparta.trello.columns.dto.ColumnsResponseDto;
-import com.sparta.trello.columns.dto.ColumnsResponseData;
+import com.sparta.trello.columns.dto.*;
 import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.Columns;
 import com.sparta.trello.columns.repository.ColumnsRepository;
@@ -16,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,12 +97,23 @@ public class ColumnsServices {
                 .build();
     }
 
-    public ColumnsListResponseDto getColumnsAndCardList(Long id) {
+    public ColumnsListResponseDto getColumnsList(Long id) {
         Board board = findBoardById(id);
-        List<Columns> columnsList = board.getColumnsList();
-        List<List<Card>> listOfCardList = new ArrayList<>();
-        for(Columns columns : columnsList) {
-            listOfCardList.add(columns.getCards());
+        List<Card> cards = new ArrayList<>();
+        List<Columns> columnList = board.getColumnsList().stream().sorted(Comparator.comparing(Columns::getOrderNum)).toList();
+        List<CardResponseDto> cardResponseDtos = new ArrayList<>();
+        List<CategoryAndCardsResponseData> columns = new ArrayList<>();
+        for (int i = 0; i < columnList.size(); i++) {
+            cards.addAll(board.getColumnsList().get(i).getCards().stream().sorted(Comparator.comparing(Card::getPosition)).toList());
+            cardResponseDtos = cards.stream().map(card -> new CardResponseDto(card)).toList();
+            columns.add(new CategoryAndCardsResponseData(board.getColumnsList().get(i), cardResponseDtos));
+            cards = new ArrayList<>();
+            cardResponseDtos = new ArrayList<>();
         }
+        List<ColumnsListResponseData> columnsList = new ArrayList<>();
+        for (int i = 0; i < columns.size(); i++) {
+            columnsList.add(new ColumnsListResponseData(columns.get(i)));
+        }
+        return new ColumnsListResponseDto(columnsList);
     }
 }
