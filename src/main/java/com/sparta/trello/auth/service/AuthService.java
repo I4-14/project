@@ -79,7 +79,6 @@ public class AuthService {
         String refreshToken = jwtUtil.createRefreshToken(user.getUsername(), user.getRole());
 
         user.updateRefresh(refreshToken);
-        userRepository.save(user);
 
         return new LoginResponseDto(accessToken, refreshToken);
     }
@@ -101,7 +100,6 @@ public class AuthService {
         }
 
         finduser.updateRefresh("");
-        userRepository.save(finduser);
     }
 
     // 회원탈퇴
@@ -117,7 +115,5 @@ public class AuthService {
 
         finduser.updateRefresh("");
         finduser.updateStatus(UserStatus.LEAVE);
-
-        userRepository.save(finduser);
     }
 }
