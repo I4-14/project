@@ -1,5 +1,6 @@
 package com.sparta.trello.columns.controller;
 
+import com.sparta.trello.columns.dto.ColumnsListResponseDto;
 import com.sparta.trello.columns.dto.ColumnsRequestDto;
 import com.sparta.trello.columns.dto.ColumnsResponseDto;
 import com.sparta.trello.columns.services.ColumnsServices;
@@ -11,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class ColumnsController {
     private final ColumnsServices columnsServices;
-
+    @GetMapping("/boards/{id}")
+    public ColumnsListResponseDto getColumnsAndCardList(@PathVariable("id") Long id) {
+        return columnsServices.getColumnsAndCardList(id);
+    }
     @PostMapping("/boards/{id}/columns")
     public ColumnsResponseDto createColumns(@PathVariable("id") Long id, @RequestBody ColumnsRequestDto requestDto) {
         return columnsServices.createColumns(id, requestDto);

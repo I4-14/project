@@ -8,7 +8,7 @@ import lombok.Getter;
 public class ColumnsResponseDto {
     private String msg;
     private int statuscode;
-    private ResponseData data;
+    private ColumnsResponseData data;
 }
 
 

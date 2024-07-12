@@ -2,9 +2,11 @@ package com.sparta.trello.columns.services;
 
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
+import com.sparta.trello.card.entity.Card;
+import com.sparta.trello.columns.dto.ColumnsListResponseDto;
 import com.sparta.trello.columns.dto.ColumnsRequestDto;
 import com.sparta.trello.columns.dto.ColumnsResponseDto;
-import com.sparta.trello.columns.dto.ResponseData;
+import com.sparta.trello.columns.dto.ColumnsResponseData;
 import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.Columns;
 import com.sparta.trello.columns.repository.ColumnsRepository;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,19 +32,19 @@ public class ColumnsServices {
                 .orderNum(maxOrderNum + 1L)
                 .build();
         columnsRepository.save(columns);
-        ResponseData responseData = new ResponseData(columns.getCategory());
-        return createResponseDto("컬럼 생성성공", HttpStatus.CREATED, responseData);
+        ColumnsResponseData columnsResponseData = new ColumnsResponseData(columns.getCategory());
+        return createResponseDto("컬럼 생성성공", HttpStatus.CREATED, columnsResponseData);
     }
     @Transactional
     public ColumnsResponseDto updateColumns(Long columnsId, ColumnsRequestDto requestDto) {
-        Columns columns = findById(columnsId);
+        Columns columns = findColumnsById(columnsId);
         columns.updateComment(requestDto);
-        ResponseData responseData = new ResponseData(columns.getCategory());
-        return createResponseDto("컬럼 수정성공", HttpStatus.OK, responseData);
+        ColumnsResponseData columnsResponseData = new ColumnsResponseData(columns.getCategory());
+        return createResponseDto("컬럼 수정성공", HttpStatus.OK, columnsResponseData);
     }
     public ColumnsResponseDto deleteColumns(Long columnId) {
         Long maxOrderNum = columnsRepository.findMaxOrderNum().orElse(0L);
-        Columns columns = findById(columnId);
+        Columns columns = findColumnsById(columnId);
 
         Long currentOrderNum = columns.getOrderNum();
         List<Columns> betweenColumns = columnsRepository.findByBetweenColumnIdAndInFrontOfId(currentOrderNum - 1, maxOrderNum);
@@ -53,7 +56,7 @@ public class ColumnsServices {
 
     @Transactional
     public ColumnsResponseDto changeOrderNum(Long columnId, Long inFrontofId) {
-        Columns columns = findById(columnId);
+        Columns columns = findColumnsById(columnId);
         Long orginalOrderNum = columns.getOrderNum();
         Long destinationOrderNum = columnsRepository.findOrderNumById(inFrontofId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컬럼입니다."));
 
@@ -72,15 +75,19 @@ public class ColumnsServices {
         return createResponseDto("순서 변경성공", HttpStatus.OK);
     }
 
-    public Columns findById(Long id) {
+    public Columns findColumnsById(Long id) {
         return columnsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컬럼입니다."));
     }
 
-    public ColumnsResponseDto createResponseDto(String msg, HttpStatus status, ResponseData responseData) {
+    public Board findBoardById(Long id) {
+        return boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 보드입니다."));
+    }
+
+    public ColumnsResponseDto createResponseDto(String msg, HttpStatus status, ColumnsResponseData columnsResponseData) {
         return ColumnsResponseDto.builder()
                 .msg(msg)
                 .statuscode(status.value())
-                .data(responseData)
+                .data(columnsResponseData)
                 .build();
     }
     public ColumnsResponseDto createResponseDto(String msg, HttpStatus status) {
@@ -88,5 +95,14 @@ public class ColumnsServices {
                 .msg(msg)
                 .statuscode(status.value())
                 .build();
+    }
+
+    public ColumnsListResponseDto getColumnsAndCardList(Long id) {
+        Board board = findBoardById(id);
+        List<Columns> columnsList = board.getColumnsList();
+        List<List<Card>> listOfCardList = new ArrayList<>();
+        for(Columns columns : columnsList) {
+            listOfCardList.add(columns.getCards());
+        }
     }
 }

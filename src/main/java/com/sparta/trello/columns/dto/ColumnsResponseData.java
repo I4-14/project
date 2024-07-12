@@ -6,6 +6,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ResponseData {
+public class ColumnsResponseData {
     private CategoryEnum category;
 }
