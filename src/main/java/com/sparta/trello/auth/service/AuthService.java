@@ -11,6 +11,7 @@ import com.sparta.trello.auth.repository.UserRepository;
 import com.sparta.trello.jwt.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
+    @Value("${manager.token.key}")
+    private String MANAGER_TOKEN;
+
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
@@ -34,12 +38,21 @@ public class AuthService {
             throw new IllegalArgumentException("이미 중복된 사용자가 존재합니다.");
         }
 
+        // 사용자 권한 확인
+        Role role = Role.USER;
+        if (requestDto.isManager()) {
+            if (!MANAGER_TOKEN.equals(requestDto.getManagerToken())) {
+                throw new IllegalArgumentException("잘못된 암호입니다.");
+            }
+            role = Role.MANAGER;
+        }
+
         User user = User.builder()
                 .username(username)
                 .password(password)
                 .name(requestDto.getName())
                 .userStatus(UserStatus.NORMAL)
-                .role(Role.USER)
+                .role(role)
                 .refreshToken("")
                 .build();
 
