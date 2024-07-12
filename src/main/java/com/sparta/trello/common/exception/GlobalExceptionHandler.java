@@ -1,4 +1,4 @@
-package com.sparta.trello.exception;
+package com.sparta.trello.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
