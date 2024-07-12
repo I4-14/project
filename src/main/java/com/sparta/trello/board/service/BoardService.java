@@ -7,6 +7,8 @@ import com.sparta.trello.board.dto.BoardResponseDto;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
 import com.sparta.trello.boardworkspace.repository.BoardWorkspaceRepository;
+import com.sparta.trello.exception.CustomException;
+import com.sparta.trello.exception.ErrorEnum;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,16 +58,19 @@ public class BoardService {
     }
 
 
-
-    public boolean deleteBoard(Long boardId, User temUser) {
+    /**
+     * 보드 삭제
+     * @param boardId 보드 id
+     * @param temUser 유저
+     */
+    public void deleteBoard(Long boardId, User temUser) {
         Board boardEntity = boardRepository.findById(boardId).orElse(null);
         if (boardEntity != null) {
             boardRepository.delete(boardEntity);
             System.out.println(true);
-            return true;
 
         }else{
-            return false;
+            throw new CustomException(ErrorEnum.NON_EXISTENT_ELEMENT);
         }
 
     }

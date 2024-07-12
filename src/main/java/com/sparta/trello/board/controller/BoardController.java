@@ -76,19 +76,10 @@ public class BoardController {
      */
     @DeleteMapping("/boards/{boardId}")
     public ResponseEntity<ApiResponse> deleteBoard(@PathVariable("boardId") Long boardId) {
-        Boolean check = boardService.deleteBoard(boardId, temUser);
-        if (check.equals(true)) {
-            ApiResponse<Void> response = new ApiResponse("보드 삭제 성공", "204", null);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
-        } else {
-            ApiResponse<Void> response = new ApiResponse("보드 삭제 실패", "400", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
-        }
-
+        boardService.deleteBoard(boardId, temUser);
+        ApiResponse<Void> response = new ApiResponse("보드 삭제 성공", "204", null);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
 
 }
