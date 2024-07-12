@@ -35,10 +35,10 @@ public class CardService {
     return cardList;
   }
 
-  public CardDetailsResponseDto getCardDetailsById(int page, int amount, Long cardId) {
+  public CardDetailsResponseDto getCardDetailsById(Long cardId) {
     Card card = findCardById(cardId);
-    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
-   return new CardDetailsResponseDto(card, commentDtos);
+//    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
+   return new CardDetailsResponseDto(card);
   }
 
   @Transactional

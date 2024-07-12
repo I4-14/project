@@ -36,13 +36,13 @@ public class CardController {
   }
 
   @GetMapping("/cards/{cardId}")
-  public ResponseEntity<CardDetailsResponseDto> getCardDetailsById(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId) {
-    CardDetailsResponseDto responseDto = cardService.getCardDetailsById(page - 1, amount, cardId);
+  public ResponseEntity<CardDetailsResponseDto> getCardDetailsById(@PathVariable Long cardId) {
+    CardDetailsResponseDto responseDto = cardService.getCardDetailsById(cardId);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 
   @PostMapping("/{id}/cards")
-  public ResponseEntity<CardResponseDto> createCard(@PathVariable Long id, @Valid @RequestBody CardCreateRequestDto requestDto) {
+  public ResponseEntity<CardResponseDto> createCard(@PathVariable("id") Long id, @Valid @RequestBody CardCreateRequestDto requestDto) {
     CardResponseDto responseDto = cardService.createCard(id, requestDto);
     return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
   }
