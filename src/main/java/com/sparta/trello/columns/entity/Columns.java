@@ -1,9 +1,12 @@
 package com.sparta.trello.columns.entity;
 
 import com.sparta.trello.board.entity.Board;
+import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.columns.dto.ColumnsRequestDto;
 import com.sparta.trello.common.Timestamped;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,5 +45,9 @@ public class Columns extends Timestamped {
     public void addOrderNum() {
         this.orderNum++;
     }
+
+    @OneToMany(mappedBy = "columns", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Card> cards = new ArrayList<>();
+
 }
 
