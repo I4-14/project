@@ -1,0 +1,233 @@
+<html><head><base href="https://websim.ai"/><title>KanbanFlow - Create Your Board</title><style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  .columns-wrapper {
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .columns {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    min-width: min-content;
+  }
+  .column {
+    flex: 0 0 200px;
+    background-color: #e4e4e4;
+    padding: 10px;
+    border-radius: 4px;
+    position: relative;
+  }
+  .column h3 {
+    margin-top: 0;
+    color: #555;
+    cursor: pointer;
+  }
+  .column input {
+    display: none;
+    width: calc(100% - 20px);
+    margin-bottom: 5px;
+  }
+  .column .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+  }
+  .column:hover .delete-btn {
+    display: block;
+  }
+  .add-column {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .create-board {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin: 20px auto;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+</style></head><body>
+  <div class="container">
+    <h1>Create Your Kanban Board</h1>
+    <form action="https://websim.ai/kanbanflow/create" method="GET">
+      <div class="form-group">
+        <label for="board-name">Board Name:</label>
+        <input type="text" id="board-name" name="board_name" required placeholder="Enter your board name">
+      </div>
+      <div class="form-group">
+        <label for="team">Team:</label>
+        <select id="team" name="team">
+          <option value="personal">Personal</option>
+          <option value="development">Development Team</option>
+          <option value="marketing">Marketing Team</option>
+          <option value="sales">Sales Team</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Columns:</label>
+        <div class="columns-wrapper">
+          <div id="columns" class="columns">
+            <div class="column">
+              <h3>To Do</h3>
+              <input type="text" value="To Do">
+              <button type="button" class="delete-btn">×</button>
+            </div>
+            <div class="column">
+              <h3>In Progress</h3>
+              <input type="text" value="In Progress">
+              <button type="button" class="delete-btn">×</button>
+            </div>
+            <div class="column">
+              <h3>Done</h3>
+              <input type="text" value="Done">
+              <button type="button" class="delete-btn">×</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="add-column">+ Add Column</button>
+      </div>
+      <input type="hidden" id="columns-data" name="columns">
+      <button type="submit" class="create-board">Create Board</button>
+    </form>
+  </div>
+
+  <script>
+    const columnsContainer = document.getElementById('columns');
+    const addColumnBtn = document.querySelector('.add-column');
+    const columnsDataInput = document.getElementById('columns-data');
+
+    function updateColumnsData() {
+      const columns = Array.from(columnsContainer.querySelectorAll('.column input')).map(input => input.value);
+      columnsDataInput.value = JSON.stringify(columns);
+    }
+
+    function createColumn(name = 'New Column') {
+      const column = document.createElement('div');
+      column.className = 'column';
+      column.innerHTML = `
+        <h3>${name}</h3>
+        <input type="text" value="${name}">
+        <button type="button" class="delete-btn">×</button>
+      `;
+      
+      const h3 = column.querySelector('h3');
+      const input = column.querySelector('input');
+      const deleteBtn = column.querySelector('.delete-btn');
+
+      h3.addEventListener('click', () => {
+        h3.style.display = 'none';
+        input.style.display = 'block';
+        input.focus();
+      });
+
+      input.addEventListener('blur', () => {
+        h3.textContent = input.value;
+        h3.style.display = 'block';
+        input.style.display = 'none';
+        updateColumnsData();
+      });
+
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          input.blur();
+        }
+      });
+
+      deleteBtn.addEventListener('click', () => {
+        column.remove();
+        updateColumnsData();
+      });
+
+      columnsContainer.appendChild(column);
+      updateColumnsData();
+    }
+
+    addColumnBtn.addEventListener('click', () => createColumn());
+
+    // Initialize existing columns
+    columnsContainer.querySelectorAll('.column').forEach(column => {
+      const h3 = column.querySelector('h3');
+      const input = column.querySelector('input');
+      const deleteBtn = column.querySelector('.delete-btn');
+
+      h3.addEventListener('click', () => {
+        h3.style.display = 'none';
+        input.style.display = 'block';
+        input.focus();
+      });
+
+      input.addEventListener('blur', () => {
+        h3.textContent = input.value;
+        h3.style.display = 'block';
+        input.style.display = 'none';
+        updateColumnsData();
+      });
+
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          input.blur();
+        }
+      });
+
+      deleteBtn.addEventListener('click', () => {
+        column.remove();
+        updateColumnsData();
+      });
+    });
+
+    updateColumnsData();
+  </script>
+</body></html>
