@@ -1,0 +1,335 @@
+<html><head><title>KanbanFlow - Your Board</title><style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  h1 {
+    color: #333;
+    margin: 0;
+  }
+  .invite-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .board {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    min-height: 600px;
+  }
+  .column {
+    background-color: #ebecf0;
+    border-radius: 4px;
+    width: 300px;
+    min-width: 300px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  .column-header {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+  }
+  .task {
+    background-color: white;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: move;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+  .task:hover {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+  .task-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .task-description {
+    font-size: 14px;
+    color: #666;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 4px;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .add-column-btn, .add-card-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .add-column-btn {
+    display: block;
+    margin: 20px auto;
+    font-size: 18px;
+    padding: 15px 30px;
+  }
+  .add-card-btn {
+    width: 100%;
+    margin-top: auto;
+  }
+</style>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head><body>
+  <div class="container">
+    <div class="header">
+      <h1>Your Kanban Board</h1>
+      <div>
+        <button class="invite-btn">Edit</button>
+        <button class="invite-btn">Invite Team Members</button>
+      </div>
+    </div>
+    <div class="board" id="board">
+
+    </div>
+    <button class="add-column-btn" th:onclick="|window.location.href = '@{/api/board/{id}/column(id=${id})}'|">+ Add Column</button>
+  </div>
+
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <p id="modalDescription"></p>
+      <p id="modalStatus"></p>
+    </div>
+  </div>
+
+  <script>
+    // Drag and drop functionality
+    let draggedTask = null;
+
+    document.querySelectorAll('.task').forEach(task => {
+      task.addEventListener('dragstart', (e) => {
+        draggedTask = e.target;
+        e.dataTransfer.setData('text/plain', e.target.id);
+        setTimeout(() => {
+          e.target.style.display = 'none';
+        }, 0);
+      });
+
+      task.addEventListener('dragend', (e) => {
+        e.target.style.display = 'block';
+      });
+
+      // Click to view details
+      task.addEventListener('click', (e) => {
+        const modal = document.getElementById('taskModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalStatus = document.getElementById('modalStatus');
+
+        modalTitle.textContent = e.currentTarget.querySelector('.task-title').textContent;
+        modalDescription.textContent = e.currentTarget.querySelector('.task-description').textContent;
+        modalStatus.textContent = 'Status: ' + e.currentTarget.closest('.column').querySelector('.column-header').textContent;
+
+        modal.style.display = 'block';
+      });
+    });
+
+    $(document).ready(function () {
+      $.ajax({
+        type: 'GET',
+        url: `/api/boards/[[${id}]]`,
+        success: function (response) {
+          var result = {
+            'columnsList': response.data.columnsList
+          }
+          addHTML(result);
+        }
+      })
+    })
+    function addHTML(result) {
+      for (let i = 0; i < result.columnsList.length; i++) {
+        let columns = result.columnsList[i];
+        let column_html = `
+                <div class="column">
+                  <div class="column-header">${columns.column.category}</div>
+                  <div id="columns${columns.column.id}">
+
+                  </div>
+                  <button class="add-card-btn" onclick="window.location.href = '/api/columns/${columns.column.id}/create/card'">+ Add Card</button>
+                </div>
+                `
+        $('#board').append(column_html);
+        for (let j = 0; j < columns.column.cards.length; j++) {
+          let card = columns.column.cards[j];
+          let card_html = `
+                  <div class="task" draggable="true" data-id=${card.id} id="card${card.id}">
+                    <div class="task-title">${card.title}</div>
+                    <div class="task-description">${card.content}</div>
+                  </div>
+          `
+          $(`#columns${columns.column.id}`).append(card_html);
+
+        }
+      }
+
+    }
+
+    document.querySelectorAll('.column').forEach(column => {
+      column.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      column.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedTask) {
+          e.target.closest('.column').insertBefore(draggedTask, e.target.closest('.column').querySelector('.add-card-btn'));
+        }
+      });
+    });
+
+    // Modal close functionality
+    const modal = document.getElementById('taskModal');
+    const span = document.getElementsByClassName('close')[0];
+
+    span.onclick = function() {
+      modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Add new column functionality
+    document.querySelector('.add-column-btn').addEventListener('click', () => {
+      const board = document.querySelector('.board');
+      const newColumn = document.createElement('div');
+      newColumn.className = 'column';
+      newColumn.innerHTML = `
+        <div class="column-header">New Column</div>
+        <button class="add-card-btn">+ Add Card</button>
+      `;
+      board.insertBefore(newColumn, document.querySelector('.add-column-btn'));
+
+      // Add event listeners to the new column
+      newColumn.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      newColumn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedTask) {
+          e.target.closest('.column').insertBefore(draggedTask, e.target.closest('.column').querySelector('.add-card-btn'));
+        }
+      });
+
+      // Add event listener to the new add-card button
+      newColumn.querySelector('.add-card-btn').addEventListener('click', addNewCard);
+    });
+
+    // Add new card functionality
+    function addNewCard(e) {
+      const column = e.target.closest('.column');
+      const newTask = document.createElement('div');
+      newTask.className = 'task';
+      newTask.draggable = true;
+      newTask.dataset.id = Date.now();  // Use timestamp as a simple unique id
+      newTask.innerHTML = `
+        <div class="task-title">New Task</div>
+        <div class="task-description">Add description here</div>
+      `;
+      column.insertBefore(newTask, e.target);
+
+      // Add event listeners to the new task
+      newTask.addEventListener('dragstart', (e) => {
+        draggedTask = e.target;
+        e.dataTransfer.setData('text/plain', e.target.id);
+        setTimeout(() => {
+          e.target.style.display = 'none';
+        }, 0);
+      });
+
+      newTask.addEventListener('dragend', (e) => {
+        e.target.style.display = 'block';
+      });
+
+      newTask.addEventListener('click', (e) => {
+        const modal = document.getElementById('taskModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalStatus = document.getElementById('modalStatus');
+
+        modalTitle.textContent = e.currentTarget.querySelector('.task-title').textContent;
+        modalDescription.textContent = e.currentTarget.querySelector('.task-description').textContent;
+        modalStatus.textContent = 'Status: ' + e.currentTarget.closest('.column').querySelector('.column-header').textContent;
+
+        modal.style.display = 'block';
+      });
+    }
+
+    // Add event listeners to all add-card buttons
+    // document.querySelectorAll('.add-card-btn').forEach(btn => {
+    //   btn.addEventListener('click', addNewCard);
+    // });
+
+    // Invite button functionality (you can customize this as needed)
+    document.querySelector('.invite-btn').addEventListener('click', () => {
+      alert('Invite functionality will be implemented here!');
+    });
+  </script>
+</body></html>

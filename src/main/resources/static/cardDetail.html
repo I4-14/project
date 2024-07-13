@@ -1,0 +1,191 @@
+<html><head><base href="https://websim.ai"/><title>KanbanFlow - Card Details</title><style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  h1, h2 {
+    color: #333;
+  }
+  .card-details {
+    margin-bottom: 30px;
+  }
+  .detail-item {
+    margin-bottom: 15px;
+  }
+  .detail-label {
+    font-weight: bold;
+    color: #555;
+  }
+  .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .status-in-progress {
+    background-color: #ffd700;
+    color: #000;
+  }
+  .comments-section {
+    margin-top: 30px;
+  }
+  .comment {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .comment-author {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .comment-date {
+    font-size: 12px;
+    color: #777;
+  }
+  .new-comment {
+    margin-top: 20px;
+  }
+  textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  .button-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .btn {
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .submit-comment {
+    background-color: #4CAF50;
+  }
+  .submit-comment:hover {
+    background-color: #45a049;
+  }
+  .back-btn {
+    background-color: #2196F3;
+  }
+  .back-btn:hover {
+    background-color: #0b7dda;
+  }
+  .edit-btn {
+    background-color: #FFA500;
+  }
+  .edit-btn:hover {
+    background-color: #FF8C00;
+  }
+  .delete-btn {
+    background-color: #f44336;
+  }
+  .delete-btn:hover {
+    background-color: #d32f2f;
+  }
+</style></head><body>
+  <div class="container">
+    <h1>Card Details</h1>
+    <div class="card-details">
+      <div class="detail-item">
+        <span class="detail-label">Title:</span>
+        <span id="cardTitle">Implement new user authentication system</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Description:</span>
+        <p id="cardDescription">Develop and implement a new user authentication system using OAuth 2.0 protocol. This will improve security and allow for single sign-on capabilities.</p>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Status:</span>
+        <span id="cardStatus" class="status status-in-progress">In Progress</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Due Date:</span>
+        <span id="cardDueDate">2023-06-30</span>
+      </div>
+    </div>
+
+    <div class="comments-section">
+      <h2>Comments</h2>
+      <div id="commentsContainer">
+        <div class="comment">
+          <div class="comment-author">John Doe</div>
+          <div class="comment-content">I've started working on the OAuth implementation. Will update once the basic flow is set up.</div>
+          <div class="comment-date">2023-05-15 14:30</div>
+        </div>
+        <div class="comment">
+          <div class="comment-author">Jane Smith</div>
+          <div class="comment-content">Great! Let me know if you need any help with the frontend integration.</div>
+          <div class="comment-date">2023-05-15 15:45</div>
+        </div>
+      </div>
+      <div class="new-comment">
+        <h3>Add a Comment</h3>
+        <textarea id="newCommentText" placeholder="Type your comment here..."></textarea>
+        <div class="button-container">
+          <button class="btn submit-comment" onclick="addComment()">Submit Comment</button>
+          <button class="btn edit-btn" onclick="editCard()">Edit Card</button>
+          <button class="btn delete-btn" onclick="deleteCard()">Delete Card</button>
+          <button class="btn back-btn" onclick="window.location.href='https://websim.ai/kanban-board'">Back to Board</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addComment() {
+      const commentText = document.getElementById('newCommentText').value;
+      if (commentText.trim() === '') return;
+
+      const commentsContainer = document.getElementById('commentsContainer');
+      const newComment = document.createElement('div');
+      newComment.className = 'comment';
+      
+      const currentDate = new Date();
+      const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')} ${String(currentDate.getHours()).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')}`;
+
+      newComment.innerHTML = `
+        <div class="comment-author">Current User</div>
+        <div class="comment-content">${commentText}</div>
+        <div class="comment-date">${formattedDate}</div>
+      `;
+
+      commentsContainer.appendChild(newComment);
+      document.getElementById('newCommentText').value = '';
+    }
+
+    function editCard() {
+      alert('Edit card functionality would be implemented here.');
+    }
+
+    function deleteCard() {
+      if (confirm('Are you sure you want to delete this card?')) {
+        alert('Delete card functionality would be implemented here.');
+      }
+    }
+  </script>
+</body></html>
