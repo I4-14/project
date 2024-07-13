@@ -1,6 +1,5 @@
 package com.sparta.trello.comment.controller;
 
-import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.comment.dto.CommentRequestDto;
 import com.sparta.trello.comment.dto.CommentResponseDto;
 import com.sparta.trello.comment.service.CommentService;
