@@ -71,18 +71,6 @@
         .signup-link a:hover {
             text-decoration: underline;
         }
-        .forgot-password {
-            text-align: right;
-            margin-top: 10px;
-        }
-        .forgot-password a {
-            color: #888;
-            font-size: 14px;
-            text-decoration: none;
-        }
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
         .error-message {
             color: #ff0000;
             font-size: 14px;
@@ -107,7 +95,7 @@
         <button type="submit" class="submit-btn">Log In</button>
     </form>
     <div class="signup-link">
-        Don't have an account? <a href="http://localhost:8080/api/auth/signup">Sign up</a>
+        Don't have an account? <a href="http://localhost:8080/view/auth/signup">Sign up</a>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -117,8 +105,8 @@
         $('#login-form').submit(function(e) {
             e.preventDefault();
 
-            var username = $('#username').val();
-            var password = $('#password').val();
+            var username = $('#username').val().trim();
+            var password = $('#password').val().trim();
 
             if (!username || !password) {
                 $('#error-message').text('Please enter both username and password.');
@@ -144,8 +132,7 @@
                     Cookies.set('Authorization', response.accessToken, { path: '/' });
                     Cookies.set('RefreshToken', response.refreshToken, { path: '/' });
 
-                    // 새로운 페이지로 이동하며 헤더에 토큰을 포함시키기
-                    window.location.href = 'http://localhost:8080/api/index';
+                    window.location.href = 'http://localhost:8080/view/index';
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     alert('Login failed: ' + jqXHR.responseJSON.msg);
@@ -155,6 +142,7 @@
             });
         });
     });
+
 
 </script>
 </body>
