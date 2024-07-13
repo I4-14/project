@@ -1,8 +1,6 @@
 package com.sparta.trello.view;
 
 import ch.qos.logback.core.model.Model;
-import com.sparta.trello.auth.security.UserDetailsImpl;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,4 +43,26 @@ public class ViewController {
         return "invitationList";
     }
 
+    @GetMapping("/board/{id}/column")
+    public String createColumnPage(@PathVariable("id") Long id) {
+        return "createColumn";
+    }
+    @GetMapping("/board/{id}")
+    public String kanbanboardPage(@PathVariable("id") Long id) {
+        return "kanbanboard";
+    }
+    @GetMapping("/column/{id}")
+    public String updateColumnPage(@PathVariable("id") Long id) {
+        return "updateColumn";
+    }
+
+    @GetMapping("/columns/{id}/create/card")
+    public String createCard(@PathVariable("id") Long id) {
+        return "createCard";
+    }
+
+    @GetMapping("/read/card/{cardId}")
+    public String readCard(@PathVariable("cardId") Long id) {
+        return "readCard";
+    }
 }
