@@ -59,14 +59,12 @@ public class BoardService {
 
     public boolean deleteBoard(Long boardId, User temUser) {
         Board boardEntity = boardRepository.findById(boardId).orElse(null);
-        System.out.println("boardEntity = " + boardEntity);
         if (boardEntity != null) {
             boardRepository.delete(boardEntity);
             System.out.println(true);
             return true;
 
         }else{
-            System.out.println("false = " + false);
             return false;
         }
 

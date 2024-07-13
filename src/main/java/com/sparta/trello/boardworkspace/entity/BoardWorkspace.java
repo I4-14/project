@@ -31,8 +31,8 @@ public class BoardWorkspace extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private InvitationEnum status;
 
-    public BoardWorkspace(User user, Board board) {
-        this.user = user;
-        this.board = board;
+
+    public void editStatus(InvitationEnum status) {
+        this.status = status;
     }
 }

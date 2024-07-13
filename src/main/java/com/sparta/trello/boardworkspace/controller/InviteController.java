@@ -1,5 +1,6 @@
 package com.sparta.trello.boardworkspace.controller;
 
+import com.sparta.trello.boardworkspace.dto.InvitationListDto;
 import com.sparta.trello.boardworkspace.dto.InviteRequestDto;
 import com.sparta.trello.boardworkspace.dto.InviteResponseDto;
 import com.sparta.trello.boardworkspace.service.InviteService;
@@ -7,10 +8,12 @@ import com.sparta.trello.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class InviteController {
     private final InviteService inviteService;
@@ -38,19 +41,34 @@ public class InviteController {
      *
      */
     @GetMapping("/invite/{id}")
-    public ResponseEntity<ApiResponse> getInvitationList(@PathVariable("id") Long id) {
-
-        return null;
+    public ResponseEntity<ApiResponse<List<InvitationListDto>>> getInvitationList(@PathVariable("id") Long id) {
+        List<InvitationListDto> responseDto= inviteService.getInvitationList(id);
+        ApiResponse<List<InvitationListDto>> response = new ApiResponse("보드 초대 성공", "201", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
     /**
      *
-     * 초대에 응답하기
+     * 초대에 승락하기
      */
 
-    @PostMapping("/invite/workspace/{workspaceId}")
-    public ResponseEntity<ApiResponse<InviteResponseDto>> respondToInvitation (@PathVariable("workspaceId") Long workspaceId, @RequestParam String status) {
-        return null;
+    @PutMapping("/accept/invite/{workspaceId}")
+    public ResponseEntity<ApiResponse<InviteResponseDto>> acceptToInvitation (@PathVariable("workspaceId") Long workspaceId) {
+        inviteService.acceptInvitation(workspaceId);
+        ApiResponse response = new ApiResponse("보드 초대 승락", "201", null);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    /**
+     * 초대에 거절하기
+     *
+     */
+
+    @PutMapping("/reject/invite/{workspaceId}")
+    public ResponseEntity<ApiResponse<InviteResponseDto>> rejectToInvitation (@PathVariable("workspaceId") Long workspaceId) {
+        inviteService.rejectInvitation(workspaceId);
+        ApiResponse response = new ApiResponse("보드 초대 거절", "201", null);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
