@@ -7,6 +7,7 @@ import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.card.service.CardService;
+import com.sparta.trello.common.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,45 +31,52 @@ public class CardController {
   private final CardService cardService;
 
   @GetMapping("/cards")
-  public ResponseEntity<List<CardResponseDto>> getAllCards(@RequestBody CardSearchCondDto searchCond) {
+  public ResponseEntity<ApiResponse<List<CardResponseDto>>> getAllCards(@RequestBody CardSearchCondDto searchCond) {
     List<CardResponseDto> cardList = cardService.getAllCards(searchCond);
-    return new ResponseEntity<>(cardList, HttpStatus.OK);
+    ApiResponse<List<CardResponseDto>> response = new ApiResponse<>("카드 전체조회 성공", "200", cardList);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @GetMapping("/cards/{cardId}")
-  public ResponseEntity<CardDetailsResponseDto> getCardDetailsById(@PathVariable Long cardId) {
-    CardDetailsResponseDto responseDto = cardService.getCardDetailsById(cardId);
-    return new ResponseEntity<>(responseDto, HttpStatus.OK);
+  public ResponseEntity<ApiResponse<CardDetailsResponseDto>> getCardDetailsById(@PathVariable Long cardId) {
+    CardDetailsResponseDto cardDetails = cardService.getCardDetailsById(cardId);
+    ApiResponse<CardDetailsResponseDto> response = new ApiResponse<>("카드 전체조회 성공", "200", cardDetails);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PostMapping("/{id}/cards")
-  public ResponseEntity<CardResponseDto> createCard(@PathVariable("id") Long id, @Valid @RequestBody CardCreateRequestDto requestDto) {
-    CardResponseDto responseDto = cardService.createCard(id, requestDto);
-    return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+  public ResponseEntity<ApiResponse<CardResponseDto>> createCard(@PathVariable("id") Long id, @Valid @RequestBody CardCreateRequestDto requestDto) {
+    CardResponseDto card = cardService.createCard(id, requestDto);
+    ApiResponse<CardResponseDto> response = new ApiResponse<>("카드 추가 성공", "201", card);
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
   @PutMapping("/cards/{cardId}")
-  public ResponseEntity<CardResponseDto> updateCard(@PathVariable Long cardId, @RequestBody CardUpdateRequestDto requestDto) {
-    CardResponseDto responseDto = cardService.updateCard(cardId, requestDto);
-    return new ResponseEntity<>(responseDto, HttpStatus.OK);
+  public ResponseEntity<ApiResponse<CardResponseDto>> updateCard(@PathVariable Long cardId, @RequestBody CardUpdateRequestDto requestDto) {
+    CardResponseDto card = cardService.updateCard(cardId, requestDto);
+    ApiResponse<CardResponseDto> response = new ApiResponse<>("카드 수정 성공", "200", card);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PutMapping("/cards/{cardId}/status")
-  public ResponseEntity<CardResponseDto> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto) {
-    CardResponseDto responseDto = cardService.updateCardStatus(cardId, requestDto);
-    return new ResponseEntity<>(responseDto, HttpStatus.OK);
+  public ResponseEntity<ApiResponse<CardResponseDto>> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto) {
+    CardResponseDto cardStatus = cardService.updateCardStatus(cardId, requestDto);
+    ApiResponse<CardResponseDto> response = new ApiResponse<>("카드상태 수정 성공", "200", cardStatus);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PutMapping("/cards/{cardId}/position")
-  public ResponseEntity<String> moveCardToPosition(@PathVariable Long cardId, @RequestParam int newPosition) {
+  public ResponseEntity<ApiResponse<Integer>> moveCardToPosition(@PathVariable Long cardId, @RequestParam int newPosition) {
     cardService.moveCardToPosition(cardId, newPosition - 1);
-    return new ResponseEntity<>("순서이동 성공",HttpStatus.OK);
+    ApiResponse<Integer> response = new ApiResponse<>("카드위치 변경 성공", "200", newPosition);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @DeleteMapping("/cards/{id}")
-  public ResponseEntity<String> deleteCard(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<Long>> deleteCard(@PathVariable Long id) {
   cardService.deleteCard(id);
-  return new ResponseEntity<>("카드 삭제 성공", HttpStatus.OK);
+  ApiResponse<Long> response = new ApiResponse<>("카드 삭제 성공", "200", id);
+  return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
 }
