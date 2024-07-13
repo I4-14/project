@@ -51,7 +51,8 @@ public enum ErrorEnum {
 
     // Column
     COLUMN_NOT_FOUND(NOT_FOUND, "존재하지 않는 컬럼입니다."),
-    SAME_COLUMN(BAD_REQUEST, "같은 컬럼을 선택했습니다.");
+    SAME_COLUMN(BAD_REQUEST, "같은 컬럼을 선택했습니다."),
+    DUPLICATE_CATEGORY(BAD_REQUEST, "중복된 컬럼 이름이 존재합니다.");
 
 
 

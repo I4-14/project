@@ -33,6 +33,19 @@
     cursor: pointer;
     border-radius: 4px;
   }
+  .edit-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
   .board {
     display: flex;
     gap: 20px;
@@ -50,6 +63,9 @@
     flex-direction: column;
   }
   .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-weight: bold;
     font-size: 18px;
     margin-bottom: 10px;
@@ -107,7 +123,7 @@
     text-decoration: none;
     cursor: pointer;
   }
-  .add-column-btn, .add-card-btn {
+  .add-column-btn, .add-card-btn, .edit-column-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -130,6 +146,10 @@
     width: 100%;
     margin-top: auto;
   }
+  .edit-column-btn {
+    width: 100px;
+    margin-top: auto;
+  }
 </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head><body>
@@ -137,7 +157,7 @@
     <div class="header">
       <h1>Your Kanban Board</h1>
       <div>
-        <button class="invite-btn">Edit</button>
+        <button class="edit-btn">Edit</button>
         <button class="invite-btn">Invite Team Members</button>
       </div>
     </div>
@@ -205,7 +225,7 @@
         let columns = result.columnsList[i];
         let column_html = `
                 <div class="column">
-                  <div class="column-header">${columns.column.category}</div>
+                  <div class="column-header">${columns.column.category} <button class="edit-column-btn" onclick="window.location.href = '/api/column/${columns.column.id}'">Edit Column</button></div>
                   <div id="columns${columns.column.id}">
 
                   </div>
@@ -329,6 +349,10 @@
 
     // Invite button functionality (you can customize this as needed)
     document.querySelector('.invite-btn').addEventListener('click', () => {
+      alert('Invite functionality will be implemented here!');
+    });
+
+    document.querySelector('.edit-btn').addEventListener('click', () => {
       alert('Invite functionality will be implemented here!');
     });
   </script>
