@@ -35,25 +35,28 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-
         String tokenValue = jwtUtil.getTokenFromRequest(req);
 
         if (StringUtils.hasText(tokenValue)) {
             tokenValue = jwtUtil.substringToken(tokenValue);
 
-            if (!jwtUtil.validateToken(tokenValue)) {
-                throw new CustomException(ErrorEnum.TOKEN_VALIDATE);
-            }
-
-            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-            String username = info.getSubject();
-            Role role = jwtUtil.getRoleFromToken(tokenValue);
-
             try {
+                if (!jwtUtil.validateToken(tokenValue)) {
+                    throw new CustomException(ErrorEnum.TOKEN_VALIDATE);
+                }
+
+                Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+                String username = info.getSubject();
+                Role role = jwtUtil.getRoleFromToken(tokenValue);
+
                 setAuthentication(username, role);
+            } catch (CustomException e) {
+                handleException(res, e.getStatusEnum().getMsg(), HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             } catch (Exception e) {
-                log.error("Authentication Error: " + e.getMessage());
+                log.error("Authentication Error: {}", e.getMessage());
                 handleException(res, "Authentication Error: " + e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
         }
         filterChain.doFilter(req, res);
