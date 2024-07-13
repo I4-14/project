@@ -16,14 +16,14 @@ public class CardDetailsResponseDto {
   private String content;
   private String dueDate;
   private CategoryEnum cardStatus;
-  private List<CommentResponseDto> commentList;
+//  private List<CommentResponseDto> commentList;
 //  private String username;
 
-  public CardDetailsResponseDto(Card card, List<CommentResponseDto> commentList) {
+  public CardDetailsResponseDto(Card card) {
     this.title = card.getTitle();
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
-    this.commentList = commentList;
+//    this.commentList = commentList;
   }
 }
