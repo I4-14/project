@@ -54,4 +54,8 @@ public class ViewController {
     public String kanbanboardPage(@PathVariable("id") Long id) {
         return "kanbanboard";
     }
+    @GetMapping("/column/{id}")
+    public String updateColumnPage(@PathVariable("id") Long id) {
+        return "updateColumn";
+    }
 }

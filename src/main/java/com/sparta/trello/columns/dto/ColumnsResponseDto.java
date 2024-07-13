@@ -1,14 +1,11 @@
 package com.sparta.trello.columns.dto;
 
-import lombok.Builder;
+import com.sparta.trello.columns.entity.CategoryEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@Builder
+@AllArgsConstructor
 public class ColumnsResponseDto {
-    private String msg;
-    private int statuscode;
-    private ColumnsResponseData data;
+    private CategoryEnum category;
 }
-
-

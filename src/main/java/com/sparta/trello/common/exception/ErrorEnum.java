@@ -36,7 +36,15 @@ public enum ErrorEnum {
 
     COMMENT_NOT_FOUND(BAD_REQUEST, "등록되지 않은 댓글입니다."),
 
-    USER_NOT_AUTHENTICATED(UNAUTHORIZED, "인증되지 않은 사용자입니다. 로그인해주세요.");
+    USER_NOT_AUTHENTICATED(UNAUTHORIZED, "인증되지 않은 사용자입니다. 로그인해주세요."),
+
+    // Board
+    BOARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 보드입니다."),
+
+    // Column
+    COLUMN_NOT_FOUND(NOT_FOUND, "존재하지 않는 컬럼입니다."),
+    SAME_COLUMN(BAD_REQUEST, "같은 컬럼을 선택했습니다.");
+
 
 
 
