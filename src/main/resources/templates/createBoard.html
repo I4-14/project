@@ -125,10 +125,23 @@
             background-color: #546E7A;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6b5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 토큰 확인
+            const token = Cookies.get('Authorization');
+            if (!token) {
+                window.location.href = 'http://localhost:8080/'; // 토큰이 없다면 로그인 화면으로 이동
+                return;
+            }
+        });
+    </script>
 </head>
 <body>
 <div class="container">
-    <button class="back-btn" onclick="window.location.href='http://localhost:8080/api/index'">Back</button>
+    <button class="back-btn" onclick="window.location.href='http://localhost:8080/view/index'">Back</button>
     <h1>Create New Board</h1>
     <form class="board-form" id="boardForm">
         <div class="form-group">
@@ -196,24 +209,61 @@
         e.preventDefault();
         const formData = new FormData(boardForm);
         const boardData = {
-            boardName: formData.get('boardName'),
-            teamName: formData.get('teamName'),
-            boardDescription: formData.get('boardDescription'),
-            columns: formData.getAll('columns[]')
+            title: formData.get('boardName'),
+            description: formData.get('boardDescription'),
+            teamName: formData.get('teamName')
         };
-        console.log(JSON.stringify(boardData));
 
         fetch('http://localhost:8080/api/boards', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': Cookies.get('Authorization')
             },
             body: JSON.stringify(boardData)
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create board');
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Success:', data);
-                alert('Board created successfully!');
+                console.log('Board creation response:', data); // 확인용 로그
+
+                if (data.statuscode === '201') {
+                    const boardId = data.data.id;
+                    const columns = Array.from(formData.getAll('columns[]')).map(columnName => ({ category: columnName }));
+
+                    console.log('Columns data to be created:', columns); // 확인용 로그
+
+                    return Promise.all(columns.map(column => {
+                        return fetch(`http://localhost:8080/api/boards/${boardId}/columns`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': Cookies.get('Authorization')
+                            },
+                            body: JSON.stringify(column)
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Failed to create column');
+                                }
+                                return response.json();
+                            })
+                            .catch(error => {
+                                console.error('Error creating column:', error);
+                                throw new Error('Failed to create column');
+                            });
+                    }));
+                } else {
+                    throw new Error('Failed to create board');
+                }
+            })
+            .then(results => {
+                console.log('Columns created:', results);
+                alert('Board and columns created successfully!');
                 boardForm.reset();
                 const columnList = document.getElementById('columnList');
                 while (columnList.children.length > 1) {
@@ -222,7 +272,8 @@
                 updateColumnNumbers();
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error creating board:', error);
+                alert('An error occurred while creating the board and columns.');
             });
     });
 </script>
