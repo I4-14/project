@@ -174,7 +174,7 @@
     <div class="board" id="board">
 
     </div>
-    <button class="add-column-btn" th:onclick="|window.location.href = '@{/api/board/{id}/column(id=${id})}'|">+ Add Column</button>
+    <button class="add-column-btn" th:onclick="|window.location.href = '@{/view/board/{id}/column(id=${id})}'|">+ Add Column</button>
   </div>
 
   <div id="taskModal" class="modal">
@@ -235,11 +235,11 @@
         let columns = result.columnsList[i];
         let column_html = `
                 <div class="column">
-                  <div class="column-header">${columns.column.category} <button id="edit-column-button${i}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/api/column/${columns.column.id}'">Edit Column</button></div>
+                  <div class="column-header">${columns.column.category} <button id="edit-column-button${i}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${columns.column.id}'">Edit Column</button></div>
                   <div class="cards" id="columns${columns.column.id}">
 
                   </div>
-                  <button class="add-card-btn" onclick="window.location.href = '/api/columns/${columns.column.id}/create/card'">+ Add Card</button>
+                  <button class="add-card-btn" onclick="window.location.href = '/view/columns/${columns.column.id}/create/card'">+ Add Card</button>
                 </div>
                 `
         $('#board').append(column_html);
@@ -386,10 +386,6 @@
 
     // Invite button functionality (you can customize this as needed)
     document.querySelector('.invite-btn').addEventListener('click', () => {
-      alert('Invite functionality will be implemented here!');
-    });
-
-    document.querySelector('.edit-btn').addEventListener('click', () => {
       alert('Invite functionality will be implemented here!');
     });
   </script>
