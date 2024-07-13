@@ -46,6 +46,19 @@ public class ViewController {
         return "invitationList";
     }
 
+    @GetMapping("/board/{id}/column")
+    public String createColumnPage(@PathVariable("id") Long id) {
+        return "createColumn";
+    }
+    @GetMapping("/board/{id}")
+    public String kanbanboardPage(@PathVariable("id") Long id) {
+        return "kanbanboard";
+    }
+    @GetMapping("/column/{id}")
+    public String updateColumnPage(@PathVariable("id") Long id) {
+        return "updateColumn";
+    }
+
     @GetMapping("/columns/{id}/create/card")
     public String createCard(@PathVariable("id") Long id) {
         return "createCard";

@@ -28,6 +28,7 @@ public class Columns extends Timestamped {
     private Board board;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(unique = true)
     private CategoryEnum category;
 
     @Column(name = "ordernum")
