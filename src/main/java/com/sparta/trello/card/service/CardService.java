@@ -10,14 +10,12 @@ import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.repository.CardRepository;
 import com.sparta.trello.columns.entity.Columns;
 import com.sparta.trello.columns.services.ColumnsServices;
-import com.sparta.trello.comment.dto.CommentResponseDto;
-import com.sparta.trello.comment.entity.Comment;
 import com.sparta.trello.comment.repository.CommentRepository;
 import com.sparta.trello.comment.service.CommentService;
+import com.sparta.trello.common.exception.CustomException;
+import com.sparta.trello.common.exception.ErrorEnum;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,7 +73,7 @@ public class CardService {
     List<Card> cards = cardRepository.findByColumnIdOrderByPositionAsc(column.getId());
 
     if (newPosition < 0 || newPosition >= cards.size()) {
-      throw new IllegalArgumentException("잘못된 카드 위치번호 입니다.");
+      throw new CustomException(ErrorEnum.WRONG_POSITION_NUMBER);
     }
 
     if(currentPosition < newPosition) {

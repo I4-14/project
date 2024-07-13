@@ -52,9 +52,15 @@ public enum ErrorEnum {
     // Column
     COLUMN_NOT_FOUND(NOT_FOUND, "존재하지 않는 컬럼입니다."),
     SAME_COLUMN(BAD_REQUEST, "같은 컬럼을 선택했습니다."),
-    DUPLICATE_CATEGORY(BAD_REQUEST, "중복된 컬럼 이름이 존재합니다.");
+    DUPLICATE_CATEGORY(BAD_REQUEST, "중복된 컬럼 이름이 존재합니다."),
+
+    // Card
+    CARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 카드입니다."),
+    WRONG_POSITION_NUMBER(BAD_REQUEST, "잘못된 위치번호 입니다."),
 
 
+    // Comment
+    COMMENT_NOT_FOUND(BAD_REQUEST, "등록되지 않은 댓글입니다.");
 
 
     HttpStatus httpStatus;

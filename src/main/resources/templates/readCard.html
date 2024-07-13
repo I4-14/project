@@ -256,13 +256,13 @@
   })
   .then(data => {
     // 받은 데이터를 UI에 반영
-    document.getElementById('cardTitle').textContent = data.title;
-    document.getElementById('cardContent').textContent = data.content;
-    document.getElementById('cardStatus').textContent = data.cardStatus;
-    document.getElementById('cardDueDate').textContent = data.dueDate;
+    document.getElementById('cardTitle').textContent = data.data.title;
+    document.getElementById('cardContent').textContent = data.data.content;
+    document.getElementById('cardStatus').textContent = data.data.cardStatus;
+    document.getElementById('cardDueDate').textContent = data.data.dueDate;
 
     // 댓글 리스트를 불러오는 API 호출
-    return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`);
+  return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`)
   })
   .then(response => {
     if (!response.ok) {
@@ -270,8 +270,10 @@
     }
     return response.json();
   })
-  .then(comments => {
-    // 받은 댓글 데이터를 UI에 반영
+  .then(data => {
+    console.log(data); // Verify the structure of 'data' received
+    const comments = data.data; // Assuming 'data' contains 'data' array with comments
+
     const commentsContainer = document.getElementById('commentsContainer');
     comments.forEach(comment => {
       const newComment = document.createElement('div');
@@ -284,8 +286,8 @@
     });
   })
   .catch(error => {
-    console.error('Error fetching card details:', error);
-    // 에러 처리
+    console.error('Error fetching or parsing comments:', error);
+    // Handle errors appropriately
   });
   function addComment() {
     const commentText = document.getElementById('newCommentText').value;
@@ -309,9 +311,9 @@
       }
       return response.json();
     })
-    .then(comment => {
+    .then(data => {
       // 서버에서 받은 새로운 댓글을 UI에 추가
-      window.location.href = `http://localhost:8080/api/read/card/[[${cardId}]]`;
+      window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
     })
     .catch(error => {
       console.error('댓글 추가 중 오류 발생:', error);
@@ -335,7 +337,7 @@
         console.log('카드가 성공적으로 삭제되었습니다:', data);
         // 필요에 따라 보드로 리다이렉트하거나 UI 업데이트 처리
         // 칸반보드로 이동 필요⭐⭐⭐
-        window.location.href = `http://localhost:8080/api/read/card/[[${cardId}]]`;
+        window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
       })
       .catch(error => {
         console.error('카드 삭제 중 오류 발생:', error);
@@ -346,9 +348,7 @@
       console.log('카드 삭제가 취소되었습니다.');
     }
   }
-
   // 카드 수정 버튼 실행
-
   function editCard() {
     // 모달 창 띄우기
     const modal = document.getElementById('editCardModal');
@@ -388,7 +388,7 @@
       console.log('카드가 성공적으로 수정되었습니다:', data);
       closeModal(); // 수정 완료 후 모달 닫기
 
-      window.location.href = `http://localhost:8080/api/read/card/[[${cardId}]]`;
+      window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
     })
     .catch(error => {
       console.error('카드 수정 중 오류 발생:', error);
