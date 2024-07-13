@@ -28,6 +28,7 @@ public class Columns extends Timestamped {
     private Board board;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(unique = true)
     private CategoryEnum category;
 
     @Column(name = "ordernum")
@@ -46,7 +47,7 @@ public class Columns extends Timestamped {
         this.orderNum++;
     }
 
-    @OneToMany(mappedBy = "columns", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "columns", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Card> cards = new ArrayList<>();
 
 }

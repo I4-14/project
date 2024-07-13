@@ -3,6 +3,7 @@ package com.sparta.trello.view;
 import ch.qos.logback.core.model.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -43,5 +44,28 @@ public class ViewController {
     @GetMapping("/user/invitation")
     public String invitaionPage() {
         return "invitationList";
+    }
+
+    @GetMapping("/board/{id}/column")
+    public String createColumnPage(@PathVariable("id") Long id) {
+        return "createColumn";
+    }
+    @GetMapping("/board/{id}")
+    public String kanbanboardPage(@PathVariable("id") Long id) {
+        return "kanbanboard";
+    }
+    @GetMapping("/column/{id}")
+    public String updateColumnPage(@PathVariable("id") Long id) {
+        return "updateColumn";
+    }
+
+    @GetMapping("/columns/{id}/create/card")
+    public String createCard(@PathVariable("id") Long id) {
+        return "createCard";
+    }
+
+    @GetMapping("/read/card/{cardId}")
+    public String readCard(@PathVariable("cardId") Long id) {
+        return "readCard";
     }
 }

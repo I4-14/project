@@ -1,6 +1,7 @@
 package com.sparta.trello.card.service;
 
 import com.sparta.trello.card.dto.CardCreateRequestDto;
+import com.sparta.trello.card.dto.CardDetailsResponseDto;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
@@ -8,7 +9,9 @@ import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.repository.CardRepository;
 import com.sparta.trello.columns.entity.Columns;
-import com.sparta.trello.columns.repository.ColumnsRepository;
+import com.sparta.trello.columns.services.ColumnsServices;
+import com.sparta.trello.comment.repository.CommentRepository;
+import com.sparta.trello.comment.service.CommentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,22 +22,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardService {
 
   private final CardRepository cardRepository;
-  private final ColumnsRepository columnsRepository;
+  private final ColumnsServices columnsServices;
+  private final CommentService commentService;
+  private final CommentRepository commentRepository;
 
   public List<CardResponseDto> getAllCards(CardSearchCondDto searchCond) {
     List<CardResponseDto> cardList = cardRepository.findCardsInColumn(searchCond);
     return cardList;
   }
 
-  public CardResponseDto getCardDetailsById(Long cardId) {
+  public CardDetailsResponseDto getCardDetailsById(Long cardId) {
     Card card = findCardById(cardId);
-   return new CardResponseDto(card);
+//    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
+   return new CardDetailsResponseDto(card);
   }
 
   @Transactional
   public CardResponseDto createCard(Long id, CardCreateRequestDto requestDto) {
-    Columns columns = findColumnById(id);
+    Columns columns = columnsServices.findById(id);
+    int position= getNextPosition(columns.getId());
     Card card = cardRepository.save(new Card(requestDto, columns));
+    card.setPosition(position);
     return new CardResponseDto(card);
   }
 
@@ -49,52 +57,76 @@ public class CardService {
   @Transactional
   public CardResponseDto updateCardStatus(Long cardId, CardUpdateCardStatusRequestDto requestDto) {
     Card card = findCardById(cardId);
-    Columns column = findColumnById(requestDto.getColumnId());
+    Columns column = columnsServices.findById(requestDto.getColumnId());
     card.updateCardStatus(column, requestDto);
     return new CardResponseDto(card);
   }
 
   @Transactional
-  public CardResponseDto moveCardToPosition(Long cardId, int newPosition) {
+  public void moveCardToPosition(Long cardId, int newPosition) {
     Card card = findCardById(cardId);
-    // 컬럼 구별 필요
-    List<Card> cards = cardRepository.findAll();
+    Columns column = card.getColumns();
+    int currentPosition = card.getPosition();
 
-    int currentPosition = cards.indexOf(card);
-    int changePosition = newPosition - 1;
+    List<Card> cards = cardRepository.findByColumnIdOrderByPositionAsc(column.getId());
 
     if (newPosition < 0 || newPosition >= cards.size()) {
       throw new IllegalArgumentException("잘못된 카드 위치번호 입니다.");
     }
 
-    if (currentPosition != newPosition) {
-      cards.remove(currentPosition);
-      cards.add(changePosition, card);
-      updateCardIndex(cards);
+    if(currentPosition < newPosition) {
+      for(Card c : cards) {
+        if (c.getPosition() > currentPosition && c.getPosition() <= newPosition) {
+          c.setPosition(c.getPosition() - 1);
+          cardRepository.save(c);
+        }
+      }
+    } else {
+      for(Card c : cards) {
+        if(c.getPosition() >= newPosition && c.getPosition() < currentPosition) {
+          c.setPosition(c.getPosition() + 1);
+          cardRepository.save(c);
+        }
+      }
     }
-    return new CardResponseDto(card);
+    updateCardPosition(cardId, newPosition);
+    reorderCards(column.getId());
   }
 
   @Transactional
-  public void deleteCard(Long id) {
-    Card card = findCardById(id);
+  public void deleteCard(Long cardId) {
+    Card card = findCardById(cardId);
 //    card.checkUser(user);
     cardRepository.delete(card);
   }
 
-   // 나중에 columns service에서 가져오기 수정필요**
-  private Columns findColumnById(Long id) {
-    return columnsRepository.findById(id).orElseThrow(
-        ()-> new IllegalArgumentException("해당 컬럼을 찾을 수 없습니다."));
+  private Card findCardById(Long cardId) {
+    return cardRepository.findCardById(cardId);
   }
 
-  private Card findCardById(Long id) {
-    return cardRepository.findCardById(id);
+  private int getNextPosition(Long id) {
+    List<Card> cards = cardRepository.findByColumnIdOrderByPositionAsc(id);
+    if (cards.isEmpty()) {
+      return 0;
+    }
+    return cards.get(cards.size() - 1).getPosition() + 1;
   }
 
-  private void updateCardIndex(List<Card> cards) {
-    for (int i=0; i < cards.size(); i++) {
-      cards.get(i).setPosition(i + 1);
+  private void reorderCards(Long id) {
+    List<Card> cards = cardRepository.findByColumnIdOrderByPositionAsc(id);
+    int position = 0;
+    for(Card card : cards) {
+      if (card.getPosition() != position) {
+        updateCardPosition(card.getId(), position);
+      }
+      position++;
     }
   }
+
+  private void updateCardPosition(Long cardId, int position) {
+    Card card = cardRepository.findCardById(cardId);
+    card.updatePosition(position);
+    cardRepository.save(card);
+  }
+
 }
