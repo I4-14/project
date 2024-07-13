@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -86,6 +83,23 @@ public class AuthController {
         ApiResponse response = ApiResponse.builder()
                 .msg("회원탈퇴 성공")
                 .statuscode(String.valueOf(HttpStatus.NO_CONTENT.value()))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * 토큰 재발급 API
+     *
+     * @param refreshToken 헤더에 존재하는 refreshToken
+     * @return 재발급된 토큰 응답 데이터
+     */
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
+        TokenResponseDto responseDto = authService.refreshToken(refreshToken);
+        ApiResponse response = ApiResponse.builder()
+                .msg("토큰 재발급 성공")
+                .statuscode(String.valueOf(HttpStatus.OK.value()))
+                .data(responseDto)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

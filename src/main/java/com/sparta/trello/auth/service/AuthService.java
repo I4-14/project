@@ -11,6 +11,7 @@ import com.sparta.trello.auth.repository.UserRepository;
 import com.sparta.trello.common.exception.CustomException;
 import com.sparta.trello.common.exception.ErrorEnum;
 import com.sparta.trello.common.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -136,5 +137,39 @@ public class AuthService {
 
         finduser.updateRefresh("");
         finduser.updateStatus(UserStatus.LEAVE);
+    }
+
+    /**
+     * Access Token 이 만료되었을 때, Refresh Token 을 사용하여 새로운 토큰 발급
+     *
+     * @param refreshToken 헤더에 존재하는 refreshToken
+     * @return 재발급된 토큰 응답 데이터
+     */
+    @Transactional
+    public TokenResponseDto refreshToken(String refreshToken) {
+        // 토큰 유효성 및 만료 확인
+        if (!jwtUtil.validateToken(refreshToken) || jwtUtil.isTokenExpired(refreshToken)) {
+            throw new CustomException(ErrorEnum.INVALID_REFRESH_TOKEN);
+        }
+
+        Claims claims = jwtUtil.getUserInfoFromToken(refreshToken);
+        String username = claims.getSubject();
+        Role role = jwtUtil.getRoleFromToken(refreshToken);
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new CustomException(ErrorEnum.USER_NOT_FOUND)
+        );
+
+        // DB에 저장된 리프레시 토큰 검증
+        if (!refreshToken.equals(user.getRefreshToken())) {
+            throw new CustomException(ErrorEnum.UNMATCHED_TOKEN);
+        }
+
+        String newAccessToken = jwtUtil.createAccessToken(username, role);
+        String newRefreshToken = jwtUtil.createRefreshToken(username, role);
+
+        user.updateRefresh(newRefreshToken);
+
+        return new TokenResponseDto(newAccessToken, newRefreshToken);
     }
 }
