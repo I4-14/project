@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CardResponseDto {
 
-  private Long id;
   private int position;
   private String title;
   private String content;
@@ -20,7 +19,6 @@ public class CardResponseDto {
 //  private String username;
 
   public CardResponseDto(Card card) {
-    this.id = card.getId();
     this.position = card.getPosition();
     this.title = card.getTitle();
     this.content = card.getContent();
