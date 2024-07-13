@@ -4,41 +4,44 @@ import ch.qos.logback.core.model.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+@RequestMapping("/view")
 public class ViewController {
-    @GetMapping("/view/auth/signup")
+    @GetMapping("/auth/signup")
     public String signupPage() {
         return "signup";
     }
 
-    @GetMapping(value = {"/view/auth/login","/"})
+    @GetMapping("/auth/login")
     public String loginPage() {
         return "login";
     }
 
-    @GetMapping("/view/index")
+    @GetMapping("/index")
     public String indexPage() {
         return "index";
     }
 
-    @GetMapping("/view/create/board")
+    @GetMapping("/create/board")
     public String createBoardPage() {
         return "createBoard";
     }
 
-    @GetMapping("/view/main")
+    @GetMapping("/main")
     public String mainPage(@RequestParam Long id, Model model) {
+        // todo main 화면을 꾸밀 model을 만들어서 넘겨야 함
         return "main";
     }
 
-    @GetMapping("/view/invite/board")
+    @GetMapping("/invite/board")
     public String inviteUserPage() {
         return "inviteUser";
     }
 
-    @GetMapping("/view/user/invitation")
+    @GetMapping("/user/invitation")
     public String invitaionPage() {
         return "invitationList";
     }
