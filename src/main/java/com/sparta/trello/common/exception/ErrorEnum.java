@@ -42,6 +42,7 @@ public enum ErrorEnum {
     NON_EXISTENT_ELEMENT(BAD_REQUEST,"존재하지 않는 요소입니다."),
 
 
+
     USER_NOT_AUTHENTICATED(UNAUTHORIZED, "인증되지 않은 사용자입니다. 로그인해주세요."),
 
     // Board
@@ -50,6 +51,7 @@ public enum ErrorEnum {
     // Column
     COLUMN_NOT_FOUND(NOT_FOUND, "존재하지 않는 컬럼입니다."),
     SAME_COLUMN(BAD_REQUEST, "같은 컬럼을 선택했습니다."),
+    DUPLICATE_CATEGORY(BAD_REQUEST, "중복된 컬럼 이름이 존재합니다."),
 
     // Card
     CARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 카드입니다."),

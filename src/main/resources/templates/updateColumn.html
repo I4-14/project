@@ -78,6 +78,7 @@
       </div>
       <div class="button-container">
         <button type="submit" class="btn add-btn">Edit Column</button>
+        <button type="button" class="btn add-btn" id="delete">Delete Column</button>
         <button type="button" class="btn back-btn" onclick="history.back()">Back to Board</button>
       </div>
     </form>
@@ -97,8 +98,21 @@
           $('#category').val(result.columnsList)
         }
       })
-    })
-
+    });
+    $('#delete').click(function () {
+      let answer = confirm("정말로 삭제하시겠습니까?(삭제하면 컬럼의 모든 카드가 삭제됩니다.)")
+      if (answer === true) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/columns/[[${id}]]`,
+          success: function (response) {
+            alert('msg : ' + response.msg + '\n' +
+                    'statuscode : ' + response.statuscode + '\n');
+            history.back();
+          }
+        });
+      }
+    });
     columnForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const category = categoryInput.value.trim();
