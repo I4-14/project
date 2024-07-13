@@ -39,7 +39,7 @@ public class CardService {
 
   @Transactional
   public CardResponseDto createCard(Long id, CardCreateRequestDto requestDto) {
-    Columns columns = columnsServices.findById(id);
+    Columns columns = columnsServices.findColumnsById(id);
     int position= getNextPosition(columns.getId());
     Card card = cardRepository.save(new Card(requestDto, columns));
     card.setPosition(position);
@@ -57,7 +57,7 @@ public class CardService {
   @Transactional
   public CardResponseDto updateCardStatus(Long cardId, CardUpdateCardStatusRequestDto requestDto) {
     Card card = findCardById(cardId);
-    Columns column = columnsServices.findById(requestDto.getColumnId());
+    Columns column = columnsServices.findColumnsById(requestDto.getColumnId());
     card.updateCardStatus(column, requestDto);
     return new CardResponseDto(card);
   }
