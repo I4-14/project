@@ -1,7 +1,11 @@
 package com.sparta.trello.common.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.security.UserDetailsServiceImpl;
+import com.sparta.trello.common.exception.CustomException;
+import com.sparta.trello.common.exception.ErrorEnum;
+import com.sparta.trello.common.exception.ExceptionDto;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,8 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             tokenValue = jwtUtil.substringToken(tokenValue);
 
             if (!jwtUtil.validateToken(tokenValue)) {
-                log.error("Token Error");
-                return;
+                throw new CustomException(ErrorEnum.TOKEN_VALIDATE);
             }
 
             Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
@@ -49,8 +52,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             try {
                 setAuthentication(username, role);
             } catch (Exception e) {
-                log.error(e.getMessage());
-                return;
+                log.error("Authentication Error: " + e.getMessage());
+                handleException(res, "Authentication Error: " + e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }
         filterChain.doFilter(req, res);
@@ -72,5 +75,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private Collection<? extends GrantedAuthority> getAuthorities(Role role) {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
+    }
+
+    private void handleException(HttpServletResponse res, String message, int statusCode) throws IOException {
+        res.setStatus(statusCode);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        ExceptionDto response = new ExceptionDto(message, statusCode);
+        res.getWriter().write(new ObjectMapper().writeValueAsString(response));
     }
 }
