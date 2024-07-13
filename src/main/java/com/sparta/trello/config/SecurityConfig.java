@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/boards/**").hasAuthority("MANAGER")
                         // 컬럼 권한
                         .requestMatchers("/api/boards/{id}/columns/**").hasAuthority("MANAGER")
-                        .requestMatchers("/api//columns/{id}/order/{destinationId}").hasAuthority("MANAGER")
+                        .requestMatchers("/api/columns/{id}/order/{destinationId}").hasAuthority("MANAGER")
                         .anyRequest().authenticated()
         );
 
