@@ -42,7 +42,6 @@ public enum ErrorEnum {
     NON_EXISTENT_ELEMENT(BAD_REQUEST,"존재하지 않는 요소입니다."),
 
 
-    COMMENT_NOT_FOUND(BAD_REQUEST, "등록되지 않은 댓글입니다."),
 
     USER_NOT_AUTHENTICATED(UNAUTHORIZED, "인증되지 않은 사용자입니다. 로그인해주세요."),
 
