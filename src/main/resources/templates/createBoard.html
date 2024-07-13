@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
+    <base href="https://websim.ai" />
     <title>KanbanFlow - Create New Board</title>
     <style>
         body {
@@ -10,62 +11,76 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             max-width: 600px;
             margin: 40px auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: relative;
         }
+
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 30px;
         }
+
         .board-form {
             display: flex;
             flex-direction: column;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
             color: #555;
         }
-        input[type="text"], textarea {
+
+        input[type="text"],
+        textarea,
+        select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
         }
+
         textarea {
             height: 100px;
             resize: vertical;
         }
+
         .column-list {
             list-style-type: none;
             padding: 0;
         }
+
         .column-item {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
+
         .column-number {
             font-weight: bold;
             margin-right: 10px;
             min-width: 20px;
         }
-        .column-item input {
+
+        .column-item select {
             flex-grow: 1;
             margin-right: 10px;
         }
+
         .remove-column {
             background-color: #f44336;
             color: white;
@@ -75,6 +90,7 @@
             border-radius: 4px;
             font-size: 14px;
         }
+
         .add-column {
             background-color: #2196F3;
             color: white;
@@ -86,11 +102,13 @@
             width: 100%;
             margin-top: 10px;
         }
+
         .button-container {
             display: flex;
             justify-content: flex-end;
             margin-top: 20px;
         }
+
         .create-btn {
             background-color: #4CAF50;
             border: none;
@@ -103,9 +121,11 @@
             cursor: pointer;
             border-radius: 4px;
         }
+
         .create-btn:hover {
             background-color: #45a049;
         }
+
         .back-btn {
             background-color: #607D8B;
             border: none;
@@ -121,24 +141,153 @@
             top: 10px;
             right: 10px;
         }
+
         .back-btn:hover {
             background-color: #546E7A;
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
-            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6b5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // 토큰 확인
             const token = Cookies.get('Authorization');
             if (!token) {
                 window.location.href = 'http://localhost:8080/'; // 토큰이 없다면 로그인 화면으로 이동
                 return;
             }
+
+            function updateColumnNumbers() {
+                const columns = document.querySelectorAll('.column-item');
+                columns.forEach((column, index) => {
+                    column.querySelector('.column-number').textContent = `${index + 1}.`;
+                });
+            }
+
+            function updateColumnOptions() {
+                const selects = document.querySelectorAll('select[name="columns[]"]');
+                const selectedValues = Array.from(selects).map(select => select.value).filter(value => value !== "");
+
+                selects.forEach(select => {
+                    Array.from(select.options).forEach(option => {
+                        if (option.value && option.value !== "") {
+                            if (selectedValues.includes(option.value) && option.value !== select.value) {
+                                option.style.display = 'none';
+                            } else {
+                                option.style.display = '';
+                            }
+                        }
+                    });
+                });
+            }
+
+            function addColumn() {
+                const columnList = document.getElementById('columnList');
+                if (columnList.children.length >= 4) {
+                    alert('You can only add up to 4 columns.');
+                    return;
+                }
+
+                const newColumn = document.createElement('li');
+                newColumn.className = 'column-item';
+                newColumn.innerHTML = `
+                <span class="column-number"></span>
+                <select name="columns[]" required>
+                    <option value="">Select a column</option>
+                    <option value="BackLog">BackLog</option>
+                    <option value="InProgress">InProgress</option>
+                    <option value="Done">Done</option>
+                    <option value="Emergency">Emergency</option>
+                </select>
+                <button type="button" class="remove-column" onclick="removeColumn(this)">Remove</button>
+              `;
+                columnList.appendChild(newColumn);
+                updateColumnNumbers();
+                updateColumnOptions();
+                newColumn.querySelector('select').addEventListener('change', updateColumnOptions);
+            }
+
+            function removeColumn(button) {
+                const columnList = document.getElementById('columnList');
+                if (columnList.children.length > 1) {
+                    button.closest('.column-item').remove();
+                    updateColumnNumbers();
+                    updateColumnOptions();
+                } else {
+                    alert('You must have at least one column.');
+                }
+            }
+
+            async function createColumn(boardId, columnName) {
+                const response = await fetch(`http://localhost:8080/api/boards/${boardId}/columns`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': Cookies.get('Authorization')
+                    },
+                    body: JSON.stringify({ category: columnName })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to create column: ${columnName}`);
+                }
+
+                return response.json();
+            }
+
+            document.getElementById('boardForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const boardData = {
+                    title: formData.get('boardName'),
+                    description: formData.get('boardDescription'),
+                };
+
+                try {
+                    const boardResponse = await fetch('http://localhost:8080/api/boards', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': Cookies.get('Authorization')
+                        },
+                        body: JSON.stringify(boardData)
+                    });
+
+                    if (!boardResponse.ok) {
+                        throw new Error('Failed to create board');
+                    }
+
+                    const boardResult = await boardResponse.json();
+                    console.log('Board creation response:', boardResult);
+
+                    if (boardResult.statuscode === '201') {
+                        const boardId = boardResult.data.id;
+                        const columns = Array.from(formData.getAll('columns[]')).filter(column => column !== "");
+
+                        for (const column of columns) {
+                            await createColumn(boardId, column);
+                        }
+
+                        alert('Board and columns created successfully!');
+                        window.location.href = 'http://localhost:8080/view/index';
+                    } else {
+                        throw new Error('Failed to create board');
+                    }
+                } catch (error) {
+                    console.error('Error creating board or columns:', error);
+                    alert('An error occurred while creating the board and columns.');
+                }
+            });
+
+            document.getElementById('addColumnButton').addEventListener('click', addColumn);
+
+            // Initialize column options
+            updateColumnOptions();
         });
     </script>
 </head>
+
 <body>
 <div class="container">
     <button class="back-btn" onclick="window.location.href='http://localhost:8080/view/index'">Back</button>
@@ -154,128 +303,31 @@
         </div>
         <div class="form-group">
             <label for="boardDescription">Description:</label>
-            <textarea id="boardDescription" name="boardDescription" placeholder="Enter board description"></textarea>
+            <textarea id="boardDescription" name="boardDescription"
+                      placeholder="Enter board description"></textarea>
         </div>
         <div class="form-group">
             <label>Columns:</label>
             <ul id="columnList" class="column-list">
                 <li class="column-item">
                     <span class="column-number">1.</span>
-                    <input type="text" name="columns[]" required placeholder="Enter column name">
+                    <select name="columns[]" required>
+                        <option value="">Select a column</option>
+                        <option value="BackLog">BackLog</option>
+                        <option value="InProgress">InProgress</option>
+                        <option value="Done">Done</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
                     <button type="button" class="remove-column" onclick="removeColumn(this)">Remove</button>
                 </li>
             </ul>
-            <button type="button" class="add-column" onclick="addColumn()">Add Column</button>
+            <button type="button" id="addColumnButton" class="add-column">Add Column</button>
         </div>
         <div class="button-container">
             <button type="submit" class="create-btn">Create Board</button>
         </div>
     </form>
 </div>
-
-<script>
-    function updateColumnNumbers() {
-        const columns = document.querySelectorAll('.column-item');
-        columns.forEach((column, index) => {
-            column.querySelector('.column-number').textContent = `${index + 1}.`;
-        });
-    }
-
-    function addColumn() {
-        const columnList = document.getElementById('columnList');
-        const newColumn = document.createElement('li');
-        newColumn.className = 'column-item';
-        newColumn.innerHTML = `
-        <span class="column-number"></span>
-        <input type="text" name="columns[]" required placeholder="Enter column name">
-        <button type="button" class="remove-column" onclick="removeColumn(this)">Remove</button>
-      `;
-        columnList.appendChild(newColumn);
-        updateColumnNumbers();
-    }
-
-    function removeColumn(button) {
-        const columnList = document.getElementById('columnList');
-        if (columnList.children.length > 1) {
-            button.closest('.column-item').remove();
-            updateColumnNumbers();
-        } else {
-            alert('You must have at least one column.');
-        }
-    }
-
-    const boardForm = document.getElementById('boardForm');
-    boardForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(boardForm);
-        const boardData = {
-            title: formData.get('boardName'),
-            description: formData.get('boardDescription'),
-            teamName: formData.get('teamName')
-        };
-
-        fetch('http://localhost:8080/api/boards', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': Cookies.get('Authorization')
-            },
-            body: JSON.stringify(boardData)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to create board');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Board creation response:', data); // 확인용 로그
-
-                if (data.statuscode === '201') {
-                    const boardId = data.data.id;
-                    const columns = Array.from(formData.getAll('columns[]')).map(columnName => ({ category: columnName }));
-
-                    console.log('Columns data to be created:', columns); // 확인용 로그
-
-                    return Promise.all(columns.map(column => {
-                        return fetch(`http://localhost:8080/api/boards/${boardId}/columns`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': Cookies.get('Authorization')
-                            },
-                            body: JSON.stringify(column)
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Failed to create column');
-                                }
-                                return response.json();
-                            })
-                            .catch(error => {
-                                console.error('Error creating column:', error);
-                                throw new Error('Failed to create column');
-                            });
-                    }));
-                } else {
-                    throw new Error('Failed to create board');
-                }
-            })
-            .then(results => {
-                console.log('Columns created:', results);
-                alert('Board and columns created successfully!');
-                boardForm.reset();
-                const columnList = document.getElementById('columnList');
-                while (columnList.children.length > 1) {
-                    columnList.removeChild(columnList.lastChild);
-                }
-                updateColumnNumbers();
-            })
-            .catch(error => {
-                console.error('Error creating board:', error);
-                alert('An error occurred while creating the board and columns.');
-            });
-    });
-</script>
 </body>
+
 </html>
