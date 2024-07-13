@@ -1,47 +1,48 @@
 package com.sparta.trello.view;
 
 import ch.qos.logback.core.model.Model;
+import com.sparta.trello.auth.security.UserDetailsImpl;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/api")
 public class ViewController {
-    @GetMapping("/auth/signup")
+    @GetMapping("/view/auth/signup")
     public String signupPage() {
         return "signup";
     }
 
-    @GetMapping("/auth/login")
+    @GetMapping(value = {"/view/auth/login","/"})
     public String loginPage() {
         return "login";
     }
 
-    @GetMapping("/index")
+    @GetMapping("/view/index")
     public String indexPage() {
         return "index";
     }
 
-    @GetMapping("/create/board")
+    @GetMapping("/view/create/board")
     public String createBoardPage() {
         return "createBoard";
     }
 
-    @GetMapping("/main")
+    @GetMapping("/view/main")
     public String mainPage(@RequestParam Long id, Model model) {
-        // todo main 화면을 꾸밀 model을 만들어서 넘겨야 함
         return "main";
     }
 
-    @GetMapping("/invite/board")
+    @GetMapping("/view/invite/board")
     public String inviteUserPage() {
         return "inviteUser";
     }
 
-    @GetMapping("/user/invitation")
+    @GetMapping("/view/user/invitation")
     public String invitaionPage() {
         return "invitationList";
     }
+
 }

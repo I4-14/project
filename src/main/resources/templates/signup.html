@@ -203,7 +203,7 @@
                     console.log('Response from server:', data);
                     if (data.msg == '회원가입 성공') {
                         alert('Sign up successful! Redirecting to login page...');
-                        window.location.href = "http://localhost:8080/user/login"
+                        window.location.href = "http://localhost:8080/"
                     }else{
                         alert('Sign up failed: ' + data.message);
                     }
