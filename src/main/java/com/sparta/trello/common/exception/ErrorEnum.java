@@ -35,6 +35,7 @@ public enum ErrorEnum {
     WITHDRAW_USER(BAD_REQUEST, "탈퇴한 회원입니다."),
     BANNED_USER(FORBIDDEN, "BAN 처리된 사용자입니다."),
     BAD_MANAGER_TOKEN(BAD_REQUEST, "잘못된 암호입니다."),
+    HEADER_NOT_FOUND_REFRESH(BAD_REQUEST,"헤더에 토큰이 존재하지 않습니다."),
 
     // Post
     POST_NOT_FOUND(BAD_REQUEST, "등록되지 않은 게시글입니다."),

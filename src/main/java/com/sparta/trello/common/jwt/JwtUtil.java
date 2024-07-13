@@ -142,7 +142,11 @@ public class JwtUtil {
 
     public String getRefreshJwtFromHeader(HttpServletRequest request) {
         String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new CustomException(ErrorEnum.HEADER_NOT_FOUND_REFRESH);
+        }
         return substringToken(refreshToken);
     }
+
 
 }

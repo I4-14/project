@@ -12,8 +12,11 @@ import com.sparta.trello.common.exception.CustomException;
 import com.sparta.trello.common.exception.ErrorEnum;
 import com.sparta.trello.common.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -142,11 +146,13 @@ public class AuthService {
     /**
      * Access Token 이 만료되었을 때, Refresh Token 을 사용하여 새로운 토큰 발급
      *
-     * @param refreshToken 헤더에 존재하는 refreshToken
+     * @param request HTTP 요청 정보
      * @return 재발급된 토큰 응답 데이터
      */
     @Transactional
-    public TokenResponseDto refreshToken(String refreshToken) {
+    public TokenResponseDto refreshToken(HttpServletRequest request) {
+        String refreshToken = jwtUtil.getRefreshJwtFromHeader(request);
+
         // 토큰 유효성 및 만료 확인
         if (!jwtUtil.validateToken(refreshToken) || jwtUtil.isTokenExpired(refreshToken)) {
             throw new CustomException(ErrorEnum.INVALID_REFRESH_TOKEN);
@@ -161,7 +167,8 @@ public class AuthService {
         );
 
         // DB에 저장된 리프레시 토큰 검증
-        if (!refreshToken.equals(user.getRefreshToken())) {
+        String userRefreshToken = user.getRefreshToken().replace("Bearer ", "");
+        if (!refreshToken.equals(userRefreshToken)) {
             throw new CustomException(ErrorEnum.UNMATCHED_TOKEN);
         }
 

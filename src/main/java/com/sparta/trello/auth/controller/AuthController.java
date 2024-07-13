@@ -7,6 +7,7 @@ import com.sparta.trello.auth.dto.TokenResponseDto;
 import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.auth.service.AuthService;
 import com.sparta.trello.common.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -90,12 +91,12 @@ public class AuthController {
     /**
      * 토큰 재발급 API
      *
-     * @param refreshToken 헤더에 존재하는 refreshToken
+     * @param request HTTP 요청 정보
      * @return 재발급된 토큰 응답 데이터
      */
     @PostMapping("/refresh-token")
-    public ResponseEntity<ApiResponse> refreshToken(@RequestHeader("Refresh-Token") String refreshToken) {
-        TokenResponseDto responseDto = authService.refreshToken(refreshToken);
+    public ResponseEntity<ApiResponse> refreshToken(HttpServletRequest request) {
+        TokenResponseDto responseDto = authService.refreshToken(request);
         ApiResponse response = ApiResponse.builder()
                 .msg("토큰 재발급 성공")
                 .statuscode(String.valueOf(HttpStatus.OK.value()))
