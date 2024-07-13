@@ -1,13 +1,14 @@
 package com.sparta.trello.common.jwt;
 
 import com.sparta.trello.auth.entity.Role;
+import com.sparta.trello.common.exception.CustomException;
+import com.sparta.trello.common.exception.ErrorEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -80,13 +81,13 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            throw new IllegalArgumentException("유효하지 않은 JWT 서명입니다.");
+            throw new CustomException(ErrorEnum.INVALID_TOKEN);
         } catch (UnsupportedJwtException e) {
-            throw new IllegalArgumentException("지원되지 않는 JWT 토큰입니다.");
+            throw new CustomException(ErrorEnum.NOT_SUPPORTED_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("잘못된 JWT 토큰입니다.");
+            throw new CustomException(ErrorEnum.FALSE_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new AccessDeniedException("재로그인 해주세요");
+            throw new CustomException(ErrorEnum.TOKEN_EXPIRATION);
         }
     }
 
@@ -101,7 +102,7 @@ public class JwtUtil {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return substringToken(bearerToken);
         }
-        throw new IllegalArgumentException("Invalid or missing Authorization header");
+        throw new CustomException(ErrorEnum.HEADER_NOT_FOUND_AUTH);
     }
 
     public String getTokenFromRequest(HttpServletRequest req) {
