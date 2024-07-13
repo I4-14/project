@@ -10,14 +10,10 @@ import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.repository.CardRepository;
 import com.sparta.trello.columns.entity.Columns;
 import com.sparta.trello.columns.services.ColumnsServices;
-import com.sparta.trello.comment.dto.CommentResponseDto;
-import com.sparta.trello.comment.entity.Comment;
 import com.sparta.trello.comment.repository.CommentRepository;
 import com.sparta.trello.comment.service.CommentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +39,7 @@ public class CardService {
 
   @Transactional
   public CardResponseDto createCard(Long id, CardCreateRequestDto requestDto) {
-    Columns columns = columnsServices.findById(id);
+    Columns columns = columnsServices.findColumnsById(id);
     int position= getNextPosition(columns.getId());
     Card card = cardRepository.save(new Card(requestDto, columns));
     card.setPosition(position);
@@ -61,7 +57,7 @@ public class CardService {
   @Transactional
   public CardResponseDto updateCardStatus(Long cardId, CardUpdateCardStatusRequestDto requestDto) {
     Card card = findCardById(cardId);
-    Columns column = columnsServices.findById(requestDto.getColumnId());
+    Columns column = columnsServices.findColumnsById(requestDto.getColumnId());
     card.updateCardStatus(column, requestDto);
     return new CardResponseDto(card);
   }
