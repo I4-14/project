@@ -63,11 +63,6 @@
     flex-direction: column;
   }
   .card{
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 20px;
-    transition: transform 0.3s ease;
     text-decoration: none; /* 밑줄 제거 */
     color: inherit; /* 텍스트 색상 상속 */
     display: block; /* 블록 요소로 표시 */
@@ -136,7 +131,7 @@
     text-decoration: none;
     cursor: pointer;
   }
-  .add-column-btn, .add-card-btn, .edit-column-btn {
+  .add-column-btn, .add-card-btn, .edit-column-btn, .reorder-column-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -153,17 +148,22 @@
     display: block;
     margin: 20px auto;
     font-size: 18px;
-    padding: 15px 30px;
   }
   .add-card-btn {
     width: 100%;
     margin-top: auto;
   }
   .edit-column-btn {
-    width: 100px;
+    width: 80px;
+    font-size: 12px;
     margin-top: auto;
   }
-  .reorder-btn {
+  .reorder-column-btn {
+    width: 80px;
+    font-size: 12px;
+    margin-top: auto;
+  }
+  .reorder-card-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -245,7 +245,13 @@
         let columns = result.columnsList[i];
         let column_html = `
                 <div class="column">
-                  <div class="column-header">${columns.column.category} <button id="edit-column-button${i}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${columns.column.id}'">Edit Column</button></div>
+                  <div class="column-header"><span id="column-id${i}" style="display: none">${columns.column.id}</span>${columns.column.category}
+                    <div>
+                      <button id="edit-column-button${i}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${columns.column.id}'">Edit Column</button>
+                      <button id="reorder-column-button${i}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${columns.column.id})" style="display: none">reorder</button>
+                    </div>
+                  </div>
+                  <div id="reorder-column-module${columns.column.id}" style="display: none"><input type="text" id="column-new-position${columns.column.id}"><button onclick="reorderColumnApi(${columns.column.id})">앞으로 이동</button></div>
                   <div class="cards" id="columns${columns.column.id}">
 
                   </div>
@@ -256,15 +262,15 @@
         for (let j = 0; j < columns.column.cards.length; j++) {
           let card = columns.column.cards[j];
           let card_html = `
-                  <button id="reorder-btn${card.id}" class="reorder-btn" onclick="toggleReorderModule(${card.id})" style="display: none">reorder</button>
+                  <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">reorder</button>
                   <div class="task" draggable="true" data-id=${card.id} id="card${card.id}">
-                  <a class="" href="/view/read/card/${card.id}">
-                    <div>${card.id}</div>
+                  <a class="card" href="/view/read/card/${card.id}">
+                    <div id="card-id${j}" style="display: none">${card.id}</div>
                     <div class="task-title">${card.title}</div>
                     <div class="task-description">${card.content}</div>
                   </a>
                   </div>
-                  <div id="reorder-module${card.id}" style="display: none"><input type="text" id="new-position${card.id}"><button onclick="reorderApi(${card.position}, ${card.id})">앞으로 이동</button></div>
+                  <div id="reorder-card-module${card.id}" style="display: none"><input type="text" id="card-new-position${card.id}"><button onclick="reorderCardApi(${card.id})">앞으로 이동</button></div>
           `
           $(`#columns${columns.column.id}`).append(card_html);
 
@@ -277,22 +283,40 @@
         let columns = result.columnsList[i];
         for (let j = 0; j < columns.column.cards.length; j++) {
           let card = columns.column.cards[j];
+          $(`#card-id${j}`).toggle();
           $(`#reorder-btn${card.id}`).toggle();
         }
+        $(`#column-id${i}`).toggle();
         $(`#edit-column-button${i}`).toggle();
+        $(`#reorder-column-button${i}`).toggle();
       }
 
     })
-    function toggleReorderModule(id) {
-      $(`#reorder-module${id}`).toggle();
+    function toggleReorderCardModule(id) {
+      $(`#reorder-card-module${id}`).toggle();
     }
-    function reorderApi(position, id) {
-      let newPositionId = $(`#new-position${id}`).val();
+    function toggleReorderColumnModule(id) {
+      $(`#reorder-column-module${id}`).toggle();
+    }
+    function reorderCardApi(id) {
+      let newPositionId = $(`#card-new-position${id}`).val();
       $.ajax({
         type: 'PUT',
         url: `/api/columns/cards/${id}/position?newPosition=${newPositionId}`,
         success: function (response) {
           alert('msg : ' + response);
+          window.location.reload();
+        }
+      })
+    }
+    function reorderColumnApi(id) {
+      let destinationId = $(`#column-new-position${id}`).val();
+      $.ajax({
+        type: 'POST',
+        url: `/api/columns/${id}/order/${destinationId}`,
+        success: function (response) {
+          alert('msg : ' + response.msg + '\n' +
+                'statuscode : ' + response.statuscode);
           window.location.reload();
         }
       })
