@@ -1,5 +1,6 @@
 package com.sparta.trello.card.dto;
 
+import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.comment.dto.CommentResponseDto;
@@ -16,12 +17,13 @@ public class CardDetailsResponseDto {
   private String content;
   private String dueDate;
   private CategoryEnum cardStatus;
-//  private String username;
+  private String username;
 
   public CardDetailsResponseDto(Card card) {
     this.title = card.getTitle();
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
+    this.username = card.getUser().getUsername();
   }
 }

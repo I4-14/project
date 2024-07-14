@@ -9,8 +9,9 @@ import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.entity.QCard;
-import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.QColumns;
+import com.sparta.trello.common.exception.CustomException;
+import com.sparta.trello.common.exception.ErrorEnum;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -50,12 +51,9 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
 
   private BooleanExpression isWhere (CardSearchCondDto searchCond) {
     BooleanExpression result = null;
-//    if(!searchCond.getUsername().isEmpty()){
-//      return result = card.user.name.eq(searchCond.getUsername());
-//    }
-    if(searchCond.getCardStatus() != null) {
-      return result = card.cardStatus.eq(CategoryEnum.valueOf(searchCond.getCardStatus()));
+    if(searchCond.getUsername().isEmpty()){
+      throw new CustomException(ErrorEnum.USER_NOT_FOUND);
     }
-    return null;
+    return result = card.user.name.eq(searchCond.getUsername());
   }
 }
