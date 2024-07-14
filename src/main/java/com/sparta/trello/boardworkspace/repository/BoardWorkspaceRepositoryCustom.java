@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface BoardWorkspaceRepositoryCustom {
     List<InvitationListDto> findAllBoardWorkspacesByUserId(Long userId);
-
+    List<String> findUsernamesByBoardId(Long boardId);
 }

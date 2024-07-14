@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.trello.board.entity.QBoard;
 import com.sparta.trello.boardworkspace.dto.InvitationListDto;
+import com.sparta.trello.boardworkspace.entity.InvitationEnum;
 import com.sparta.trello.boardworkspace.entity.QBoardWorkspace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -31,6 +32,18 @@ public class BoardWorkspaceRepositoryImpl implements BoardWorkspaceRepositoryCus
                 .from(boardWorkspace)
                 .join(boardWorkspace.board, board)
                 .where(boardWorkspace.user.id.eq(userId))
+                .fetch();
+    }
+
+    @Override
+    public List<String> findUsernamesByBoardId(Long boardId) {
+        QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
+
+        return jpaQueryFactory
+                .select(qBoardWorkspace.user.username)
+                .from(qBoardWorkspace)
+                .where(qBoardWorkspace.board.id.eq(boardId)
+                        .and(qBoardWorkspace.status.eq(InvitationEnum.ACCEPTED)))
                 .fetch();
     }
 }

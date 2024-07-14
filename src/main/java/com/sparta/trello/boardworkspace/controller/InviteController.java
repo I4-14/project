@@ -43,7 +43,7 @@ public class InviteController {
     @GetMapping("/invite/{id}")
     public ResponseEntity<ApiResponse<List<InvitationListDto>>> getInvitationList(@PathVariable("id") Long id) {
         List<InvitationListDto> responseDto= inviteService.getInvitationList(id);
-        ApiResponse<List<InvitationListDto>> response = new ApiResponse("보드 초대 성공", "201", responseDto);
+        ApiResponse<List<InvitationListDto>> response = new ApiResponse("보드 초대 목록보기", "201", responseDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -71,4 +71,16 @@ public class InviteController {
         ApiResponse response = new ApiResponse("보드 초대 거절", "201", null);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+
+    /**
+     *  보드에 있는 사람 목록 보기
+     */
+    @GetMapping("/boards/{boardId}/member")
+    public ResponseEntity<ApiResponse<List<String>>> getBoardMember (@PathVariable("boardId") Long boardId) {
+        List<String> boardMember = inviteService.getBoardMember(boardId);
+        ApiResponse response = new ApiResponse("보드 초대한 사람 목록", "200", boardMember);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
