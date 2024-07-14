@@ -5,13 +5,13 @@ import static com.sparta.trello.card.entity.QCard.card;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.entity.QCard;
-import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.QColumns;
+import com.sparta.trello.common.exception.CustomException;
+import com.sparta.trello.common.exception.ErrorEnum;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -51,12 +51,9 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
 
   private BooleanExpression isWhere (CardSearchCondDto searchCond) {
     BooleanExpression result = null;
-    if(!searchCond.getUsername().isEmpty()){
-      return result = card.user.name.eq(searchCond.getUsername());
+    if(searchCond.getUsername().isEmpty()){
+      throw new CustomException(ErrorEnum.USER_NOT_FOUND);
     }
-    if(searchCond.getCardStatus() != null) {
-      return result = card.cardStatus.eq(CategoryEnum.valueOf(searchCond.getCardStatus()));
-    }
-    return null;
+    return result = card.user.name.eq(searchCond.getUsername());
   }
 }
