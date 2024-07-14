@@ -1,6 +1,8 @@
 package com.sparta.trello.card.entity;
 
 import com.sparta.trello.auth.entity.Role;
+import com.sparta.trello.auth.entity.User;
+import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
@@ -50,9 +52,9 @@ public class Card extends Timestamped {
   @JoinColumn(name = "column_id")
   private Columns columns;
 
-//  @ManyToOne
-//  @JoinColumn(name = "user_id")
-//  private User user;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
 
   @ManyToOne
   @JoinColumn(name = "board_id")
@@ -65,14 +67,13 @@ public class Card extends Timestamped {
   @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Comment> comments = new ArrayList<>();
 
-  public Card(CardCreateRequestDto requestDto, Columns column) {
-    this.board = column.getBoard();
+  public Card(CardCreateRequestDto requestDto, Columns column, User user) {
     this.title = requestDto.getTitle();
     this.cardStatus = column.getCategory();
     this.content = requestDto.getContent();
     this.dueDate = requestDto.getDueDate();
     this.columns = column;
-//    this.user = user;
+    this.user = user;
   }
 
   public void updateCard(CardUpdateRequestDto requestDto) {
@@ -90,9 +91,9 @@ public class Card extends Timestamped {
     this.position = newPosition;
   }
 
-//  public boolean checkUser(User user) {
-//    if (!this.user.getRole().equals(Role.MANAGER) || !this.user.getId().equals(user.getId())) {
-//      throw new IllegalArgumentException("해당 카드의 수정/삭제 권한이 없는 유저입니다.");
-//    } return true;
-//  }
+  public boolean checkUser(User user) {
+    if (!this.user.getRole().equals(Role.MANAGER) || !this.user.getId().equals(user.getId())) {
+      throw new IllegalArgumentException("해당 카드의 수정/삭제 권한이 없는 유저입니다.");
+    } return true;
+  }
 }
