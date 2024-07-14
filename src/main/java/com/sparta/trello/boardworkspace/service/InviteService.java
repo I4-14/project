@@ -68,4 +68,9 @@ public class InviteService {
             // todo 초대받은 기록이 없음
         }
     }
+
+    public List<String> getBoardMember(Long boardId) {
+        List<String> userNameList= boardWorkspaceRepository.findUsernamesByBoardId(boardId);
+        return userNameList;
+    }
 }
