@@ -73,7 +73,7 @@ public class CardController {
   @PutMapping("/cards/{cardId}/position")
   public ResponseEntity<ApiResponse<Integer>> moveCardToPosition(@PathVariable Long cardId, @RequestParam int newPosition, @AuthenticationPrincipal
   UserDetailsImpl userDetails) {
-    cardService.moveCardToPosition(cardId, newPosition - 1, userDetails.getUser().getId());
+    cardService.moveCardToPosition(cardId, newPosition, userDetails.getUser().getId());
     ApiResponse<Integer> response = new ApiResponse<>("카드위치 변경 성공", "200", newPosition);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
