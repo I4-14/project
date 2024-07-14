@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CardResponseDto {
-  
+
+  private Long boardId;
+  private Long columnId;
   private Long id;
   private int position;
   private String title;
@@ -20,6 +22,8 @@ public class CardResponseDto {
 //  private String username;
 
   public CardResponseDto(Card card) {
+    this.boardId = card.getBoard().getId();
+    this.columnId = card.getColumns().getId();
     this.id = card.getId();
     this.position = card.getPosition();
     this.title = card.getTitle();

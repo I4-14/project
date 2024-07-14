@@ -221,7 +221,7 @@
         <button class="btn submit-comment" onclick="addComment()">Submit Comment</button>
         <button class="btn edit-btn" onclick="editCard()">Edit Card</button>
         <button class="btn delete-btn" onclick="deleteCard()">Delete Card</button>
-        <button class="btn back-btn" onclick="window.location.href='https://websim.ai/kanban-board'">Back to Board</button>
+        <button class="btn back-btn" onclick="redirectToBoard()">Back to Board</button>
       </div>
     </div>
   </div>
@@ -335,9 +335,9 @@
       })
       .then(data => {
         console.log('카드가 성공적으로 삭제되었습니다:', data);
-        // 필요에 따라 보드로 리다이렉트하거나 UI 업데이트 처리
-        // 칸반보드로 이동 필요⭐⭐⭐
-        window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
+        // 보드 페이지로 리다이렉트
+        const boardId = data.data;
+        window.location.href = `http://localhost:8080/view/board/${boardId}`;
       })
       .catch(error => {
         console.error('카드 삭제 중 오류 발생:', error);
@@ -387,14 +387,16 @@
     .then(data => {
       console.log('카드가 성공적으로 수정되었습니다:', data);
       closeModal(); // 수정 완료 후 모달 닫기
-
-      window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
+      window.location.reload();
     })
     .catch(error => {
       console.error('카드 수정 중 오류 발생:', error);
       // 오류 처리, 오류 메시지 표시 등
     });
-
+  }
+  function redirectToBoard() {
+    // 보드 페이지로 리다이렉트
+    history.back();
   }
 </script>
 </body></html>

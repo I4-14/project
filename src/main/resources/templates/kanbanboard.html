@@ -298,17 +298,47 @@
     function toggleReorderColumnModule(id) {
       $(`#reorder-column-module${id}`).toggle();
     }
-    function reorderCardApi(id) {
-      let newPositionId = $(`#card-new-position${id}`).val();
+
+    $(document).ready(function() {
+      // 드래그 앤 드롭 이벤트 리스너 등록
+      document.addEventListener('dragstart', function(event) {
+        // 드래그되는 요소의 데이터로 카드 ID를 설정합니다
+        event.dataTransfer.setData('cardId', event.target.dataset.id);
+      });
+
+      // 드롭 이벤트 리스너 등록
+      document.addEventListener('drop', function(event) {
+        event.preventDefault();
+        const cardId = event.dataTransfer.getData('cardId');
+        const newPosition = event.target.dataset.position; // 드롭한 위치의 데이터로 새로운 위치를 설정합니다
+
+        if (cardId && newPosition) {
+          moveCardToPosition(cardId, parseInt(newPosition));
+        }
+      });
+
+      // 드래그된 요소가 드롭 가능한 영역 위에 있을 때의 이벤트 처리
+      document.addEventListener('dragover', function(event) {
+        event.preventDefault();
+      });
+    });
+    function moveCardToPosition(cardId, newPosition) {
       $.ajax({
         type: 'PUT',
-        url: `/api/columns/cards/${id}/position?newPosition=${newPositionId}`,
+        url: `/api/columns/cards/${cardId}/position`,
+        data: {
+          newPosition: newPosition
+        },
         success: function (response) {
-          alert('msg : ' + response);
-          window.location.reload();
+          alert('카드 위치 변경 성공: ' + response);
+          window.location.reload();  // 페이지 리로드 또는 필요한 동작 수행
+        },
+        error: function (xhr, status, error) {
+          alert('카드 위치 변경 실패: ' + error);
         }
-      })
+      });
     }
+
     function reorderColumnApi(id) {
       let destinationId = $(`#column-new-position${id}`).val();
       $.ajax({
@@ -421,6 +451,7 @@
     // });
 
     // Invite button functionality (you can customize this as needed)
+
     document.querySelector('.invite-btn').addEventListener('click', () => {
       alert('Invite functionality will be implemented here!');
     });

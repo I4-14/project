@@ -74,8 +74,8 @@ public class CardController {
 
   @DeleteMapping("/cards/{id}")
   public ResponseEntity<ApiResponse<Long>> deleteCard(@PathVariable Long id) {
-  cardService.deleteCard(id);
-  ApiResponse<Long> response = new ApiResponse<>("카드 삭제 성공", "200", id);
+  Long boardId = cardService.deleteCard(id);
+  ApiResponse<Long> response = new ApiResponse<>("카드 삭제 성공", "200", boardId);
   return new ResponseEntity<>(response, HttpStatus.OK);
   }
 

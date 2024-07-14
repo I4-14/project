@@ -35,7 +35,6 @@ public class ViewController {
         // todo main 화면을 꾸밀 model을 만들어서 넘겨야 함
         return "main";
     }
-
     @GetMapping("/invite/board")
     public String inviteUserPage() {
         return "inviteUser";
@@ -50,16 +49,18 @@ public class ViewController {
     public String createColumnPage(@PathVariable("id") Long id) {
         return "createColumn";
     }
+
     @GetMapping("/board/{id}")
     public String kanbanboardPage(@PathVariable("id") Long id) {
         return "kanbanboard";
     }
+
     @GetMapping("/column/{id}")
     public String updateColumnPage(@PathVariable("id") Long id) {
         return "updateColumn";
     }
 
-    @GetMapping("/columns/{id}/create/card")
+    @GetMapping("/column/{id}/create/card")
     public String createCard(@PathVariable("id") Long id) {
         return "createCard";
     }

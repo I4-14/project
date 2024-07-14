@@ -1,5 +1,6 @@
 package com.sparta.trello.card.service;
 
+import com.sparta.trello.board.dto.BoardResponseDto;
 import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardDetailsResponseDto;
 import com.sparta.trello.card.dto.CardResponseDto;
@@ -8,6 +9,7 @@ import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.repository.CardRepository;
+import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.Columns;
 import com.sparta.trello.columns.services.ColumnsServices;
 import com.sparta.trello.comment.repository.CommentRepository;
@@ -96,10 +98,11 @@ public class CardService {
   }
 
   @Transactional
-  public void deleteCard(Long cardId) {
+  public Long deleteCard(Long cardId) {
     Card card = findCardById(cardId);
 //    card.checkUser(user);
     cardRepository.delete(card);
+    return card.getBoard().getId();
   }
 
   private Card findCardById(Long cardId) {

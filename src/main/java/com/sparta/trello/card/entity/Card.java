@@ -1,5 +1,7 @@
 package com.sparta.trello.card.entity;
 
+import com.sparta.trello.auth.entity.Role;
+import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
@@ -52,6 +54,10 @@ public class Card extends Timestamped {
 //  @JoinColumn(name = "user_id")
 //  private User user;
 
+  @ManyToOne
+  @JoinColumn(name = "board_id")
+  private Board board;
+
   @Enumerated(EnumType.STRING)
   @Column(name= "card_status")
   private CategoryEnum cardStatus;
@@ -60,8 +66,9 @@ public class Card extends Timestamped {
   private List<Comment> comments = new ArrayList<>();
 
   public Card(CardCreateRequestDto requestDto, Columns column) {
+    this.board = column.getBoard();
     this.title = requestDto.getTitle();
-    this.cardStatus = CategoryEnum.valueOf(requestDto.getCardStatus());
+    this.cardStatus = column.getCategory();
     this.content = requestDto.getContent();
     this.dueDate = requestDto.getDueDate();
     this.columns = column;
