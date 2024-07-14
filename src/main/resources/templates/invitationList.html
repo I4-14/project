@@ -129,46 +129,48 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6b5Ebd07/g=" crossorigin="anonymous" w-tid="10"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js" w-tid="11"></script>
 
 <script w-tid="12">
-    document.addEventListener('DOMContentLoaded', function() {
-        // 토큰 확인
+    $(document).ready(function() {
         const token = Cookies.get('Authorization');
+        console.log(token);
         if (!token) {
-            window._tmk11himl4b.href = 'http://localhost:8080/'; // 토큰이 없다면 로그인 화면으로 이동
+            window.location.href = 'http://localhost:8080/'; // 토큰이 없으면 로그인 페이지로 리다이렉트
             return;
         }
 
-        // 가상의 초대 데이터
-        const mockInvitations = [
-            { id: 1, title: "Project X", description: "Collaborative project for innovation", status: "PENDING" },
-            { id: 2, title: "Team Alpha", description: "Task management for Alpha team", status: "ACCEPTED" },
-            { id: 3, title: "Marketing Board", description: "Q3 Marketing campaign planning", status: "DECLINED" },
-            { id: 4, title: "Bug Tracker", description: "Tracking and managing software bugs", status: "PENDING" }
-        ];
+        // 초대 데이터를 API에서 가져옴
+        $.ajax({
+            url: 'http://localhost:8080/api/invite',
+            type: 'GET',
+            headers: {
+                'Authorization': token
+            },
+            success: function(data) {
+                const invitationList = $('#invitationList');
+                data.data.forEach(function(invitation) {
+                    const card = $('<div>').addClass('invitation-card')
+                        .html(`
+                                          <h2 class="invitation-title">${invitation.title}</h2>
+                                          <p class="invitation-description">${invitation.description}</p>
+                                          <p class="invitation-status status-${invitation.status.toLowerCase()}">
+                                              ${getStatusIcon(invitation.status)}
+                                              Status: ${invitation.status}
+                                          </p>
+                                          ${getActionButtons(invitation.status, invitation.id)}
+                                      `);
+                    invitationList.append(card);
 
-        const invitationList = document.getElementById('invitationList');
-
-        mockInvitations.forEach(invitation => {
-            const card = document.createElement('div');
-            card.classList.add('invitation-card');
-            card.innerHTML = `
-                <h2 class="invitation-title">${invitation.title}</h2>
-                <p class="invitation-description">${invitation.description}</p>
-                <p class="invitation-status status-${invitation.status.toLowerCase()}">
-                    ${getStatusIcon(invitation.status)}
-                    Status: ${invitation.status}
-                </p>
-                ${getActionButtons(invitation.status, invitation.id)}
-            `;
-            invitationList.appendChild(card);
-        });
-
-        // 수락 및 거절 버튼에 이벤트 리스너 추가
-        document.querySelectorAll('.btn-accept, .btn-decline').forEach(button => {
-            button.addEventListener('click', handleInvitationResponse);
+                    // 수락 및 거절 버튼에 이벤트 리스너 추가
+                    card.find('.btn-accept, .btn-decline').click(handleInvitationResponse);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching data:', error);
+                // 에러 처리 (예: 에러 메시지 표시)
+            }
         });
     });
 
@@ -188,34 +190,34 @@
     function getActionButtons(status, id) {
         if (status === 'PENDING') {
             return `
-                <div class="invitation-actions">
-                    <button class="btn btn-accept" data-id="${id}">Accept</button>
-                    <button class="btn btn-decline" data-id="${id}">Decline</button>
-                </div>
-            `;
+            <div class="invitation-actions">
+                <button class="btn btn-accept" data-id="${id}">Accept</button>
+                <button class="btn btn-decline" data-id="${id}">Decline</button>
+            </div>
+        `;
         }
         return '';
     }
 
     function handleInvitationResponse(event) {
-        const button = event.target;
-        const invitationId = button.getAttribute('data-id');
-        const action = button.classList.contains('btn-accept') ? 'accept' : 'decline';
+        const button = $(event.target);
+        const invitationId = button.data('id');
+        const action = button.hasClass('btn-accept') ? 'accept' : 'decline';
         const card = button.closest('.invitation-card');
-        const statusElement = card.querySelector('.invitation-status');
+        const statusElement = card.find('.invitation-status');
 
         // 여기서 실제로는 서버에 요청을 보내야 합니다.
         // 이 예제에서는 즉시 UI를 업데이트합니다.
         if (action === 'accept') {
-            statusElement.innerHTML = `${getStatusIcon('ACCEPTED')}Status: ACCEPTED`;
-            statusElement.className = 'invitation-status status-accepted';
+            statusElement.html(`${getStatusIcon('ACCEPTED')}Status: ACCEPTED`);
+            statusElement.removeClass().addClass('invitation-status status-accepted');
         } else {
-            statusElement.innerHTML = `${getStatusIcon('DECLINED')}Status: DECLINED`;
-            statusElement.className = 'invitation-status status-declined';
+            statusElement.html(`${getStatusIcon('DECLINED')}Status: DECLINED`);
+            statusElement.removeClass().addClass('invitation-status status-declined');
         }
 
         // 버튼 제거
-        card.querySelector('.invitation-actions').remove();
+        card.find('.invitation-actions').remove();
     }
 </script>
 </body></html>
