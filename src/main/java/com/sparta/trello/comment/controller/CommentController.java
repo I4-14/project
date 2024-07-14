@@ -1,5 +1,7 @@
 package com.sparta.trello.comment.controller;
 
+import com.sparta.trello.auth.entity.User;
+import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.comment.dto.CommentRequestDto;
 import com.sparta.trello.comment.dto.CommentResponseDto;
 import com.sparta.trello.comment.service.CommentService;
@@ -9,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,15 +29,16 @@ public class CommentController {
 
   @PostMapping("/{cardId}/comments")
   public ResponseEntity<ApiResponse<CommentResponseDto>> createComment(@PathVariable Long cardId,
-      @RequestBody @Valid CommentRequestDto requestDto) {
-    CommentResponseDto comment = commentService.createComment(cardId, requestDto);
+      @RequestBody @Valid CommentRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    CommentResponseDto comment = commentService.createComment(cardId, requestDto, userDetails.getUser().getId());
     ApiResponse<CommentResponseDto> response = new ApiResponse<>("댓글 추가 성공", "201", comment);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
   @GetMapping("/{cardId}/comments")
-  public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId) {
-    List<CommentResponseDto> comments = commentService.getComments(page - 1, amount, cardId);
+  public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId, @AuthenticationPrincipal
+      UserDetailsImpl userDetails) {
+    List<CommentResponseDto> comments = commentService.getComments(page - 1, amount, cardId, userDetails.getUser().getId());
     ApiResponse<List<CommentResponseDto>> response = new ApiResponse<>("댓글 조회 성공", "200", comments);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }

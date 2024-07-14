@@ -1,5 +1,6 @@
 package com.sparta.trello.comment.entity;
 
+import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.comment.dto.CommentRequestDto;
 import com.sparta.trello.common.Timestamped;
