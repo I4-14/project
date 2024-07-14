@@ -148,8 +148,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var boardContainer = document.querySelector('.board');
-    var id = 1;
-
+    var id = 2;
     // Function to fetch board data and update UI
     function fetchAndRenderBoard() {
       fetch(`http://localhost:8080/api/boards/${id}`)
