@@ -40,7 +40,6 @@ public class CardService {
   public CardDetailsResponseDto getCardDetailsById(Long cardId, Long userId) {
     User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
-    card.checkUser(user);
 //    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
    return new CardDetailsResponseDto(card);
   }
