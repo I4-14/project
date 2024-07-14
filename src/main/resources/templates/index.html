@@ -1,4 +1,6 @@
-<html><head><base href="https://websim.ai"/>
+<html>
+<head>
+    <base href="https://websim.ai"/>
     <meta charset="UTF-8">
     <title>KanbanFlow - Your Boards</title>
     <style>
@@ -33,9 +35,10 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
             transition: transform 0.3s ease;
-            text-decoration: none;
             color: inherit;
             display: block;
+            position: relative;
+            cursor: pointer;
         }
 
         .board-card:hover {
@@ -131,12 +134,138 @@
             top: 10px;
             right: 10px;
         }
+
+        .edit-mode-button {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 16px;
+            margin: 20px 0 20px auto;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-mode-button.active {
+            background-color: #f44336;
+        }
+
+        .edit-buttons {
+            display: none;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        .edit-buttons button {
+            margin-left: 5px;
+            padding: 5px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .edit-button {
+            color: #4CAF50;
+        }
+
+        .delete-button {
+            color: #f44336;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* modal */
+        .modal input[type="text"],
+        .modal textarea {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .modal button:hover {
+            opacity: 0.8;
+        }
+
+        /* Delete Confirmation Modal Styles */
+        .delete-modal .modal-content {
+            background-color: #fff;
+            border: 1px solid #f44336;
+        }
+
+        .delete-modal .modal-content h2 {
+            color: #f44336;
+        }
+
+        .delete-modal .modal-content button.confirm-delete {
+            background-color: #f44336;
+        }
+
+        .delete-modal .modal-content button.cancel {
+            background-color: #ddd;
+            color: #333;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
 <div class="container">
     <button class="logout" onclick="logout()">Logout</button>
-    <a href="#" class="view-invitations">View Invitations</a>
+    <a href="http://localhost:8080/view/user/invitation" class="view-invitations">View Invitations</a>
     <h1>Your Kanban Boards</h1>
 
     <div class="search-bar">
@@ -144,18 +273,157 @@
         <button class="search-button">Search</button>
     </div>
 
+    <button class="edit-mode-button" onclick="toggleEditMode()">Edit Boards</button>
+
     <div class="boards-grid" id="boardsGrid">
 
     </div>
 
-    <a href="#" class="create-board" id="createBoardLink">Create New Board</a>
+    <a href="http://localhost:8080/view/create/board" class="create-board" id="createBoardLink">Create New Board</a>
 </div>
+
+<!-- Edit Board Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <h2>Edit Board</h2>
+        <input type="hidden" id="editBoardId">
+        <label for="editBoardTitle">Board Title</label>
+        <input type="text" id="editBoardTitle" placeholder="Enter board title">
+        <label for="editBoardInfo">Board Info</label>
+        <textarea id="editBoardInfo" placeholder="Enter board info"></textarea>
+        <label for="editBoardTeam">Board Team</label>
+        <input type="text" id="editBoardTeam" placeholder="Enter board team">
+        <button onclick="saveBoardChanges()">Save Changes</button>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal delete-modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>Confirm Delete</h2>
+        <p>Are you sure you want to delete this board?</p>
+        <input type="hidden" id="deleteBoardId">
+        <button class="confirm-delete" onclick="deleteBoard()">Delete</button>
+        <button class="cancel" onclick="closeDeleteModal()">Cancel</button>
+    </div>
+</div>
+
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonwebtoken/8.5.1/jsonwebtoken.min.js"></script>
 
 <script>
+    let editMode = false;
+
+    function toggleEditMode() {
+        editMode = !editMode;
+        const editModeButton = document.querySelector('.edit-mode-button');
+        const editButtons = document.querySelectorAll('.edit-buttons');
+        if (editMode) {
+            editModeButton.classList.add('active');
+            editModeButton.textContent = 'Exit Edit Mode';
+            editButtons.forEach(button => button.style.display = 'block');
+        } else {
+            editModeButton.classList.remove('active');
+            editModeButton.textContent = 'Edit Boards';
+            editButtons.forEach(button => button.style.display = 'none');
+        }
+    }
+
+    function openEditModal(boardId, title, info, team) {
+        document.getElementById('editBoardId').value = boardId;
+        document.getElementById('editBoardTitle').value = title;
+        document.getElementById('editBoardInfo').value = info;
+        document.getElementById('editBoardTeam').value = team;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    function saveBoardChanges() {
+        const boardId = document.getElementById('editBoardId').value;
+        const title = document.getElementById('editBoardTitle').value;
+        const info = document.getElementById('editBoardInfo').value;
+        const team = document.getElementById('editBoardTeam').value;
+        const token = Cookies.get('Authorization'); // Retrieve the token
+
+        // Data to be sent in the POST request
+        const requestData = {
+            title: title,
+            description: info
+        };
+
+        // Send the POST request to update the board
+        fetch(`http://localhost:8080/api/boards/${boardId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.msg);
+                if (data.statuscode=="200") {
+                    const boardCard = document.querySelector(`.board-card[data-board-id="${boardId}"]`);
+
+                    boardCard.querySelector('.board-title').textContent = title;
+                    boardCard.querySelector('.board-info').textContent = info;
+                    boardCard.querySelector('.board-team').textContent = `Team: ${team}`;
+
+                    closeEditModal();
+                } else {
+                    console.error('Failed to update board:', data.message);
+                }
+            })
+            .catch(error => console.error('Error updating board:', error));
+    }
+
+    function openDeleteModal(boardId) {
+        document.getElementById('deleteBoardId').value = boardId;
+        document.getElementById('deleteModal').style.display = 'block';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    function deleteBoard() {
+        const boardId = document.getElementById('deleteBoardId').value;
+        const token = Cookies.get('Authorization'); // Retrieve the token
+
+        fetch(`http://localhost:8080/api/boards/${boardId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    // Board successfully deleted
+                    const boardCard = document.querySelector(`.board-card[data-board-id="${boardId}"]`);
+                    boardCard.remove();
+                    closeDeleteModal();
+                } else {
+                    // Handle other status codes
+                    console.error('Failed to delete board. Status code:', response.status);
+                    // Optionally, display an error message or handle it in a way suitable for your application
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting board:', error);
+                // Handle network errors or other exceptions
+            });
+    }
+
+
     document.addEventListener('DOMContentLoaded', function () {
         // 토큰 확인
         const token = Cookies.get('Authorization');
@@ -171,7 +439,7 @@
             }
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
 
@@ -189,7 +457,6 @@
         }
 
 
-
         fetch('http://localhost:8080/api/boards', {
             headers: {
                 'Authorization': token
@@ -198,7 +465,7 @@
             .then(response => {
                 if (response.status === 403) {
                     // 403 에러 처리: 토큰 삭제 및 로그인 페이지로 리디렉션
-                    Cookies.remove('Authorization', { path: '/' });
+                    Cookies.remove('Authorization', {path: '/'});
                     window.location.href = 'http://localhost:8080/';
                     throw new Error('Unauthorized access - Token removed');
                 }
@@ -209,15 +476,33 @@
 
                 data.data.forEach(board => {
                     console.log(board);
-                    const card = document.createElement('a');
+                    const card = document.createElement('div');
                     card.classList.add('board-card');
-                    card.href = `http://localhost:8080/view/board/${board.id}`;
-                    card.setAttribute('data-id', board.id); // ID 값을 data-id 속성에 저장
+                    card.setAttribute('data-href', `http://localhost:8080/view/board/${board.id}`);
+                    card.setAttribute('data-board-id', board.id);
                     card.innerHTML = `
-                    <h2 class="board-title">${board.title}</h2>
-                    <p class="board-info">${board.description}</p>
-                `;
+                <h2 class="board-title">${board.title}</h2>
+                <p class="board-info">${board.description}</p>
+                <span class="board-team">Team: ${board.team}</span>
+                <div class="edit-buttons">
+                    <button class="edit-button" onclick="openEditModal(${board.id}, '${board.title}', '${board.description}', '${board.team}')">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="delete-button" onclick="openDeleteModal(${board.id})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
                     boardsGrid.appendChild(card);
+                });
+
+                // 여기에 board-card 클릭 이벤트 리스너 추가
+                document.querySelectorAll('.board-card').forEach(card => {
+                    card.addEventListener('click', function (event) {
+                        if (!editMode && !event.target.closest('.edit-buttons')) {
+                            window.location.href = card.getAttribute('data-href');
+                        }
+                    });
                 });
             })
             .catch(error => console.error('Error fetching boards:', error));
@@ -229,7 +514,8 @@
 
         boardCards.forEach(card => {
             const title = card.querySelector('.board-title').textContent.toLowerCase();
-            if (title.includes(searchTerm)) {
+            const info = card.querySelector('.board-info').textContent.toLowerCase();
+            if (title.includes(searchTerm) || info.includes(searchTerm)) {
                 card.style.display = 'block';
             } else {
                 card.style.display = 'none';
@@ -237,15 +523,6 @@
         });
     });
 
-    document.querySelector('.create-board').addEventListener('click', function (event) {
-        event.preventDefault();
-        window.location.href = 'http://localhost:8080/view/create/board';
-    });
-
-    document.querySelector('.view-invitations').addEventListener('click', function (event) {
-        event.preventDefault();
-        window.location.href = 'http://localhost:8080/view/user/invitation';
-    });
 
     function logout() {
         const token = Cookies.get('Authorization');
@@ -269,6 +546,8 @@
             })
             .catch(error => console.error('Error during logout:', error));
     }
+
+
 </script>
 </body>
 </html>
