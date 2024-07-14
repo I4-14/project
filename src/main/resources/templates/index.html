@@ -174,7 +174,6 @@
                     div.setAttribute('id', `board-${board.id}`)
                     div.innerHTML = `
                         <button id="edit-board${board.id}" class="reorder-card-btn" style="display: none" onclick="window.location.href='http://localhost:8080/view/update/board/${board.id}'">edit</button>
-                        <button id="reorder-board${board.id}" class="reorder-card-btn" style="display: none" onclick="toggleReorderModule(${board.id})">reorder</button>
                     `
                     boardsGrid.appendChild(div);
 
@@ -184,7 +183,6 @@
                     card.href = `http://localhost:8080/api/main?id=${board.id}`;
                     card.setAttribute('data-id', board.id); // ID 값을 data-id 속성에 저장
                     card.innerHTML = `
-            <p id="board-id${board.id}" class="board-info" style="display: none;">${board.id}</p>
             <h2 class="board-title">${board.title}</h2>
             <p class="board-info">${board.description}</p>
           `;
@@ -203,17 +201,9 @@
     });
     $('#edit-btn').click(function () {
         res.data.forEach(board => {
-            $(`#board-id${board.id}`).toggle();
             $(`#edit-board${board.id}`).toggle();
-            $(`#reorder-board${board.id}`).toggle();
         })
     });
-    function toggleReorderModule(id) {
-        $(`#reorder-module${id}`).toggle();
-    }
-    function reorderBoardApi(id) {
-
-    }
     document.querySelector('.search-button').addEventListener('click', function() {
         const searchTerm = document.querySelector('.search-input').value.toLowerCase();
         const boardCards = document.querySelectorAll('.board-card');
