@@ -239,7 +239,27 @@
           addHTML(result);
         }
       })
+      var boardContainer = document.querySelector('.board');
+      // Event listener for drop operation
+      boardContainer.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+
+      boardContainer.addEventListener('drop', function (event) {
+        event.preventDefault();
+        var taskId = event.dataTransfer.getData('text/plain');
+        var targetTask = event.target.closest('.task');
+        console.log(taskId);
+        console.log(targetTask);
+        if (targetTask) {
+          var newPosition = Array.from(targetTask.parentNode.parentNode.children).indexOf(targetTask.parentNode);
+          // var newPosition = targetTask.getAttribute("data-id"); // 1-based index
+          console.log(newPosition);
+          reorderCardApi(taskId, newPosition + 1);
+        }
+      });
     })
+
     function addHTML(result) {
       for (let i = 0; i < result.columnsList.length; i++) {
         let columns = result.columnsList[i];
@@ -262,28 +282,41 @@
         for (let j = 0; j < columns.column.cards.length; j++) {
           let card = columns.column.cards[j];
           let card_html = `
-                  <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">reorder</button>
-                  <div class="task" draggable="true" data-id=${card.id} id="card${card.id}">
-                  <a class="card" href="/view/read/card/${card.id}">
-                    <div id="card-id${j}" style="display: none">${card.id}</div>
-                    <div class="task-title">${card.title}</div>
-                    <div class="task-description">${card.content}</div>
-                  </a>
-                  </div>
-                  <div id="reorder-card-module${card.id}" style="display: none"><input type="text" id="card-new-position${card.id}"><button onclick="reorderCardApi(${card.id})">앞으로 이동</button></div>
-          `
+                        <div>
+                          <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">reorder</button>
+                          <div class="task" draggable="false" data-id=${card.id} id="card${card.id}">
+                            <a class="card" id="read-href${card.id}" href="/view/read/card/${card.id}">
+                              <div id="card-id${j}" style="display: none">${card.id}</div>
+                              <div class="task-title">${card.title}</div>
+                              <div class="task-description">${card.content}</div>
+                            </a>
+                          </div>
+                          <div id="reorder-card-module${card.id}" style="display: none"><input type="text" id="card-new-position${card.id}"><button onclick="reorderCardApi(${card.id})">앞으로 이동</button></div>
+                        </div>
+              `
           $(`#columns${columns.column.id}`).append(card_html);
-
+          var cardElement = document.getElementById(`card${card.id}`);
+          cardElement.addEventListener('dragstart', function (event) {
+            event.dataTransfer.setData('text/plain', card.id.toString());
+          })
         }
       }
 
     }
+
     $('#edit-btn').click(function () {
       for (let i = 0; i < result.columnsList.length; i++) {
         let columns = result.columnsList[i];
         for (let j = 0; j < columns.column.cards.length; j++) {
           let card = columns.column.cards[j];
           $(`#card-id${j}`).toggle();
+          if ($(`#card${card.id}`).attr("draggable") === "false") {
+            $(`#card${card.id}`).attr("draggable", "true");
+            $(`#read-href${card.id}`).bind('click', false);
+          } else if ($(`#card${card.id}`).attr("draggable") === "true") {
+            $(`#card${card.id}`).attr("draggable", "false");
+            $(`#read-href${card.id}`).unbind('click', false);
+          }
           $(`#reorder-btn${card.id}`).toggle();
         }
         $(`#column-id${i}`).toggle();
@@ -292,23 +325,27 @@
       }
 
     })
+
     function toggleReorderCardModule(id) {
       $(`#reorder-card-module${id}`).toggle();
     }
+
     function toggleReorderColumnModule(id) {
       $(`#reorder-column-module${id}`).toggle();
     }
-    function reorderCardApi(id) {
-      let newPositionId = $(`#card-new-position${id}`).val();
+
+    function reorderCardApi(id, newPosition) {
       $.ajax({
         type: 'PUT',
-        url: `/api/columns/cards/${id}/position?newPosition=${newPositionId}`,
+        url: `/api/columns/cards/${id}/position?newPosition=${newPosition}`,
         success: function (response) {
-          alert('msg : ' + response);
+          alert('msg : ' + response.msg + '\n' +
+                  'statuscode : ' + response.statuscode);
           window.location.reload();
         }
       })
     }
+
     function reorderColumnApi(id) {
       let destinationId = $(`#column-new-position${id}`).val();
       $.ajax({
@@ -321,6 +358,7 @@
         }
       })
     }
+
     document.querySelectorAll('.column').forEach(column => {
       column.addEventListener('dragover', (e) => {
         e.preventDefault();
