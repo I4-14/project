@@ -52,11 +52,11 @@
       padding: 10px;
       margin-bottom: 10px;
     }
-    .comment-author {
+    .comment-username {
       font-weight: bold;
       margin-bottom: 5px;
     }
-    .comment-date {
+    .comment-createdAt {
       font-size: 12px;
       color: #777;
     }
@@ -201,6 +201,10 @@
       <p id="cardContent"></p>
     </div>
     <div class="detail-item">
+      <span class="detail-label">Assignee:</span>
+      <span id="cardAssignee"></span>
+    </div>
+    <div class="detail-item">
       <span class="detail-label">Status:</span>
       <span id="cardStatus"></span>
     </div>
@@ -237,8 +241,12 @@
       <label for="editCardContent">Content:</label>
       <textarea id="editCardContent" placeholder="Enter card content"></textarea>
 
+      <label for="editAssignee">Assignee:</label>
+      <input type="text" id="editAssignee" placeholder="Enter assignee">
+
       <label for="editCardDueDate">Due Date:</label>
       <input type="date" id="editCardDueDate">
+
 
       <button class="btn submit-edit" onclick="submitEdit()">Save Changes</button>
     </div>
@@ -260,6 +268,7 @@
     document.getElementById('cardContent').textContent = data.data.content;
     document.getElementById('cardStatus').textContent = data.data.cardStatus;
     document.getElementById('cardDueDate').textContent = data.data.dueDate;
+    document.getElementById('cardAssignee').textContent = data.data.username;
 
     // 댓글 리스트를 불러오는 API 호출
   return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`)
@@ -279,6 +288,7 @@
       const newComment = document.createElement('div');
       newComment.className = 'comment';
       newComment.innerHTML = `
+        <div class="comment-username">${comment.username}</div>
         <div class="comment-content">${comment.message}</div>
         <div class="comment-createdAt">${comment.createdAt}</div>
       `;
@@ -312,6 +322,7 @@
       return response.json();
     })
     .then(data => {
+      alert('댓글이 성공적으로 추가되었습니다.');
       // 서버에서 받은 새로운 댓글을 UI에 추가
       window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
     })
@@ -334,6 +345,7 @@
         return response.json();
       })
       .then(data => {
+        alert('카드가 성공적으로 삭제되었습니다:');
         console.log('카드가 성공적으로 삭제되었습니다:', data);
         // 보드 페이지로 리다이렉트
         const boardId = data.data;
@@ -345,7 +357,7 @@
       });
     } else {
       // 사용자가 취소를 선택한 경우 아무 동작도 하지 않습니다
-      console.log('카드 삭제가 취소되었습니다.');
+      alert('카드 삭제가 취소되었습니다.');
     }
   }
   // 카드 수정 버튼 실행
@@ -367,7 +379,7 @@
     const updatedData = {
       title: document.getElementById('editCardTitle').value,
       content: document.getElementById('editCardContent').value,
-      // cardStatus: document.getElementById('editAssignee').value,
+      assignee: document.getElementById('editAssignee').value,
       dueDate: document.getElementById('editCardDueDate').value,
     };
 
