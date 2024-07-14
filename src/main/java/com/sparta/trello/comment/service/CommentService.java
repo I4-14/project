@@ -28,6 +28,9 @@ public class CommentService {
   public List<CommentResponseDto> getComments(int page, int amount, Long cardId) {
     Card card = cardRepository.findCardById(cardId);
     List<CommentResponseDto> comments = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
+    if(comments.isEmpty()) {
+      throw new IllegalArgumentException("현재 카드의 댓글이 존재하지 않습니다.");
+    }
     return comments;
   }
 

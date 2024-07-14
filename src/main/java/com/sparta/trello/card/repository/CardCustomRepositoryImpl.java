@@ -5,6 +5,7 @@ import static com.sparta.trello.card.entity.QCard.card;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.entity.Card;
@@ -50,9 +51,9 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
 
   private BooleanExpression isWhere (CardSearchCondDto searchCond) {
     BooleanExpression result = null;
-//    if(!searchCond.getUsername().isEmpty()){
-//      return result = card.user.name.eq(searchCond.getUsername());
-//    }
+    if(!searchCond.getUsername().isEmpty()){
+      return result = card.user.name.eq(searchCond.getUsername());
+    }
     if(searchCond.getCardStatus() != null) {
       return result = card.cardStatus.eq(CategoryEnum.valueOf(searchCond.getCardStatus()));
     }
