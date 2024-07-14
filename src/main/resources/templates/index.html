@@ -79,7 +79,11 @@
             cursor: pointer;
             border-radius: 4px;
         }
-
+        .view-invitations-group{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
         .view-invitations {
             background-color: #008CBA;
             color: white;
@@ -91,9 +95,6 @@
             font-size: 14px;
             cursor: pointer;
             border-radius: 4px;
-            position: absolute;
-            top: 10px;
-            right: 10px;
         }
 
         .search-bar {
@@ -118,11 +119,29 @@
             border-radius: 0 4px 4px 0;
             cursor: pointer;
         }
+        .edit-button {
+            padding: 10px 20px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 4px 4px 4px 4px;
+            cursor: pointer;
+        }
+        .reorder-card-btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="#" class="view-invitations">View Invitations</a>
+    <div class="view-invitations-group">
+        <button id="edit-btn" class="edit-button">Edit</button>
+        <a href="#" class="view-invitations">View Invitations</a>
+    </div>
     <h1>Your Kanban Boards</h1>
 
     <div class="search-bar">
@@ -138,32 +157,63 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"
-        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6b5Ebd07/g=" crossorigin="anonymous"></script>
+        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 
 <script>
+    let res;
     document.addEventListener('DOMContentLoaded', function() {
         fetch('http://localhost:8080/api/boards')
             .then(response => response.json())
             .then(data => {
                 const boardsGrid = document.getElementById('boardsGrid');
-
+                res = data;
                 data.data.forEach(board => {
                     console.log(board);
+                    let div = document.createElement('div')
+                    div.setAttribute('id', `board-${board.id}`)
+                    div.innerHTML = `
+                        <button id="edit-board${board.id}" class="reorder-card-btn" style="display: none" onclick="window.location.href='http://localhost:8080/view/update/board/${board.id}'">edit</button>
+                        <button id="reorder-board${board.id}" class="reorder-card-btn" style="display: none" onclick="toggleReorderModule(${board.id})">reorder</button>
+                    `
+                    boardsGrid.appendChild(div);
+
+                    div = document.getElementById(`board-${board.id}`);
                     const card = document.createElement('a');
                     card.classList.add('board-card');
                     card.href = `http://localhost:8080/api/main?id=${board.id}`;
                     card.setAttribute('data-id', board.id); // ID 값을 data-id 속성에 저장
                     card.innerHTML = `
+            <p id="board-id${board.id}" class="board-info" style="display: none;">${board.id}</p>
             <h2 class="board-title">${board.title}</h2>
             <p class="board-info">${board.description}</p>
           `;
-                    boardsGrid.appendChild(card);
+                    div.appendChild(card);
+
+                    let reorderDiv = document.createElement('div');
+                    reorderDiv.setAttribute('id', `reorder-module${board.id}`);
+                    reorderDiv.setAttribute('style', 'display: none')
+                    reorderDiv.innerHTML = `
+                        <input type="text" id="new-position${board.id}"><button onclick="reorderBoardApi(${board.id})">앞으로 이동</button>
+                    `
+                    div.appendChild(reorderDiv);
                 });
             })
             .catch(error => console.error('Error fetching boards:', error));
     });
+    $('#edit-btn').click(function () {
+        res.data.forEach(board => {
+            $(`#board-id${board.id}`).toggle();
+            $(`#edit-board${board.id}`).toggle();
+            $(`#reorder-board${board.id}`).toggle();
+        })
+    });
+    function toggleReorderModule(id) {
+        $(`#reorder-module${id}`).toggle();
+    }
+    function reorderBoardApi(id) {
 
+    }
     document.querySelector('.search-button').addEventListener('click', function() {
         const searchTerm = document.querySelector('.search-input').value.toLowerCase();
         const boardCards = document.querySelectorAll('.board-card');

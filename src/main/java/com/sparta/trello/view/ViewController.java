@@ -30,6 +30,11 @@ public class ViewController {
         return "createBoard";
     }
 
+    @GetMapping("/update/board/{id}")
+    public String updateBoardPage(@PathVariable("id") Long id) {
+        return "updateBoard";
+    }
+
     @GetMapping("/main")
     public String mainPage(@RequestParam Long id, Model model) {
         // todo main 화면을 꾸밀 model을 만들어서 넘겨야 함
