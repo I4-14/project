@@ -1,127 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <base href="https://websim.ai"/>
-    <title>KanbanFlow - Invite Team Members</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .invite-form {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        .invite-btn {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            align-self: flex-start;
-        }
-        .invite-btn:hover {
-            background-color: #45a049;
-        }
-        .invited-users {
-            margin-top: 30px;
-        }
-        .invited-user {
-            background-color: #e9e9e9;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .remove-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .remove-btn:hover {
-            background-color: #d32f2f;
-        }
-        .back-btn {
-            background-color: #2196F3;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 20px 0;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .back-btn:hover {
-            background-color: #0b7dda;
-        }
-    </style>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
-            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6b5Ebd07/g=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 토큰 확인
-            const token = Cookies.get('Authorization');
-            if (!token) {
-                window.location.href = 'http://localhost:8080/'; // 토큰이 없다면 로그인 화면으로 이동
-                return;
-            }
-        });
-    </script>
-</head>
+<html><head><base href="https://websim.ai"><title>KanbanFlow - Invite Team Member</title><style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .invite-form {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    .invite-btn {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 12px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+        align-self: flex-start;
+    }
+    .invite-btn:hover {
+        background-color: #45a049;
+    }
+    .board-members {
+        margin-top: 30px;
+    }
+    .board-member {
+        background-color: #e9e9e9;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+    }
+    .back-btn {
+        background-color: #2196F3;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 3px;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    .back-btn:hover {
+        background-color: #0b7dda;
+    }
+</style></head>
 <body>
 <div class="container">
-    <h1>Invite Team Members</h1>
+    <button class="back-btn">Back</button>
+    <h1>Invite Team Member</h1>
     <form class="invite-form" id="inviteForm">
         <div class="form-group">
             <label for="username">User Name:</label>
@@ -130,52 +95,105 @@
         <button type="submit" class="invite-btn">Invite User</button>
     </form>
 
-    <div class="invited-users" id="invitedUsers">
-        <h2>Invited Users:</h2>
-        <!-- Invited users will be dynamically added here -->
+    <div class="board-members" id="boardMembers">
+        <h2>Board Members:</h2>
+        <!-- Board members will be dynamically added here -->
     </div>
-
-    <button class="back-btn">Back to Board</button>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6b5Ebd07/g=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script>
-    const inviteForm = document.getElementById('inviteForm');
-    const invitedUsersContainer = document.getElementById('invitedUsers');
-    const invitedUsers = [];
-
-    inviteForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        if (username && !invitedUsers.includes(username)) {
-            invitedUsers.push(username);
-            updateInvitedUsersList();
-            document.getElementById('username').value = '';
-        } else if (invitedUsers.includes(username)) {
-            alert('This user has already been invited.');
+    document.addEventListener('DOMContentLoaded', function() {
+        // 토큰 확인
+        const token = Cookies.get('Authorization');
+        if (!token) {
+            window.location.href = 'http://localhost:8080/'; // Redirecting to login page if no token
+            return;
         }
+
+        // Fetch board members on page load
+        fetchBoardMembers();
+
+        // Handle form submission
+        const inviteForm = document.getElementById('inviteForm');
+        inviteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            if (username) {
+                inviteUser(username);
+                document.getElementById('username').value = '';
+            }
+        });
+
+        // Back button handler
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
     });
 
-    function updateInvitedUsersList() {
-        invitedUsersContainer.innerHTML = '<h2>Invited Users:</h2>';
-        invitedUsers.forEach((user, index) => {
-            const userElement = document.createElement('div');
-            userElement.className = 'invited-user';
-            userElement.innerHTML = `
-          <span>${user}</span>
-          <button class="remove-btn" onclick="removeUser(${index})">Remove</button>
-        `;
-            invitedUsersContainer.appendChild(userElement);
+    // 수정된 fetchBoardMembers 함수
+    function fetchBoardMembers() {
+        const pathSegments = window.location.pathname.split('/');
+        const boardId = pathSegments[pathSegments.length - 1]; // 마지막 경로 세그먼트를 가져옴 (보드 ID)
+        console.log("boardId"+boardId)
+        const url = `http://localhost:8080/api/boards/${boardId}/member`;
+
+        fetch(url, {
+            headers: {
+                'Authorization': Cookies.get('Authorization')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.statuscode === "200") {
+                    updateBoardMembers(data.data);
+                } else {
+                    console.error('Failed to fetch board members:', data.message);
+                }
+            })
+            .catch(error => console.error('Error fetching board members:', error));
+    }
+
+    // 수정된 inviteUser 함수
+    function inviteUser(username) {
+        const pathSegments = window.location.pathname.split('/');
+        const boardId = pathSegments[pathSegments.length - 1];
+
+        const url = `http://localhost:8080/api/boards/${boardId}/users`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': Cookies.get('Authorization')
+            },
+            body: JSON.stringify({ userName: username })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.statuscode)
+                if (data.statuscode === "201") {
+                    alert(`Successfully invited ${username} to the board.`);
+                    window.history.back();
+                } else {
+                    alert('Failed to invite user: ' + data.msg);
+                }
+            })
+            .catch(error => console.error('Error inviting user:', error));
+    }
+
+
+    function updateBoardMembers(members) {
+        const boardMembersContainer = document.getElementById('boardMembers');
+        boardMembersContainer.innerHTML = '<h2>"Invited Users:</h2>';
+        members.forEach(member => {
+            const memberElement = document.createElement('div');
+            memberElement.className = 'board-member';
+            memberElement.textContent = member;
+            boardMembersContainer.appendChild(memberElement);
         });
     }
-
-    document.querySelector('.back-btn').addEventListener('click', function() {
-        window.history.back();
-    });
-
-    function removeUser(index) {
-        invitedUsers.splice(index, 1);
-        updateInvitedUsersList();
-    }
 </script>
-</body>
-</html>
+</body></html>
