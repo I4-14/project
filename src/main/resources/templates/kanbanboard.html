@@ -178,7 +178,7 @@
       <h1>Your Kanban Board</h1>
       <div>
         <button id="edit-btn" class="edit-btn">Edit</button>
-        <button class="invite-btn">Invite Team Members</button>
+        <button class="invite-btn" th:onclick="|window.location.href = '@{/view/invite/board/{id}(id=${id})}'|">Invite Team Members</button>
       </div>
     </div>
     <div class="board" id="board">
