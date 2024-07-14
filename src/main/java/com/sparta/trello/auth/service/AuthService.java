@@ -15,8 +15,6 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -45,7 +42,7 @@ public class AuthService {
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
 
-        Optional<User> checkUser = userRepository.findByUsername(username);
+        Optional<User> checkUser = Optional.ofNullable(findByUsername(username));
         // 중복 사용자 확인
         if (checkUser.isPresent()) {
             throw new CustomException(ErrorEnum.DUPLICATE_USER);
@@ -81,14 +78,10 @@ public class AuthService {
      */
     @Transactional
     public TokenResponseDto login(LoginRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(
-                () -> new CustomException(ErrorEnum.USER_NOT_FOUND)
-        );
+        User user = findByUsername(requestDto.getUsername());
 
         // 회원 상태 확인
-        if (!user.isExist()) {
-            throw new CustomException(ErrorEnum.WITHDRAW_USER);
-        }
+        checkUserStatus(user);
 
         // 암호화 비밀번호 검증
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
@@ -110,14 +103,10 @@ public class AuthService {
      */
     @Transactional
     public void logout(User user) {
-        User finduser = userRepository.findByUsername(user.getUsername()).orElseThrow(
-                () -> new CustomException(ErrorEnum.USER_NOT_FOUND)
-        );
+        User finduser = findByUsername(user.getUsername());
 
         // 회원 상태 확인
-        if (!user.isExist()) {
-            throw new CustomException(ErrorEnum.WITHDRAW_USER);
-        }
+        checkUserStatus(finduser);
 
         // DB refresh 토큰 삭제
         finduser.updateRefresh("");
@@ -130,14 +119,10 @@ public class AuthService {
      */
     @Transactional
     public void withdraw(User user) {
-        User finduser = userRepository.findByUsername(user.getUsername()).orElseThrow(
-                () -> new CustomException(ErrorEnum.USER_NOT_FOUND)
-        );
+        User finduser = findByUsername(user.getUsername());
 
         // 회원 상태 확인
-        if (!user.isExist()) {
-            throw new CustomException(ErrorEnum.WITHDRAW_USER);
-        }
+        checkUserStatus(finduser);
 
         finduser.updateRefresh("");
         finduser.updateStatus(UserStatus.LEAVE);
@@ -162,9 +147,7 @@ public class AuthService {
         String username = claims.getSubject();
         Role role = jwtUtil.getRoleFromToken(refreshToken);
 
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new CustomException(ErrorEnum.USER_NOT_FOUND)
-        );
+        User user = findByUsername(username);
 
         // DB에 저장된 리프레시 토큰 검증
         String userRefreshToken = user.getRefreshToken().replace("Bearer ", "");
@@ -178,5 +161,28 @@ public class AuthService {
         user.updateRefresh(newRefreshToken);
 
         return new TokenResponseDto(newAccessToken, newRefreshToken);
+    }
+
+    /**
+     * username 을 통해 유저 정보 가져오기
+     *
+     * @param username 사용자 ID
+     * @return 유저 정보
+     */
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new CustomException(ErrorEnum.USER_NOT_FOUND)
+        );
+    }
+
+    /**
+     * 회원 가입상태 검증 (정상, 탈퇴)
+     *
+     * @param user 요청한 유저 정보
+     */
+    public void checkUserStatus(User user) {
+        if (!user.isExist()) {
+            throw new CustomException(ErrorEnum.WITHDRAW_USER);
+        }
     }
 }
