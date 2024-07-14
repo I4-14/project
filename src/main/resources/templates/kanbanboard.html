@@ -33,6 +33,19 @@
     cursor: pointer;
     border-radius: 4px;
   }
+  .edit-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
   .board {
     display: flex;
     gap: 20px;
@@ -49,7 +62,18 @@
     display: flex;
     flex-direction: column;
   }
+  .card{
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 텍스트 색상 상속 */
+    display: block; /* 블록 요소로 표시 */
+  }
+  .cards {
+    justify-content: center;
+  }
   .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-weight: bold;
     font-size: 18px;
     margin-bottom: 10px;
@@ -107,7 +131,7 @@
     text-decoration: none;
     cursor: pointer;
   }
-  .add-column-btn, .add-card-btn {
+  .add-column-btn, .add-card-btn, .edit-column-btn, .reorder-column-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -124,11 +148,27 @@
     display: block;
     margin: 20px auto;
     font-size: 18px;
-    padding: 15px 30px;
   }
   .add-card-btn {
     width: 100%;
     margin-top: auto;
+  }
+  .edit-column-btn {
+    width: 80px;
+    font-size: 12px;
+    margin-top: auto;
+  }
+  .reorder-column-btn {
+    width: 80px;
+    font-size: 12px;
+    margin-top: auto;
+  }
+  .reorder-card-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    text-align: center;
+    font-size: 16px;
   }
 </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -137,14 +177,14 @@
     <div class="header">
       <h1>Your Kanban Board</h1>
       <div>
-        <button class="invite-btn">Edit</button>
+        <button id="edit-btn" class="edit-btn">Edit</button>
         <button class="invite-btn">Invite Team Members</button>
       </div>
     </div>
     <div class="board" id="board">
 
     </div>
-    <button class="add-column-btn" th:onclick="|window.location.href = '@{/api/board/{id}/column(id=${id})}'|">+ Add Column</button>
+    <button class="add-column-btn" th:onclick="|window.location.href = '@{/view/board/{id}/column(id=${id})}'|">+ Add Column</button>
   </div>
 
   <div id="taskModal" class="modal">
@@ -159,7 +199,7 @@
   <script>
     // Drag and drop functionality
     let draggedTask = null;
-
+    let result;
     document.querySelectorAll('.task').forEach(task => {
       task.addEventListener('dragstart', (e) => {
         draggedTask = e.target;
@@ -193,7 +233,7 @@
         type: 'GET',
         url: `/api/boards/[[${id}]]`,
         success: function (response) {
-          var result = {
+          result = {
             'columnsList': response.data.columnsList
           }
           addHTML(result);
@@ -205,21 +245,32 @@
         let columns = result.columnsList[i];
         let column_html = `
                 <div class="column">
-                  <div class="column-header">${columns.column.category}</div>
-                  <div id="columns${columns.column.id}">
+                  <div class="column-header"><span id="column-id${i}" style="display: none">${columns.column.id}</span>${columns.column.category}
+                    <div>
+                      <button id="edit-column-button${i}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${columns.column.id}'">Edit Column</button>
+                      <button id="reorder-column-button${i}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${columns.column.id})" style="display: none">reorder</button>
+                    </div>
+                  </div>
+                  <div id="reorder-column-module${columns.column.id}" style="display: none"><input type="text" id="column-new-position${columns.column.id}"><button onclick="reorderColumnApi(${columns.column.id})">앞으로 이동</button></div>
+                  <div class="cards" id="columns${columns.column.id}">
 
                   </div>
-                  <button class="add-card-btn" onclick="window.location.href = '/api/columns/${columns.column.id}/create/card'">+ Add Card</button>
+                  <button class="add-card-btn" onclick="window.location.href = '/view/columns/${columns.column.id}/create/card'">+ Add Card</button>
                 </div>
                 `
         $('#board').append(column_html);
         for (let j = 0; j < columns.column.cards.length; j++) {
           let card = columns.column.cards[j];
           let card_html = `
+                  <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">reorder</button>
                   <div class="task" draggable="true" data-id=${card.id} id="card${card.id}">
+                  <a class="card" href="/view/read/card/${card.id}">
+                    <div id="card-id${j}" style="display: none">${card.id}</div>
                     <div class="task-title">${card.title}</div>
                     <div class="task-description">${card.content}</div>
+                  </a>
                   </div>
+                  <div id="reorder-card-module${card.id}" style="display: none"><input type="text" id="card-new-position${card.id}"><button onclick="reorderCardApi(${card.id})">앞으로 이동</button></div>
           `
           $(`#columns${columns.column.id}`).append(card_html);
 
@@ -227,7 +278,49 @@
       }
 
     }
+    $('#edit-btn').click(function () {
+      for (let i = 0; i < result.columnsList.length; i++) {
+        let columns = result.columnsList[i];
+        for (let j = 0; j < columns.column.cards.length; j++) {
+          let card = columns.column.cards[j];
+          $(`#card-id${j}`).toggle();
+          $(`#reorder-btn${card.id}`).toggle();
+        }
+        $(`#column-id${i}`).toggle();
+        $(`#edit-column-button${i}`).toggle();
+        $(`#reorder-column-button${i}`).toggle();
+      }
 
+    })
+    function toggleReorderCardModule(id) {
+      $(`#reorder-card-module${id}`).toggle();
+    }
+    function toggleReorderColumnModule(id) {
+      $(`#reorder-column-module${id}`).toggle();
+    }
+    function reorderCardApi(id) {
+      let newPositionId = $(`#card-new-position${id}`).val();
+      $.ajax({
+        type: 'PUT',
+        url: `/api/columns/cards/${id}/position?newPosition=${newPositionId}`,
+        success: function (response) {
+          alert('msg : ' + response);
+          window.location.reload();
+        }
+      })
+    }
+    function reorderColumnApi(id) {
+      let destinationId = $(`#column-new-position${id}`).val();
+      $.ajax({
+        type: 'POST',
+        url: `/api/columns/${id}/order/${destinationId}`,
+        success: function (response) {
+          alert('msg : ' + response.msg + '\n' +
+                'statuscode : ' + response.statuscode);
+          window.location.reload();
+        }
+      })
+    }
     document.querySelectorAll('.column').forEach(column => {
       column.addEventListener('dragover', (e) => {
         e.preventDefault();
