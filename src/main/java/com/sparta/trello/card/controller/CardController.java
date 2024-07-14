@@ -64,9 +64,8 @@ public class CardController {
   }
 
   @PutMapping("/cards/{cardId}/status")
-  public ResponseEntity<ApiResponse<CardResponseDto>> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto, @AuthenticationPrincipal
-  UserDetailsImpl userDetails) {
-    CardResponseDto cardStatus = cardService.updateCardStatus(cardId, requestDto, userDetails.getUser().getId());
+  public ResponseEntity<ApiResponse<CardResponseDto>> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto) {
+    CardResponseDto cardStatus = cardService.updateCardStatus(cardId, requestDto);
     ApiResponse<CardResponseDto> response = new ApiResponse<>("카드상태 수정 성공", "200", cardStatus);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }

@@ -1,5 +1,6 @@
 package com.sparta.trello.comment.controller;
 
+import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.comment.dto.CommentRequestDto;
 import com.sparta.trello.comment.dto.CommentResponseDto;
 import com.sparta.trello.comment.service.CommentService;
@@ -8,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,14 +27,14 @@ public class CommentController {
 
   @PostMapping("/{cardId}/comments")
   public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long cardId,
-      @RequestBody @Valid CommentRequestDto requestDto) {
+      @RequestBody @Valid CommentRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(commentService.createComment(cardId, requestDto));
+        .body(commentService.createComment(cardId, requestDto, userDetails.getUser().getId()));
   }
 
   @GetMapping("/{cardId}/comments")
-  public ResponseEntity<List<CommentResponseDto>> getComments(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId) {
-    return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(page - 1, amount, cardId));
+  public ResponseEntity<List<CommentResponseDto>> getComments(@RequestParam int page, @RequestParam(defaultValue = "5") int amount, @PathVariable Long cardId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(page - 1, amount, cardId, userDetails.getUser().getId()));
   }
 
 }

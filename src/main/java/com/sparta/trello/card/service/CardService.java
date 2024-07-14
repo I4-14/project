@@ -29,14 +29,18 @@ public class CardService {
   private final ColumnsServices columnsServices;
   private final CommentService commentService;
   private final CommentRepository commentRepository;
+  private final UserRepository userRepository;
 
-  public List<CardResponseDto> getAllCards(CardSearchCondDto searchCond) {
+  public List<CardResponseDto> getAllCards(CardSearchCondDto searchCond, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     List<CardResponseDto> cardList = cardRepository.findCardsInColumn(searchCond);
     return cardList;
   }
 
-  public CardDetailsResponseDto getCardDetailsById(Long cardId) {
+  public CardDetailsResponseDto getCardDetailsById(Long cardId, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
+    card.checkUser(user);
 //    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
    return new CardDetailsResponseDto(card);
   }
@@ -104,7 +108,8 @@ public class CardService {
   @Transactional
   public void deleteCard(Long cardId, Long userId) {
     Card card = findCardById(cardId);
-//    card.checkUser(user);
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
+    card.checkUser(user);
     cardRepository.delete(card);
   }
 

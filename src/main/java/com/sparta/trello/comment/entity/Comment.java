@@ -28,13 +28,13 @@ public class Comment extends Timestamped {
   @JoinColumn(name = "card_id")
   private Card card;
 
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = "user_id")
-//  private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  public Comment(CommentRequestDto requestDto, Card card){
+  public Comment(CommentRequestDto requestDto, Card card, User user){
     this.message = requestDto.getMessage();
     this.card = card;
-//    this.user = user;
+    this.user = user;
   }
 }

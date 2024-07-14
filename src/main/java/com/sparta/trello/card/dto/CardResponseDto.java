@@ -16,7 +16,7 @@ public class CardResponseDto {
   private String content;
   private String dueDate;
   private CategoryEnum cardStatus;
-//  private String username;
+  private String username;
 
   public CardResponseDto(Card card) {
     this.position = card.getPosition();
@@ -24,6 +24,7 @@ public class CardResponseDto {
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
+    this.username = card.getUser().getUsername();
   }
 
 }
