@@ -109,6 +109,9 @@
             alert('msg : ' + response.msg + '\n' +
                     'statuscode : ' + response.statuscode + '\n');
             history.back();
+          },
+          error:function(jqXHR, textStatus, errorThrown) {
+            alert("code:" + jqXHR.statuscode + "\n" + "message:" + jqXHR.msg + "\n");
           }
         });
       }
