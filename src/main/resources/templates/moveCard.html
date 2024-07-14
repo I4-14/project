@@ -139,11 +139,6 @@
   </div>
   <div class="board">
     <div class="column" id="done">
-
-      <div class="task" draggable="true" data-id="10">
-        <div class="task-title">Update dependencies</div>
-        <div class="task-description">Upgrade all packages to latest versions</div>
-      </div>
       <button class="add-card-btn">+ Add Card</button>
     </div>
   </div>
@@ -188,6 +183,11 @@
             var cardElement = createCardElement(card);
             columnElement.appendChild(cardElement);
           });
+
+          var addCardButton = document.createElement('button');
+          addCardButton.classList.add('add-card-btn');
+          addCardButton.textContent = '+ Add Card';
+          columnElement.appendChild(addCardButton);
 
           // Append column element to board container
           boardContainer.appendChild(columnElement);
@@ -239,6 +239,7 @@
       });
     }
 
+
     function createCardElement(card) {
       var cardElement = document.createElement('div');
       cardElement.classList.add('task');
@@ -273,185 +274,5 @@
     }
   });
 
-  // document.querySelectorAll('.task').forEach(task => {
-  //   task.addEventListener('dragstart', (e) => {
-  //     draggedTask = e.target;
-  //     e.dataTransfer.setData('text/plain', e.target.id);
-  //     setTimeout(() => {
-  //       e.target.style.opacity = '0.5';
-  //     }, 0);
-  //     $(this).addClass('dragging');
-  //   });
-  //
-  //   task.addEventListener('dragend', (e) => {
-  //
-  //     e.target.style.opacity = '1';
-  //     $(this).removeClass('dragging');
-  //   });
-  //
-  //   // Click to view details
-  //   task.addEventListener('click', (e) => {
-  //     const modal = document.getElementById('taskModal');
-  //     const modalTitle = document.getElementById('modalTitle');
-  //     const modalDescription = document.getElementById('modalDescription');
-  //     const modalStatus = document.getElementById('modalStatus');
-  //
-  //     modalTitle.textContent = e.currentTarget.querySelector('.task-title').textContent;
-  //     modalDescription.textContent = e.currentTarget.querySelector('.task-description').textContent;
-  //     modalStatus.textContent = 'Status: ' + e.currentTarget.closest('.column').querySelector('.column-header').textContent;
-  //
-  //     modal.style.display = 'block';
-  //   });
-  // });
-
-  document.querySelectorAll('.column').forEach(column => {
-    column.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      const afterElement = getDragAfterElement(column, e.clientY);
-      const task = document.querySelector('.task.dragging');
-      if (afterElement == null) {
-        column.insertBefore(draggedTask, column.querySelector('.add-card-btn'));
-      } else {
-        column.insertBefore(draggedTask, afterElement);
-      }
-    });
-
-    column.addEventListener('dragenter', (e) => {
-      e.preventDefault();
-      column.classList.add('drag-over');
-    });
-
-    column.addEventListener('dragleave', () => {
-      column.classList.remove('drag-over');
-    });
-
-    column.addEventListener('drop', (e) => {
-      e.preventDefault();
-      column.classList.remove('drag-over');
-      if (draggedTask) {
-        const afterElement = getDragAfterElement(column, e.clientY);
-        if (afterElement == null) {
-          column.insertBefore(draggedTask, column.querySelector('.add-card-btn'));
-        } else {
-          column.insertBefore(draggedTask, afterElement);
-        }
-        draggedTask = null;
-      }
-    });
-  });
-
-  function getDragAfterElement(column, y) {
-    const draggableElements = [...column.querySelectorAll('.task:not(.dragging)')];
-
-    return draggableElements.reduce((closest, child) => {
-      const box = child.getBoundingClientRect();
-      const offset = y - box.top - box.height / 2;
-      if (offset < 0 && offset > closest.offset) {
-        return { offset: offset, element: child };
-      } else {
-        return closest;
-      }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-  }
-
-  // // Add new column functionality
-  // document.querySelector('.add-column-btn').addEventListener('click', () => {
-  //   const board = document.querySelector('.board');
-  //   const newColumn = document.createElement('div');
-  //   newColumn.className = 'column';
-  //   newColumn.innerHTML = `
-  //       <div class="column-header">New Column</div>
-  //       <button class="add-card-btn">+ Add Card</button>
-  //     `;
-  //   board.insertBefore(newColumn, document.querySelector('.add-column-btn'));
-  //
-  //   // Add event listeners to the new column
-  //   newColumn.addEventListener('dragover', (e) => {
-  //     e.preventDefault();
-  //     const afterElement = getDragAfterElement(newColumn, e.clientY);
-  //     const task = document.querySelector('.task.dragging');
-  //     if (afterElement == null) {
-  //       newColumn.insertBefore(draggedTask, newColumn.querySelector('.add-card-btn'));
-  //     } else {
-  //       newColumn.insertBefore(draggedTask, afterElement);
-  //     }
-  //   });
-  //
-  //   newColumn.addEventListener('dragenter', (e) => {
-  //     e.preventDefault();
-  //     newColumn.classList.add('drag-over');
-  //   });
-  //
-  //   newColumn.addEventListener('dragleave', () => {
-  //     newColumn.classList.remove('drag-over');
-  //   });
-  //
-  //   newColumn.addEventListener('drop', (e) => {
-  //     e.preventDefault();
-  //     newColumn.classList.remove('drag-over');
-  //     if (draggedTask) {
-  //       const afterElement = getDragAfterElement(newColumn, e.clientY);
-  //       if (afterElement == null) {
-  //         newColumn.insertBefore(draggedTask, newColumn.querySelector('.add-card-btn'));
-  //       } else {
-  //         newColumn.insertBefore(draggedTask, afterElement);
-  //       }
-  //       draggedTask = null;
-  //     }
-  //   });
-  //
-  //   // Add event listener to the new add-card button
-  //   newColumn.querySelector('.add-card-btn').addEventListener('click', addNewCard);
-  // });
-  //
-  // // Add new card functionality
-  // function addNewCard(e) {
-  //   const column = e.target.closest('.column');
-  //   const newTask = document.createElement('div');
-  //   newTask.className = 'task';
-  //   newTask.draggable = true;
-  //   newTask.dataset.id = Date.now();  // Use timestamp as a simple unique id
-  //   newTask.innerHTML = `
-  //       <div class="task-title">New Task</div>
-  //       <div class="task-description">Add description here</div>
-  //     `;
-  //   column.insertBefore(newTask, e.target);
-  //
-  //   // Add event listeners to the new task
-  //   newTask.addEventListener('dragstart', (e) => {
-  //     draggedTask = e.target;
-  //     e.dataTransfer.setData('text/plain', e.target.id);
-  //     setTimeout(() => {
-  //       e.target.style.opacity = '0.5';
-  //     }, 0);
-  //   });
-  //
-  //   newTask.addEventListener('dragend', (e) => {
-  //     e.target.style.opacity = '1';
-  //   });
-  //
-  //   newTask.addEventListener('click', (e) => {
-  //     const modal = document.getElementById('taskModal');
-  //     const modalTitle = document.getElementById('modalTitle');
-  //     const modalDescription = document.getElementById('modalDescription');
-  //     const modalStatus = document.getElementById('modalStatus');
-  //
-  //     modalTitle.textContent = e.currentTarget.querySelector('.task-title').textContent;
-  //     modalDescription.textContent = e.currentTarget.querySelector('.task-description').textContent;
-  //     modalStatus.textContent = 'Status: ' + e.currentTarget.closest('.column').querySelector('.column-header').textContent;
-  //
-  //     modal.style.display = 'block';
-  //   });
-  // }
-  //
-  // // Add event listeners to all add-card buttons
-  // document.querySelectorAll('.add-card-btn').forEach(btn => {
-  //   btn.addEventListener('click', addNewCard);
-  // });
-  //
-  // // Invite button functionality (you can customize this as needed)
-  // document.querySelector('.invite-btn').addEventListener('click', () => {
-  //   alert('Invite functionality will be implemented here!');
-  // });
 </script>
 </body></html>
