@@ -1,5 +1,7 @@
 package com.sparta.trello.card.service;
 
+import com.sparta.trello.auth.entity.User;
+import com.sparta.trello.auth.repository.UserRepository;
 import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardDetailsResponseDto;
 import com.sparta.trello.card.dto.CardResponseDto;
@@ -27,31 +29,37 @@ public class CardService {
   private final ColumnsServices columnsServices;
   private final CommentService commentService;
   private final CommentRepository commentRepository;
+  private final UserRepository userRepository;
 
-  public List<CardResponseDto> getAllCards(CardSearchCondDto searchCond) {
+  public List<CardResponseDto> getAllCards(CardSearchCondDto searchCond, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     List<CardResponseDto> cardList = cardRepository.findCardsInColumn(searchCond);
     return cardList;
   }
 
-  public CardDetailsResponseDto getCardDetailsById(Long cardId) {
+  public CardDetailsResponseDto getCardDetailsById(Long cardId, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
+    card.checkUser(user);
 //    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
    return new CardDetailsResponseDto(card);
   }
 
   @Transactional
-  public CardResponseDto createCard(Long id, CardCreateRequestDto requestDto) {
+  public CardResponseDto createCard(Long id, CardCreateRequestDto requestDto, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Columns columns = columnsServices.findColumnsById(id);
     int position= getNextPosition(columns.getId());
-    Card card = cardRepository.save(new Card(requestDto, columns));
+    Card card = cardRepository.save(new Card(requestDto, columns, user));
     card.setPosition(position);
     return new CardResponseDto(card);
   }
 
   @Transactional
-  public CardResponseDto updateCard(Long cardId, CardUpdateRequestDto requestDto) {
+  public CardResponseDto updateCard(Long cardId, CardUpdateRequestDto requestDto, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
-//    card.checkUser(user);
+    card.checkUser(user);
     card.updateCard(requestDto);
     return new CardResponseDto(card);
   }
@@ -65,8 +73,10 @@ public class CardService {
   }
 
   @Transactional
-  public void moveCardToPosition(Long cardId, int newPosition) {
+  public void moveCardToPosition(Long cardId, int newPosition, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
+    card.checkUser(user);
     Columns column = card.getColumns();
     int currentPosition = card.getPosition();
 
@@ -96,9 +106,10 @@ public class CardService {
   }
 
   @Transactional
-  public void deleteCard(Long cardId) {
+  public void deleteCard(Long cardId, Long userId) {
     Card card = findCardById(cardId);
-//    card.checkUser(user);
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
+    card.checkUser(user);
     cardRepository.delete(card);
   }
 
