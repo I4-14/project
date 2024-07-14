@@ -1,5 +1,6 @@
 package com.sparta.trello.boardworkspace.controller;
 
+import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.boardworkspace.dto.InvitationListDto;
 import com.sparta.trello.boardworkspace.dto.InviteRequestDto;
 import com.sparta.trello.boardworkspace.dto.InviteResponseDto;
@@ -8,6 +9,7 @@ import com.sparta.trello.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,9 +42,9 @@ public class InviteController {
      *      초대 목록 보기
      *
      */
-    @GetMapping("/invite/{id}")
-    public ResponseEntity<ApiResponse<List<InvitationListDto>>> getInvitationList(@PathVariable("id") Long id) {
-        List<InvitationListDto> responseDto= inviteService.getInvitationList(id);
+    @GetMapping("/invite")
+    public ResponseEntity<ApiResponse<List<InvitationListDto>>> getInvitationList(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<InvitationListDto> responseDto= inviteService.getInvitationList(userDetails.getUser().getId());
         ApiResponse<List<InvitationListDto>> response = new ApiResponse("보드 초대 목록보기", "201", responseDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
