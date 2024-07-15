@@ -55,7 +55,7 @@ public class ViewController {
         return "createCard";
     }
 
-    @GetMapping("/read/card/{cardId}")
+    @GetMapping("/view/read/card/{cardId}")
     public String readCard(@PathVariable("cardId") Long id) {
         return "readCard";
     }
