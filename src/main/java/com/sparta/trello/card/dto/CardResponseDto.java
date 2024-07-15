@@ -23,13 +23,12 @@ public class CardResponseDto {
     this.boardId = card.getBoard().getId();
     this.columnId = card.getColumns().getId();
     this.id = card.getId();
-    this.columnId = card.getColumns().getId();
     this.position = card.getPosition();
     this.title = card.getTitle();
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
-    this.username = card.getUser().getUsername();
+    this.username = card.getUser().getName();
   }
 
 }
