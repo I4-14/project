@@ -422,10 +422,13 @@
 
         const userRole = decodedToken.auth;
         const createBoardLink = document.querySelector('.create-board');
+        const editButtonLink = document.querySelector('.edit-mode-button');
 
         // Hide "Create New Board" link if user is not a MANAGER
         if (userRole == 'MANAGER') {
             createBoardLink.style.display = 'block'; // Show if userRole is 'MANAGER'
+        }else{
+            editButtonLink.style.display = 'none';
         }
 
 
