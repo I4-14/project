@@ -1,7 +1,5 @@
 package com.sparta.trello.card.repository;
 
-import static com.sparta.trello.card.entity.QCard.card;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,12 +7,15 @@ import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.entity.QCard;
-import com.sparta.trello.columns.entity.QColumns;
 import com.sparta.trello.common.exception.CustomException;
 import com.sparta.trello.common.exception.ErrorEnum;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.sparta.trello.card.entity.QCard.card;
+import static com.sparta.trello.columns.entity.QColumns.columns;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,13 +24,15 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
   private final JPAQueryFactory queryFactory;
 
   public List<CardResponseDto> findCardsInColumn(CardSearchCondDto searchCond) {
-    QColumns column = QColumns.columns;
-    QCard card = QCard.card;
+
+    if(searchCond.getUsername().isEmpty()){
+      throw new CustomException(ErrorEnum.USER_NOT_FOUND);
+    }
 
     List<CardResponseDto> cardList = queryFactory
         .select(Projections.constructor(CardResponseDto.class, card))
         .from(card)
-        .innerJoin(card.columns, column)
+        .innerJoin(card.columns, columns)
         .where(isWhere(searchCond))
         .limit(10)
         .fetch();
@@ -50,10 +53,7 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
   }
 
   private BooleanExpression isWhere (CardSearchCondDto searchCond) {
-    BooleanExpression result = null;
-    if(searchCond.getUsername().isEmpty()){
-      throw new CustomException(ErrorEnum.USER_NOT_FOUND);
-    }
-    return result = card.user.username.eq(searchCond.getUsername());
+    BooleanExpression result = card.user.username.eq(searchCond.getUsername());
+    return result;
   }
 }
