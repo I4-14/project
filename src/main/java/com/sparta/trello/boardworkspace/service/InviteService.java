@@ -56,9 +56,10 @@ public class InviteService {
         List<MemberDto> userNameList= boardWorkspaceRepository.findUsernamesByBoardId(boardId);
         return userNameList;
     }
+
     @Transactional
     public void deleteMember(Long boardId, Long memberId) {
-        BoardWorkspace boardWorkspace = boardWorkspaceRepository.findByBoardIdAndMemberId(boardId,memberId);
+        BoardWorkspace boardWorkspace = boardWorkspaceRepository.findByBoardIdAndUserId(boardId,memberId);
         boardWorkspaceRepository.delete(boardWorkspace);
 
     }
