@@ -14,6 +14,6 @@ public class CardUpdateRequestDto {
   private String title;
   private String content;
   private String dueDate;
-  private String username;
+  private Long userId;
 
 }

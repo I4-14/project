@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 public class CardSearchCondDto {
 
   private String username;
-  private String cardStatus;
 
 }

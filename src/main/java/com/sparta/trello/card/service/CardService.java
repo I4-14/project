@@ -59,7 +59,8 @@ public class CardService {
     User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
     card.checkUser(user);
-    card.updateCard(requestDto);
+    User changeUser = userRepository.findById(requestDto.getUserId()).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
+    card.updateCard(requestDto, changeUser);
     return new CardResponseDto(card);
   }
 
