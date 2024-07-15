@@ -41,8 +41,8 @@ public class ViewController {
     public String createColumnPage(@PathVariable("id") Long id) {
         return "createColumn";
     }
-    @GetMapping("/view/board/{id}")
-    public String kanbanboardPage(@PathVariable("id") Long id) {
+    @GetMapping("/view/board/{id}/{boardname}")
+    public String kanbanboardPage(@PathVariable("id") Long id, @PathVariable("boardname") String boardname) {
         return "kanbanboard";
     }
     @GetMapping("/view/column/{id}")
