@@ -57,5 +57,6 @@ public class Columns extends Timestamped {
             throw new IllegalArgumentException("해당 컬럼에 접근 권한이 없는 유저입니다.");
         } return true;
     }
+
 }
 

@@ -23,7 +23,9 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
     QComment comment = QComment.comment;
 
     List<CommentResponseDto> commentList = queryFactory
-        .select(Projections.constructor(CommentResponseDto.class, comment))
+        .select(Projections.constructor(CommentResponseDto.class,
+            comment,
+            comment.user))
         .from(comment)
         .where(comment.card.id.eq(cardId))
         .leftJoin(comment.card, card)

@@ -2,8 +2,6 @@ package com.sparta.trello.card.dto;
 
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.columns.entity.CategoryEnum;
-import com.sparta.trello.comment.entity.Comment;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,13 +22,12 @@ public class CardResponseDto {
   public CardResponseDto(Card card) {
     this.boardId = card.getColumns().getBoard().getId();
     this.id = card.getId();
-    this.columnId = card.getColumns().getId();
     this.position = card.getPosition();
     this.title = card.getTitle();
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
-    this.username = card.getUser().getUsername();
+    this.username = card.getUser().getName();
   }
 
 }
