@@ -1,0 +1,13 @@
+### 댓글 생성
+POST localhost:8080/api/cards/1/comments
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "message": "comment msg"
+}
+
+### 댓글 조회
+GET localhost:8080/api/cards/1/comments?page=1
+Content-Type: application/json
+Authorization: {{accessToken}}
