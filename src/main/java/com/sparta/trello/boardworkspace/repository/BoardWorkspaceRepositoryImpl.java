@@ -50,13 +50,13 @@ public class BoardWorkspaceRepositoryImpl implements BoardWorkspaceRepositoryCus
     }
 
     @Override
-    public BoardWorkspace findByBoardIdAndMemberId(Long boardId, Long memberId) {
+    public BoardWorkspace findByBoardIdAndUserId(Long boardId, Long userId) {
         QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
 
         return jpaQueryFactory.selectFrom(qBoardWorkspace)
                 .where(
                         qBoardWorkspace.board.id.eq(boardId)
-                                .and(qBoardWorkspace.user.id.eq(memberId))
+                                .and(qBoardWorkspace.user.id.eq(userId))
                 )
                 .fetchOne();
 
