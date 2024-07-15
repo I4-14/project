@@ -63,6 +63,17 @@
     .new-comment {
       margin-top: 20px;
     }
+    input[type="text"],
+    textarea,
+    select,
+    input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
     textarea {
       width: 100%;
       height: 100px;
@@ -242,7 +253,13 @@
       <textarea id="editCardContent" placeholder="Enter card content"></textarea>
 
       <label for="editAssignee">Assignee:</label>
-      <input type="text" id="editAssignee" placeholder="Enter assignee">
+      <select id="editAssignee" name="assignee">
+        <option value="">Select an assignee</option>
+        <option value="user1">User 1</option>
+        <option value="user2">User 2</option>
+        <option value="user3">User 3</option>
+        <!-- Add more options as needed -->
+      </select>
 
       <label for="editCardDueDate">Due Date:</label>
       <input type="date" id="editCardDueDate">
@@ -256,7 +273,15 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script>
 
+  function getCardIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('cardId');
+  }
+  const cardId = getCardIdFromURL();
+  let boardId;
+
   const token = Cookies.get('Authorization');
+
   fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
     headers: {
       'Content-Type': 'application/json',
@@ -271,6 +296,7 @@
   })
   .then(data => {
     // 받은 데이터를 UI에 반영
+    boardId = data.data.boardId;
     document.getElementById('cardTitle').textContent = data.data.title;
     document.getElementById('cardContent').textContent = data.data.content;
     document.getElementById('cardStatus').textContent = data.data.cardStatus;
@@ -310,7 +336,7 @@
     console.error('Error fetching or parsing comments:', error);
     // Handle errors appropriately
   });
-  function addComment() {
+  function addComment(cardId) {
     const commentText = document.getElementById('newCommentText').value;
     if (commentText.trim() === '') return;
 
@@ -345,7 +371,7 @@
     });
   }
   // 카드 삭제 DELETE 요청 보내기
-  function deleteCard() {
+  function deleteCard(cardId) {
     // 사용자에게 삭제 확인 메시지를 보여줍니다
     if (confirm('삭제하는 경우 작성한 데이터가 전부 삭제됩니다. 정말 삭제하시겠습니까?')) {
       fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
@@ -364,7 +390,6 @@
         alert('카드가 성공적으로 삭제되었습니다:');
         console.log('카드가 성공적으로 삭제되었습니다:', data);
         // 보드 페이지로 리다이렉트
-        const boardId = data.data;
         window.location.href = `http://localhost:8080/view/board/${boardId}`;
       })
       .catch(error => {
@@ -377,11 +402,57 @@
       alert('카드 삭제가 취소되었습니다.');
     }
   }
+
   // 카드 수정 버튼 실행
   function editCard() {
     // 모달 창 띄우기
     const modal = document.getElementById('editCardModal');
     modal.style.display = 'block';
+    const board = parseInt(boardId);
+    if (isNaN(board)) {
+      console.error('Invalid boardId:', boardId);
+      return;
+    }
+    fetchBoardMembers(board);
+  }
+
+  function fetchBoardMembers(board) {
+    fetch(`http://localhost:8080/api/boards/${board}/member`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('보드 멤버를 가져오는 데 실패했습니다');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // 가져온 데이터로 드롭다운을 채우는 함수 호출
+      populateAssigneeDropdown(data.data); // data.data가 멤버 배열을 가정합니다
+    })
+    .catch(error => {
+      console.error('보드 멤버를 가져오는 중 오류 발생:', error);
+      // 오류 처리 (예: 알림 표시)
+    });
+  }
+  function populateAssigneeDropdown(members) {
+    const assigneeDropdown = document.getElementById('editAssignee');
+
+    // 기존 옵션 초기화
+    assigneeDropdown.innerHTML = '';
+
+    // 기본 옵션 추가
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '담당자 선택';
+    assigneeDropdown.appendChild(defaultOption);
+
+    // 각 멤버에 대한 옵션 추가
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member.id;
+        option.textContent = member.username;
+        assigneeDropdown.appendChild(option);
+
+    });
   }
 
   // 모달 닫기
@@ -391,13 +462,15 @@
   }
 
   // 수정된 카드 정보를 서버로 전송
-  function submitEdit() {
-
+  function submitEdit(cardId) {
+      // 페이지의 모든 리소스가 완전히 로드된 후 실행되는 코드
+    const selectedUserId = document.getElementById('editAssignee').value;
+    console.log(selectedUserId);
     const updatedData = {
-      title: document.getElementById('editCardTitle').value,
-      content: document.getElementById('editCardContent').value,
-      assignee: document.getElementById('editAssignee').value,
-      dueDate: document.getElementById('editCardDueDate').value,
+        title: document.getElementById('editCardTitle').value,
+        content: document.getElementById('editCardContent').value,
+        userId: Number(selectedUserId),
+        dueDate: document.getElementById('editCardDueDate').value,
     };
 
     fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
@@ -415,15 +488,17 @@
       return response.json();
     })
     .then(data => {
+      alert("카드가 성공적으로 수정되었습니다");
       console.log('카드가 성공적으로 수정되었습니다:', data);
       closeModal(); // 수정 완료 후 모달 닫기
       window.location.reload();
     })
     .catch(error => {
-      alert("접근권한이 없습니다.");
+      alert("카드 수정 실패하였습니다.");
       console.error('카드 수정 중 오류 발생:', error);
       // 오류 처리, 오류 메시지 표시 등
     });
+
   }
   function redirectToBoard() {
     // 보드 페이지로 리다이렉트
