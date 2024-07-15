@@ -1,8 +1,10 @@
 package com.sparta.trello.comment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.trello.auth.entity.QUser;
 import com.sparta.trello.comment.dto.CommentResponseDto;
 import com.sparta.trello.comment.entity.Comment;
+import com.sparta.trello.comment.entity.QComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,9 +22,8 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
   public List<CommentResponseDto> findCommentByCardIdOrderByCreatedAtDesc(int page, int amount, Long cardId) {
     List<Comment> commentList = queryFactory
-            .select(comment)
-            .from(comment)
-            .join(comment.user, user)
+            .selectFrom(comment)
+            .join(comment.user, user).fetchJoin()
             .where(comment.card.id.eq(cardId))
             .orderBy(comment.createdAt.desc())
             .offset(page * amount)
