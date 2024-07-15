@@ -7,6 +7,7 @@ import com.sparta.trello.boardworkspace.dto.InviteRequestDto;
 import com.sparta.trello.boardworkspace.dto.InviteResponseDto;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
+import com.sparta.trello.boardworkspace.dto.MemberDto;
 import com.sparta.trello.boardworkspace.entity.BoardWorkspace;
 import com.sparta.trello.boardworkspace.entity.InvitationEnum;
 import com.sparta.trello.boardworkspace.repository.BoardWorkspaceRepository;
@@ -69,8 +70,8 @@ public class InviteService {
         }
     }
 
-    public List<String> getBoardMember(Long boardId) {
-        List<String> userNameList= boardWorkspaceRepository.findUsernamesByBoardId(boardId);
+    public List<MemberDto> getBoardMember(Long boardId) {
+        List<MemberDto> userNameList= boardWorkspaceRepository.findUsernamesByBoardId(boardId);
         return userNameList;
     }
 }

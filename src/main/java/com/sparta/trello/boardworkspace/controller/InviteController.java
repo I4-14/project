@@ -4,6 +4,7 @@ import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.boardworkspace.dto.InvitationListDto;
 import com.sparta.trello.boardworkspace.dto.InviteRequestDto;
 import com.sparta.trello.boardworkspace.dto.InviteResponseDto;
+import com.sparta.trello.boardworkspace.dto.MemberDto;
 import com.sparta.trello.boardworkspace.service.InviteService;
 import com.sparta.trello.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -79,9 +80,9 @@ public class InviteController {
      *  보드에 있는 사람 목록 보기
      */
     @GetMapping("/boards/{boardId}/member")
-    public ResponseEntity<ApiResponse<List<String>>> getBoardMember (@PathVariable("boardId") Long boardId) {
-        List<String> boardMember = inviteService.getBoardMember(boardId);
-        ApiResponse response = new ApiResponse("보드 초대한 사람 목록", "200", boardMember);
+    public ResponseEntity<ApiResponse<List<MemberDto>>> getBoardMember (@PathVariable("boardId") Long boardId) {
+        List<MemberDto> boardMember = inviteService.getBoardMember(boardId);
+        ApiResponse response = new ApiResponse("보드 멤버 목록 조회 성공", "200", boardMember);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
