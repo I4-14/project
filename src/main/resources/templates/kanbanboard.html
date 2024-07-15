@@ -203,7 +203,9 @@
   .filter-content a:hover {
     background-color: #f1f1f1;
   }
-
+  .show {
+    display: block;
+  }
   </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
@@ -218,10 +220,6 @@
           <button class="filter-btn">Filter by Team Member</button>
           <div id="filterDropdown" class="filter-content">
             <a href="#" data-member="all">All Members</a>
-            <a href="#" data-member="john">John</a>
-            <a href="#" data-member="sarah">Sarah</a>
-            <a href="#" data-member="mike">Mike</a>
-            <a href="#" data-member="emily">Emily</a>
           </div>
         </div>
       </div>
@@ -290,7 +288,7 @@
           result = {
             'columnsList': response.data.columnsList
           }
-          addHTML(result);
+          addCardColumnHTML(result);
         }
       })
       var boardContainer = document.querySelector('.board');
@@ -312,9 +310,19 @@
           reorderCardApi(taskId, newPosition);
         }
       });
+      $.ajax({
+        type: 'GET',
+        url: `/api/boards/[[${id}]]/member`,
+        success: function (response) {
+          result = {
+            'data': response.data
+          }
+          addInvitedUserHTML(result);
+        }
+      })
     })
 
-    function addHTML(result) {
+    function addCardColumnHTML(result) {
       for (let i = 0; i < result.columnsList.length; i++) {
         let columns = result.columnsList[i];
         let column_html = `
@@ -356,7 +364,13 @@
           })
         }
       }
+    }
 
+    function addInvitedUserHTML(result) {
+      result.data.forEach(row => {
+        let invitedUserTag = `<a href="#" data-member="all">${row.username}</a>`
+        $('#filterDropdown').append(invitedUserTag);
+      })
     }
 
     $('#edit-btn').click(function () {
@@ -516,119 +530,119 @@
     }
 
     // // 작성자별 조회 필터
-    // $(document).ready(function() {
-    //   $.ajax({
-    //     type: 'GET',
-    //     url: `/api/columns/cards`,
-    //     success: function (response) {
-    //       var cards = response.data; // 카드 데이터 배열
-    //
-    //       // Initialize columnsMap to group cards by columnId
-    //       var columnsMap = {};
-    //
-    //       // Group cards by columnId
-    //       cards.forEach(function(card) {
-    //         if (!columnsMap[card.columnId]) {
-    //           columnsMap[card.columnId] = [];
-    //         }
-    //         columnsMap[card.columnId].push(card);
-    //       });
-    //
-    //       // Convert columnsMap to columnsList array
-    //       var columnsList = Object.keys(columnsMap).map(function(columnId) {
-    //         return {
-    //           columnId: parseInt(columnId),
-    //           cards: columnsMap[columnId]
-    //         };
-    //       });
-    //
-    //       console.log('Columns List:', columnsList);
-    //
-    //       // Render columnsList on the UI
-    //       renderColumns(columnsList);
-    //     },
-    //     error: function (xhr, status, error) {
-    //       console.error('Failed to fetch board data:', status, error);
-    //     }
-    //   });
-    //
-    //   $(".filter-btn").click(function () {
-    //     $("#filterDropdown").toggleClass("show");
-    //   });
-    //
-    //   // Close the dropdown if the user clicks outside of it
-    //   $(window).click(function (event) {
-    //     if (!event.target.matches('.filter-btn')) {
-    //       var dropdowns = $(".filter-content");
-    //       dropdowns.each(function () {
-    //         if ($(this).hasClass('show')) {
-    //           $(this).removeClass('show');
-    //         }
-    //       });
-    //     }
-    //   });
-    //
-    //   // Filter tasks by team member
-    //   $("#filterDropdown a").click(function (e) {
-    //     e.preventDefault();
-    //     var member = $(this).data('member');
-    //     if (member === 'all') {
-    //       $(".task").show();
-    //     } else {
-    //       $(".task").hide();
-    //       $(".task[data-member='" + member + "']").show();
-    //     }
-    //     $("#filterDropdown").removeClass("show");
-    //   });
-    // })
-    //
-    // function renderColumns(columnsList) {
-    //   columnsList.forEach(function(column, columnIndex) {
-    //     var columnHtml = `
-    //   <div class="column">
-    //     <div class="column-header">
-    //       <span id="column-id${columnIndex}" style="display: none">${column.columnId}</span>
-    //       ${column.category}
-    //       <div>
-    //         <button id="edit-column-button${columnIndex}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${column.columnId}'">Edit Column</button>
-    //         <button id="reorder-column-button${columnIndex}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${column.columnId})" style="display: none">Reorder</button>
-    //       </div>
-    //     </div>
-    //     <div id="reorder-column-module${column.columnId}" style="display: none">
-    //       <input type="text" id="column-new-position${column.columnId}">
-    //       <button onclick="reorderColumnApi(${column.columnId})">앞으로 이동</button>
-    //     </div>
-    //     <div class="cards" id="cards-column${columnIndex}">`;
-    //
-    //     column.cards.forEach(function(card, cardIndex) {
-    //       var cardHtml = `
-    //     <div>
-    //       <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">Reorder</button>
-    //       <div class="task" draggable="true" data-id="${card.id}" id="card${card.id}">
-    //         <a class="card" id="read-href${card.id}" href="/view/read/card/${card.id}">
-    //           <div id="card-id${cardIndex}" style="display: none">${card.id}</div>
-    //           <div class="task-title">${card.title}</div>
-    //           <div class="task-description">${card.content}</div>
-    //         </a>
-    //       </div>
-    //       <div id="reorder-card-module${card.id}" style="display: none">
-    //         <input type="text" id="card-new-position${card.id}">
-    //         <button onclick="reorderCardApi(${card.id})">앞으로 이동</button>
-    //       </div>
-    //     </div>
-    //   `;
-    //       columnHtml += cardHtml;
-    //     });
-    //
-    //     columnHtml += `
-    //     </div>
-    //     <button class="add-card-btn" onclick="window.location.href = '/view/columns/${column.columnId}/create/card'">+ Add Card</button>
-    //   </div>
-    // `;
-    //
-    //     $('#board').append(columnHtml);
-    //   });
-    // }
+    $(document).ready(function() {
+      $.ajax({
+        type: 'GET',
+        url: `/api/columns/cards`,
+        success: function (response) {
+          var cards = response.data; // 카드 데이터 배열
+
+          // Initialize columnsMap to group cards by columnId
+          var columnsMap = {};
+
+          // Group cards by columnId
+          cards.forEach(function(card) {
+            if (!columnsMap[card.columnId]) {
+              columnsMap[card.columnId] = [];
+            }
+            columnsMap[card.columnId].push(card);
+          });
+
+          // Convert columnsMap to columnsList array
+          var columnsList = Object.keys(columnsMap).map(function(columnId) {
+            return {
+              columnId: parseInt(columnId),
+              cards: columnsMap[columnId]
+            };
+          });
+
+          console.log('Columns List:', columnsList);
+
+          // Render columnsList on the UI
+          renderColumns(columnsList);
+        },
+        error: function (xhr, status, error) {
+          console.error('Failed to fetch board data:', status, error);
+        }
+      });
+
+      $(".filter-btn").click(function () {
+        $("#filterDropdown").toggleClass("show");
+      });
+
+      // Close the dropdown if the user clicks outside of it
+      $(window).click(function (event) {
+        if (!event.target.matches('.filter-btn')) {
+          var dropdowns = $(".filter-content");
+          dropdowns.each(function () {
+            if ($(this).hasClass('show')) {
+              $(this).removeClass('show');
+            }
+          });
+        }
+      });
+
+      // Filter tasks by team member
+      $("#filterDropdown a").click(function (e) {
+        e.preventDefault();
+        var member = $(this).data('member');
+        if (member === 'all') {
+          $(".task").show();
+        } else {
+          $(".task").hide();
+          $(".task[data-member='" + member + "']").show();
+        }
+        $("#filterDropdown").removeClass("show");
+      });
+    })
+
+    function renderColumns(columnsList) {
+      columnsList.forEach(function(column, columnIndex) {
+        var columnHtml = `
+      <div class="column">
+        <div class="column-header">
+          <span id="column-id${columnIndex}" style="display: none">${column.columnId}</span>
+          ${column.category}
+          <div>
+            <button id="edit-column-button${columnIndex}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${column.columnId}'">Edit Column</button>
+            <button id="reorder-column-button${columnIndex}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${column.columnId})" style="display: none">Reorder</button>
+          </div>
+        </div>
+        <div id="reorder-column-module${column.columnId}" style="display: none">
+          <input type="text" id="column-new-position${column.columnId}">
+          <button onclick="reorderColumnApi(${column.columnId})">앞으로 이동</button>
+        </div>
+        <div class="cards" id="cards-column${columnIndex}">`;
+
+        column.cards.forEach(function(card, cardIndex) {
+          var cardHtml = `
+        <div>
+          <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">Reorder</button>
+          <div class="task" draggable="true" data-id="${card.id}" id="card${card.id}">
+            <a class="card" id="read-href${card.id}" href="/view/read/card/${card.id}">
+              <div id="card-id${cardIndex}" style="display: none">${card.id}</div>
+              <div class="task-title">${card.title}</div>
+              <div class="task-description">${card.content}</div>
+            </a>
+          </div>
+          <div id="reorder-card-module${card.id}" style="display: none">
+            <input type="text" id="card-new-position${card.id}">
+            <button onclick="reorderCardApi(${card.id})">앞으로 이동</button>
+          </div>
+        </div>
+      `;
+          columnHtml += cardHtml;
+        });
+
+        columnHtml += `
+        </div>
+        <button class="add-card-btn" onclick="window.location.href = '/view/columns/${column.columnId}/create/card'">+ Add Card</button>
+      </div>
+    `;
+
+        $('#board').append(columnHtml);
+      });
+    }
 
 
     // Invite button functionality (you can customize this as needed)
