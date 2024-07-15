@@ -102,6 +102,13 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script>
     $(document).ready(function() {
+        // 토큰 확인
+        const token = Cookies.get('Authorization');
+        if (token) {
+            window.location.href = 'http://localhost:8080/view/index'; // 토큰이 없다면 로그인 화면으로 이동
+            return;
+        }
+
         $('#login-form').submit(function(e) {
             e.preventDefault();
 
