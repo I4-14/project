@@ -531,10 +531,8 @@
 
     // // 작성자별 조회 필터
     function getCardsByUsername(username) {
-      username='홍길동1'
       let searchCond = {
-        'username' : username,
-        'cardStatus' : 'ACCEPTED'
+        'username' : username
       }
       console.log(searchCond);
       $.ajax({
@@ -609,11 +607,12 @@
       });
 
     function renderColumns(columnsList) {
+      $('#board').text(' ')
       columnsList.forEach(function(column, columnIndex) {
         var columnHtml = `
       <div class="column">
         <div class="column-header">
-          <span id="column-id${columnIndex}" style="display: none">${column.columnId}</span>
+          <span id="column-id${columnIndex}" style="display: none">${column.cardStatus}</span>
           ${column.category}
           <div>
             <button id="edit-column-button${columnIndex}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${column.columnId}'">Edit Column</button>
