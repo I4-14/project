@@ -215,7 +215,7 @@
       <h1>Your Kanban Board</h1>
       <div>
         <button id="edit-btn" class="edit-btn">Edit</button>
-        <button class="invite-btn">Invite Team Members</button>
+        <button class="invite-btn" th:onclick="|window.location.href = '@{/view/invite/board/{id}(id=${id})}'|">Invite Team Members</button>
         <div class="filter-dropdown">
           <button class="filter-btn">Filter by Team Member</button>
           <div id="filterDropdown" class="filter-content">
