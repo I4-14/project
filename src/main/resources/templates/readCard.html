@@ -253,9 +253,16 @@
   </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script>
-  fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`)
+
+  const token = Cookies.get('Authorization');
+  fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    }
+  })
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -271,7 +278,11 @@
     document.getElementById('cardAssignee').textContent = data.data.username;
 
     // 댓글 리스트를 불러오는 API 호출
-  return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`)
+  return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`, {
+    headers: {
+      'Authorization': token
+    }
+  })
   })
   .then(response => {
     if (!response.ok) {
@@ -312,6 +323,7 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token
       },
       body: JSON.stringify(newCommentData),
     })
@@ -327,6 +339,7 @@
       window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
     })
     .catch(error => {
+      alert("댓글 추가 실패");
       console.error('댓글 추가 중 오류 발생:', error);
       // 오류 처리
     });
@@ -337,6 +350,9 @@
     if (confirm('삭제하는 경우 작성한 데이터가 전부 삭제됩니다. 정말 삭제하시겠습니까?')) {
       fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': token
+        }
       })
       .then(response => {
         if (!response.ok) {
@@ -352,6 +368,7 @@
         window.location.href = `http://localhost:8080/view/board/${boardId}`;
       })
       .catch(error => {
+        alert("접근권한이 없습니다.");
         console.error('카드 삭제 중 오류 발생:', error);
         // 오류 처리, 오류 메시지 표시 등
       });
@@ -387,6 +404,7 @@
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token
       },
       body: JSON.stringify(updatedData),
     })
@@ -402,6 +420,7 @@
       window.location.reload();
     })
     .catch(error => {
+      alert("접근권한이 없습니다.");
       console.error('카드 수정 중 오류 발생:', error);
       // 오류 처리, 오류 메시지 표시 등
     });
