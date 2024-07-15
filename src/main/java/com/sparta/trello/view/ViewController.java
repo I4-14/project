@@ -1,71 +1,57 @@
 package com.sparta.trello.view;
 
-import ch.qos.logback.core.model.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/view")
 public class ViewController {
-    @GetMapping("/auth/signup")
+    @GetMapping("/view/auth/signup")
     public String signupPage() {
         return "signup";
     }
 
-    @GetMapping("/auth/login")
+    @GetMapping(value = {"/","/view/auth/login"})
     public String loginPage() {
         return "login";
     }
 
-    @GetMapping("/index")
+    @GetMapping("/view/index")
     public String indexPage() {
         return "index";
     }
 
-    @GetMapping("/create/board")
+    @GetMapping("/view/create/board")
     public String createBoardPage() {
         return "createBoard";
     }
 
-    @GetMapping("/update/board/{id}")
-    public String updateBoardPage(@PathVariable("id") Long id) {
-        return "updateBoard";
-    }
 
-    @GetMapping("/main")
-    public String mainPage(@RequestParam Long id, Model model) {
-        // todo main 화면을 꾸밀 model을 만들어서 넘겨야 함
-        return "main";
-    }
-    @GetMapping("/invite/board")
+    @GetMapping("/view/invite/board/{boardId}")
     public String inviteUserPage() {
         return "inviteUser";
     }
 
-    @GetMapping("/user/invitation")
+    @GetMapping("/view/user/invitation")
     public String invitaionPage() {
         return "invitationList";
     }
 
-    @GetMapping("/board/{id}/column")
+    @GetMapping("/view/board/{id}/column")
     public String createColumnPage(@PathVariable("id") Long id) {
         return "createColumn";
     }
-
-    @GetMapping("/board/{id}")
+    @GetMapping("/view/board/{id}")
     public String kanbanboardPage(@PathVariable("id") Long id) {
         return "kanbanboard";
     }
-
-    @GetMapping("/column/{id}")
+    @GetMapping("/view/column/{id}")
     public String updateColumnPage(@PathVariable("id") Long id) {
         return "updateColumn";
     }
 
-    @GetMapping("/column/{id}/create/card")
+
+    @GetMapping("/view/columns/{id}/create/card")
     public String createCard(@PathVariable("id") Long id) {
         return "createCard";
     }
