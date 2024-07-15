@@ -21,6 +21,7 @@ public class CardResponseDto {
 
   public CardResponseDto(Card card) {
     this.boardId = card.getBoard().getId();
+    this.columnId = card.getColumns().getId();
     this.id = card.getId();
     this.position = card.getPosition();
     this.title = card.getTitle();

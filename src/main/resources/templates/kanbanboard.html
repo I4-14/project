@@ -368,7 +368,7 @@
 
     function addInvitedUserHTML(result) {
       result.data.forEach(row => {
-        let invitedUserTag = `<a href="#" data-member="all">${row.username}</a>`
+        let invitedUserTag = `<a href="#" onclick="getCardsByUsername('${row.username}')" data-member="all">${row.username}</a>`
         $('#filterDropdown').append(invitedUserTag);
       })
     }
@@ -530,10 +530,21 @@
     }
 
     // // 작성자별 조회 필터
-    $(document).ready(function() {
+    function getCardsByUsername(username) {
+      username='홍길동1'
+      let searchCond = {
+        'username' : username,
+        'cardStatus' : 'ACCEPTED'
+      }
+      console.log(searchCond);
       $.ajax({
-        type: 'GET',
+        type: 'PUT',
         url: `/api/columns/cards`,
+        contentType: "application/json",
+        headers: {
+          'Authorization': token
+        },
+        data: JSON.stringify(searchCond),
         success: function (response) {
           var cards = response.data; // 카드 데이터 배열
 
@@ -565,6 +576,8 @@
           console.error('Failed to fetch board data:', status, error);
         }
       });
+    }
+
 
       $(".filter-btn").click(function () {
         $("#filterDropdown").toggleClass("show");
@@ -594,7 +607,6 @@
         }
         $("#filterDropdown").removeClass("show");
       });
-    })
 
     function renderColumns(columnsList) {
       columnsList.forEach(function(column, columnIndex) {
