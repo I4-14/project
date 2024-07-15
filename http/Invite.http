@@ -4,13 +4,12 @@ Content-Type: application/json
 Authorization: {{accessToken}}
 
 {
-  "userName": "user"
+  "userName": "user1234"
 }
 
 ### 보드 사용자 목록
 GET localhost:8080/api/boards/1/member
 Content-Type: application/json
-Authorization: {{accessToken}}
 
 ### 보드 초대 복록
 GET localhost:8080/api/invite
