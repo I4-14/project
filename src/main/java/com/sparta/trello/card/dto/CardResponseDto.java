@@ -22,6 +22,7 @@ public class CardResponseDto {
 
   public CardResponseDto(Card card) {
     this.boardId = card.getBoard().getId();
+    this.columnId = card.getColumns().getId();
     this.id = card.getId();
     this.position = card.getPosition();
     this.title = card.getTitle();
@@ -29,7 +30,7 @@ public class CardResponseDto {
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
     this.userId = card.getUser().getId();
-    this.username = card.getUser().getName();
+    this.username = card.getUser().getUsername();
   }
 
 }

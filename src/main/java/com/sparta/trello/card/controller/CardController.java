@@ -5,7 +5,6 @@ import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardDetailsResponseDto;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
-import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.card.service.CardService;
 import com.sparta.trello.common.ApiResponse;
@@ -60,13 +59,6 @@ public class CardController {
   UserDetailsImpl userDetails) {
     CardResponseDto card = cardService.updateCard(cardId, requestDto, userDetails.getUser().getId());
     ApiResponse<CardResponseDto> response = new ApiResponse<>("카드 수정 성공", "200", card);
-    return new ResponseEntity<>(response, HttpStatus.OK);
-  }
-
-  @PutMapping("/cards/{cardId}/status")
-  public ResponseEntity<ApiResponse<CardResponseDto>> updateCardStatus(@PathVariable Long cardId, @RequestBody CardUpdateCardStatusRequestDto requestDto) {
-    CardResponseDto cardStatus = cardService.updateCardStatus(cardId, requestDto);
-    ApiResponse<CardResponseDto> response = new ApiResponse<>("카드상태 수정 성공", "200", cardStatus);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 

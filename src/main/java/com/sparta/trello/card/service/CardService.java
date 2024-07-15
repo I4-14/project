@@ -6,7 +6,6 @@ import com.sparta.trello.card.dto.CardCreateRequestDto;
 import com.sparta.trello.card.dto.CardDetailsResponseDto;
 import com.sparta.trello.card.dto.CardResponseDto;
 import com.sparta.trello.card.dto.CardSearchCondDto;
-import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.card.repository.CardRepository;
@@ -40,7 +39,6 @@ public class CardService {
   public CardDetailsResponseDto getCardDetailsById(Long cardId, Long userId) {
     User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     Card card = findCardById(cardId);
-//    List<CommentResponseDto> commentDtos = commentRepository.findCommentByCardIdOrderByCreatedAtDesc(page, amount, cardId);
    return new CardDetailsResponseDto(card);
   }
 
@@ -61,14 +59,6 @@ public class CardService {
     card.checkUser(user);
     User changeUser = userRepository.findById(requestDto.getUserId()).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
     card.updateCard(requestDto, changeUser);
-    return new CardResponseDto(card);
-  }
-
-  @Transactional
-  public CardResponseDto updateCardStatus(Long cardId, CardUpdateCardStatusRequestDto requestDto) {
-    Card card = findCardById(cardId);
-    Columns column = columnsServices.findColumnsById(requestDto.getColumnId());
-    card.updateCardStatus(column, requestDto);
     return new CardResponseDto(card);
   }
 
