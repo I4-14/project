@@ -396,7 +396,7 @@
         alert('카드가 성공적으로 삭제되었습니다:');
         console.log('카드가 성공적으로 삭제되었습니다:', data);
         // 보드 페이지로 리다이렉트
-        window.location.href = `http://localhost:8080/view/board/${boardId}`;
+        window.location = document.referrer;
       })
       .catch(error => {
         alert("접근권한이 없습니다.");
