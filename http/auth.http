@@ -1,0 +1,50 @@
+### 회원가입 signup (USER)
+POST localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "user1234",
+  "password": "Password123!",
+  "name": "user"
+}
+
+### 회원가입 signup (MANAGER)
+POST localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "admin1234",
+  "password": "Password123!",
+  "name": "admin",
+  "manager": true,
+  "managerToken": "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC"
+}
+
+### 로그인 login
+POST localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user1234",
+  "password": "Password123!"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken)
+    client.global.set("refreshToken", response.body.data.refreshToken)
+%}
+
+### 로그아웃 logout
+POST localhost:8080/api/auth/logout
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+### 회원탈퇴 withdraw
+POST localhost:8080/api/auth/withdraw
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+### 토큰 재발급 refresh-token
+POST localhost:8080/api/auth/refresh-token
+Content-Type: application/json
+RefreshToken: {{refreshToken}}

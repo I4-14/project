@@ -38,42 +38,13 @@ public class InviteController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    /**
-     *
-     *      초대 목록 보기
-     *
-     */
-    @GetMapping("/invite")
-    public ResponseEntity<ApiResponse<List<InvitationListDto>>> getInvitationList(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<InvitationListDto> responseDto= inviteService.getInvitationList(userDetails.getUser().getId());
-        ApiResponse<List<InvitationListDto>> response = new ApiResponse("보드 초대 목록보기", "201", responseDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @DeleteMapping("/boards/{boardId}/users/{userId}")
+    public ResponseEntity<ApiResponse<InviteResponseDto>> deleteMember(@PathVariable("boardId") Long boardId, @PathVariable("userId") Long userId) {
+        inviteService.deleteMember(boardId,userId);
+        ApiResponse<InviteResponseDto> response = new ApiResponse("보드 맴버 삭제 성공", "204", null);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    /**
-     *
-     * 초대에 승락하기
-     */
-
-    @PutMapping("/accept/invite/{workspaceId}")
-    public ResponseEntity<ApiResponse<InviteResponseDto>> acceptToInvitation (@PathVariable("workspaceId") Long workspaceId) {
-        inviteService.acceptInvitation(workspaceId);
-        ApiResponse response = new ApiResponse("보드 초대 승락", "201", null);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    /**
-     * 초대에 거절하기
-     *
-     */
-
-    @PutMapping("/reject/invite/{workspaceId}")
-    public ResponseEntity<ApiResponse<InviteResponseDto>> rejectToInvitation (@PathVariable("workspaceId") Long workspaceId) {
-        inviteService.rejectInvitation(workspaceId);
-        ApiResponse response = new ApiResponse("보드 초대 거절", "201", null);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
 
 
     /**

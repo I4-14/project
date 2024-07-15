@@ -45,13 +45,6 @@
     const formData = new FormData(this);
     const cardData = Object.fromEntries(formData); // Converts FormData to a plain object
 
-    // Logs the card data to console
-    console.log('Card created:', cardData);
-
-    // Alerts the user with formatted JSON of the card data
-    alert('Card created successfully!\n\n' + JSON.stringify(cardData, null, 2));
-
-    // You might want to send this data to the backend here using fetch() or XMLHttpRequest
     // Example using fetch():
     const token = Cookies.get('Authorization');
 
@@ -66,6 +59,7 @@
     .then(response => response.json())
     .then(data => {
       console.log('Success:', data);
+      alert('카드가 성공적으로 추가되었습니다.');
 
       window.location = document.referrer;
     })

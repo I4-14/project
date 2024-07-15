@@ -47,6 +47,7 @@ public enum ErrorEnum {
 
     // Board
     BOARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 보드입니다."),
+    MANAGER_CANNOT_BE_INVITED(BAD_REQUEST, "매니저는 초대할 수 없습니다."), // 추가된 에러
 
     // Column
     COLUMN_NOT_FOUND(NOT_FOUND, "존재하지 않는 컬럼입니다."),

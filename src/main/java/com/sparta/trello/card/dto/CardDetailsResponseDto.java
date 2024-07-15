@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CardDetailsResponseDto {
 
+  private Long boardId;
+  private Long id;
   private String title;
   private String content;
   private String dueDate;
@@ -20,6 +22,8 @@ public class CardDetailsResponseDto {
   private String username;
 
   public CardDetailsResponseDto(Card card) {
+    this.boardId = card.getBoard().getId();
+    this.id = card.getId();
     this.title = card.getTitle();
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
