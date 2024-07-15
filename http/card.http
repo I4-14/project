@@ -12,21 +12,19 @@ Authorization: {{accessToken}}
 ### 카드 전체 조회
 GET localhost:8080/api/columns/cards
 Content-Type: application/json
-Authorization: Bearer {{accessToken}}
+Authorization: {{accessToken}}
 
 {
-  "columnId": 1,
-  "status": "In Progress"
+  "username":"admin"
 }
 
-### 카드 단건 조회
+### 카드 조회
 GET localhost:8080/api/columns/cards/1
 Content-Type: application/json
-Authorization: Bearer {{accessToken}}
+Authorization: {{accessToken}}
 
 {
-  "columnId": 1,
-  "status": "In Progress"
+  "username":"admin"
 }
 
 ### 카드 수정
@@ -56,6 +54,6 @@ Content-Type: application/json
 Authorization: {{accessToken}}
 
 ### 카드 삭제
-DELETE localhost:8080/api/columns/cards/1
+DELETE localhost:8080/api/columns/cards/3
 Content-Type: application/json
-Authorization: Bearer {{accessToken}}
+Authorization: {{accessToken}}
