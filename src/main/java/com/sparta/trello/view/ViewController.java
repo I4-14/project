@@ -65,7 +65,7 @@ public class ViewController {
         return "updateColumn";
     }
 
-    @GetMapping("/column/{id}/create/card")
+    @GetMapping("/columns/{id}/create/card")
     public String createCard(@PathVariable("id") Long id) {
         return "createCard";
     }
