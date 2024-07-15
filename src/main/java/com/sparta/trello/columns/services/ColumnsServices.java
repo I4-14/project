@@ -1,5 +1,6 @@
 package com.sparta.trello.columns.services;
 
+import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.repository.BoardRepository;
 import com.sparta.trello.card.dto.CardResponseDto;
@@ -11,9 +12,6 @@ import com.sparta.trello.columns.repository.ColumnsRepository;
 import com.sparta.trello.common.exception.CustomException;
 import com.sparta.trello.common.exception.ErrorEnum;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +24,7 @@ import java.util.List;
 public class ColumnsServices {
     private final ColumnsRepository columnsRepository;
     private final BoardRepository boardRepository;
-    public ColumnsResponseDto createColumns(Long boardId, ColumnsRequestDto requestDto) {
+    public ColumnsResponseDto createColumns(Long boardId, ColumnsRequestDto requestDto, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorEnum.BOARD_NOT_FOUND));
         Long maxOrderNum = columnsRepository.findMaxOrderNum().orElse(0L);
         Columns columns = Columns.builder()
@@ -34,19 +32,21 @@ public class ColumnsServices {
                 .category(CategoryEnum.valueOf(requestDto.getCategory()))
                 .orderNum(maxOrderNum + 1L)
                 .build();
+        columns.checkUser(user);
         columnsRepository.save(columns);
         return new ColumnsResponseDto(columns.getCategory());
     }
     @Transactional
-    public ColumnsResponseDto updateColumns(Long columnsId, ColumnsRequestDto requestDto) {
+    public ColumnsResponseDto updateColumns(Long columnsId, ColumnsRequestDto requestDto, User user) {
         Columns columns = findColumnsById(columnsId);
+        columns.checkUser(user);
         columns.updateComment(requestDto);
         return new ColumnsResponseDto(columns.getCategory());
     }
-    public void deleteColumns(Long columnId) {
+    public void deleteColumns(Long columnId, User user) {
         Long maxOrderNum = columnsRepository.findMaxOrderNum().orElse(0L);
         Columns columns = findColumnsById(columnId);
-
+        columns.checkUser(user);
         Long currentOrderNum = columns.getOrderNum();
         List<Columns> betweenColumns = columnsRepository.findByBetweenColumnIdAndInFrontOfId(currentOrderNum - 1, maxOrderNum);
         betweenColumns.forEach(Columns::subtractOrderNum);
@@ -55,8 +55,9 @@ public class ColumnsServices {
     }
 
     @Transactional
-    public void changeOrderNum(Long columnId, Long inFrontofId) {
+    public void changeOrderNum(Long columnId, Long inFrontofId, User user) {
         Columns columns = findColumnsById(columnId);
+        columns.checkUser(user);
         Long orginalOrderNum = columns.getOrderNum();
         Long destinationOrderNum = columnsRepository.findOrderNumById(inFrontofId).orElseThrow(() -> new CustomException(ErrorEnum.COLUMN_NOT_FOUND));
 
@@ -80,10 +81,11 @@ public class ColumnsServices {
     public Board findBoardById(Long id) {
         return boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorEnum.BOARD_NOT_FOUND));
     }
-    public ColumnsListResponseDto getColumnsList(Long id) {
+    public ColumnsListResponseDto getColumnsList(Long id, User user) {
         Board board = findBoardById(id);
         List<Card> cards = new ArrayList<>();
         List<Columns> columnList = board.getColumnsList().stream().sorted(Comparator.comparing(Columns::getOrderNum)).toList();
+        columnList.get(0).checkUser(user);
         List<CardResponseDto> cardResponseDtos = new ArrayList<>();
         List<CategoryAndCardsResponseData> columns = new ArrayList<>();
         for (int i = 0; i < columnList.size(); i++) {
@@ -100,8 +102,9 @@ public class ColumnsServices {
         return new ColumnsListResponseDto(columnsListData);
     }
 
-    public ColumnsResponseDto getColumnsById(Long id) {
+    public ColumnsResponseDto getColumnsById(Long id, User user) {
         Columns columns = findColumnsById(id);
+        columns.checkUser(user);
         return new ColumnsResponseDto(columns.getCategory());
     }
 }
