@@ -64,7 +64,7 @@
       margin-top: 20px;
     }
     textarea {
-      width: 100%;
+      width: 98%;
       height: 100px;
       padding: 10px;
       border: 1px solid #ddd;
@@ -128,8 +128,8 @@
 
     .modal-content {
       background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
+      margin: 10% auto;
+      padding: 20px 40px;
       border: 1px solid #888;
       width: 80%;
       max-width: 500px;
@@ -150,6 +150,10 @@
       text-decoration: none;
       cursor: pointer;
     }
+    form-group{margin-bottom: 20px}
+    label{display:block;margin-bottom:5px;font-weight:bold;color:#555}
+    input[type="text"],input[type="date"],select,textarea{width:95%;padding:10px 20px;border:1px solid #ddd;border-radius:4px;font-size:16px}
+    textarea{height:100px;resize:vertical}
 
     .modal-content ul {
       list-style-type: none;
@@ -161,17 +165,19 @@
     }
 
     .modal-content label {
+      margin-top: 10px;
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
 
     .modal-content input[type="text"],
     .modal-content input[type="date"],
     .modal-content textarea {
-      width: 100%;
-      padding: 5px 5px;
+      width: 98%;
+      padding: 5px;
       border: 1px solid #ddd;
       border-radius: 4px;
+      margin-bottom: 15px;
     }
 
     .modal-content .submit-edit {
@@ -241,8 +247,16 @@
       <label for="editCardContent">Content:</label>
       <textarea id="editCardContent" placeholder="Enter card content"></textarea>
 
-      <label for="editAssignee">Assignee:</label>
-      <input type="text" id="editAssignee" placeholder="Enter assignee">
+      <div class="form-group">
+        <label for="editAssignee">cardAssignee:</label>
+        <select id="editAssignee" name="cardAssignee" required>
+          <option value="">Select a assignee</option>
+          <option value="backlog">1</option>
+          <option value="in-progress">2</option>
+          <option value="done">3</option>
+          <option value="emergency">4</option>
+        </select>
+      </div>
 
       <label for="editCardDueDate">Due Date:</label>
       <input type="date" id="editCardDueDate">
