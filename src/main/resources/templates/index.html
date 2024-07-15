@@ -57,14 +57,7 @@
             color: #666;
         }
 
-        .board-team {
-            display: inline-block;
-            background-color: #e1e1e1;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-top: 10px;
-        }
+
 
         .create-board {
             background-color: #4CAF50;
@@ -276,8 +269,6 @@
         <input type="text" id="editBoardTitle" placeholder="Enter board title">
         <label for="editBoardInfo">Board Info</label>
         <textarea id="editBoardInfo" placeholder="Enter board info"></textarea>
-        <label for="editBoardTeam">Board Team</label>
-        <input type="text" id="editBoardTeam" placeholder="Enter board team">
         <button onclick="saveBoardChanges()">Save Changes</button>
     </div>
 </div>
@@ -317,11 +308,10 @@
         }
     }
 
-    function openEditModal(boardId, title, info, team) {
+    function openEditModal(boardId, title, info) {
         document.getElementById('editBoardId').value = boardId;
         document.getElementById('editBoardTitle').value = title;
         document.getElementById('editBoardInfo').value = info;
-        document.getElementById('editBoardTeam').value = team;
         document.getElementById('editModal').style.display = 'block';
     }
 
@@ -333,7 +323,6 @@
         const boardId = document.getElementById('editBoardId').value;
         const title = document.getElementById('editBoardTitle').value;
         const info = document.getElementById('editBoardInfo').value;
-        const team = document.getElementById('editBoardTeam').value;
         const token = Cookies.get('Authorization'); // Retrieve the token
 
         // Data to be sent in the POST request
@@ -359,7 +348,6 @@
 
                     boardCard.querySelector('.board-title').textContent = title;
                     boardCard.querySelector('.board-info').textContent = info;
-                    boardCard.querySelector('.board-team').textContent = `Team: ${team}`;
 
                     closeEditModal();
                 } else {
@@ -470,9 +458,8 @@
                     card.innerHTML = `
                 <h2 class="board-title">${board.title}</h2>
                 <p class="board-info">${board.description}</p>
-                <span class="board-team">Team: ${board.team}</span>
                 <div class="edit-buttons">
-                    <button class="edit-button" onclick="openEditModal(${board.id}, '${board.title}', '${board.description}', '${board.team}')">
+                    <button class="edit-button" onclick="openEditModal(${board.id}, '${board.title}', '${board.description}')">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
                     <button class="delete-button" onclick="openDeleteModal(${board.id})">
