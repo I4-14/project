@@ -1,0 +1,61 @@
+### 카드 생성
+POST localhost:8080/api/columns/1/cards
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "title": "card title",
+  "content": "card content",
+  "dueDate": "2024-07-16"
+}
+
+### 카드 전체 조회
+GET localhost:8080/api/columns/cards
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "columnId": 1,
+  "status": "In Progress"
+}
+
+### 카드 단건 조회
+GET localhost:8080/api/columns/cards/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "columnId": 1,
+  "status": "In Progress"
+}
+
+### 카드 수정
+PUT localhost:8080/api/columns/cards/1
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "title": "card title update",
+  "content": "card content update",
+  "dueDate": "2024-07-17"
+}
+
+### 카드 상태 수정
+PUT localhost:8080/api/columns/cards/1/status
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "columnId": 1,
+  "cardStatus": "Done"
+}
+
+### 카드 위치 변경
+PUT localhost:8080/api/columns/cards/1/position?newPosition=0
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+### 카드 삭제
+DELETE localhost:8080/api/columns/cards/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
