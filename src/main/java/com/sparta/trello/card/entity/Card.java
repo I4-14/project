@@ -2,10 +2,8 @@ package com.sparta.trello.card.entity;
 
 import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.entity.User;
-import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.card.dto.CardCreateRequestDto;
-import com.sparta.trello.card.dto.CardUpdateCardStatusRequestDto;
 import com.sparta.trello.card.dto.CardUpdateRequestDto;
 import com.sparta.trello.columns.entity.CategoryEnum;
 import com.sparta.trello.columns.entity.Columns;
@@ -77,15 +75,11 @@ public class Card extends Timestamped {
     this.user = user;
   }
 
-  public void updateCard(CardUpdateRequestDto requestDto) {
+  public void updateCard(CardUpdateRequestDto requestDto, User user) {
     this.title = requestDto.getTitle();
     this.content = requestDto.getContent();
     this.dueDate = requestDto.getDueDate();
-  }
-
-  public void updateCardStatus(Columns column, CardUpdateCardStatusRequestDto requestDto) {
-    this.columns = column;
-    this.cardStatus = CategoryEnum.valueOf(requestDto.getCardStatus());
+    this.user = user;
   }
 
   public void updatePosition(int newPosition) {
