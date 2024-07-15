@@ -2,8 +2,6 @@ package com.sparta.trello.card.dto;
 
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.columns.entity.CategoryEnum;
-import com.sparta.trello.comment.entity.Comment;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +12,6 @@ public class CardResponseDto {
   private Long boardId;
   private Long columnId;
   private Long id;
-  private Long columnId;
   private int position;
   private String title;
   private String content;
