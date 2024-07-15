@@ -85,7 +85,7 @@ public class ColumnsServices {
         Board board = findBoardById(id);
         List<Card> cards = new ArrayList<>();
         List<Columns> columnList = board.getColumnsList().stream().sorted(Comparator.comparing(Columns::getOrderNum)).toList();
-        columnList.get(0).checkUser(user);
+        //columnList.get(0).checkUser(user);
         List<CardResponseDto> cardResponseDtos = new ArrayList<>();
         List<CategoryAndCardsResponseData> columns = new ArrayList<>();
         for (int i = 0; i < columnList.size(); i++) {
