@@ -50,5 +50,7 @@ public class Columns extends Timestamped {
     @OneToMany(mappedBy = "columns", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Card> cards = new ArrayList<>();
 
+
+
 }
 

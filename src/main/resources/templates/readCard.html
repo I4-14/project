@@ -52,11 +52,11 @@
       padding: 10px;
       margin-bottom: 10px;
     }
-    .comment-author {
+    .comment-username {
       font-weight: bold;
       margin-bottom: 5px;
     }
-    .comment-date {
+    .comment-createdAt {
       font-size: 12px;
       color: #777;
     }
@@ -201,6 +201,10 @@
       <p id="cardContent"></p>
     </div>
     <div class="detail-item">
+      <span class="detail-label">Assignee:</span>
+      <span id="cardAssignee"></span>
+    </div>
+    <div class="detail-item">
       <span class="detail-label">Status:</span>
       <span id="cardStatus"></span>
     </div>
@@ -221,7 +225,7 @@
         <button class="btn submit-comment" onclick="addComment()">Submit Comment</button>
         <button class="btn edit-btn" onclick="editCard()">Edit Card</button>
         <button class="btn delete-btn" onclick="deleteCard()">Delete Card</button>
-        <button class="btn back-btn" onclick="window.location.href='https://websim.ai/kanban-board'">Back to Board</button>
+        <button class="btn back-btn" onclick="redirectToBoard()">Back to Board</button>
       </div>
     </div>
   </div>
@@ -237,17 +241,28 @@
       <label for="editCardContent">Content:</label>
       <textarea id="editCardContent" placeholder="Enter card content"></textarea>
 
+      <label for="editAssignee">Assignee:</label>
+      <input type="text" id="editAssignee" placeholder="Enter assignee">
+
       <label for="editCardDueDate">Due Date:</label>
       <input type="date" id="editCardDueDate">
+
 
       <button class="btn submit-edit" onclick="submitEdit()">Save Changes</button>
     </div>
   </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script>
-  fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`)
+
+  const token = Cookies.get('Authorization');
+  fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    }
+  })
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -260,9 +275,14 @@
     document.getElementById('cardContent').textContent = data.data.content;
     document.getElementById('cardStatus').textContent = data.data.cardStatus;
     document.getElementById('cardDueDate').textContent = data.data.dueDate;
+    document.getElementById('cardAssignee').textContent = data.data.username;
 
     // 댓글 리스트를 불러오는 API 호출
-  return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`)
+  return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`, {
+    headers: {
+      'Authorization': token
+    }
+  })
   })
   .then(response => {
     if (!response.ok) {
@@ -279,6 +299,7 @@
       const newComment = document.createElement('div');
       newComment.className = 'comment';
       newComment.innerHTML = `
+        <div class="comment-username">${comment.username}</div>
         <div class="comment-content">${comment.message}</div>
         <div class="comment-createdAt">${comment.createdAt}</div>
       `;
@@ -302,6 +323,7 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token
       },
       body: JSON.stringify(newCommentData),
     })
@@ -312,10 +334,12 @@
       return response.json();
     })
     .then(data => {
+      alert('댓글이 성공적으로 추가되었습니다.');
       // 서버에서 받은 새로운 댓글을 UI에 추가
       window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
     })
     .catch(error => {
+      alert("댓글 추가 실패");
       console.error('댓글 추가 중 오류 발생:', error);
       // 오류 처리
     });
@@ -326,6 +350,9 @@
     if (confirm('삭제하는 경우 작성한 데이터가 전부 삭제됩니다. 정말 삭제하시겠습니까?')) {
       fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': token
+        }
       })
       .then(response => {
         if (!response.ok) {
@@ -334,18 +361,20 @@
         return response.json();
       })
       .then(data => {
+        alert('카드가 성공적으로 삭제되었습니다:');
         console.log('카드가 성공적으로 삭제되었습니다:', data);
-        // 필요에 따라 보드로 리다이렉트하거나 UI 업데이트 처리
-        // 칸반보드로 이동 필요⭐⭐⭐
-        window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
+        // 보드 페이지로 리다이렉트
+        const boardId = data.data;
+        window.location.href = `http://localhost:8080/view/board/${boardId}`;
       })
       .catch(error => {
+        alert("접근권한이 없습니다.");
         console.error('카드 삭제 중 오류 발생:', error);
         // 오류 처리, 오류 메시지 표시 등
       });
     } else {
       // 사용자가 취소를 선택한 경우 아무 동작도 하지 않습니다
-      console.log('카드 삭제가 취소되었습니다.');
+      alert('카드 삭제가 취소되었습니다.');
     }
   }
   // 카드 수정 버튼 실행
@@ -367,7 +396,7 @@
     const updatedData = {
       title: document.getElementById('editCardTitle').value,
       content: document.getElementById('editCardContent').value,
-      // cardStatus: document.getElementById('editAssignee').value,
+      assignee: document.getElementById('editAssignee').value,
       dueDate: document.getElementById('editCardDueDate').value,
     };
 
@@ -375,6 +404,7 @@
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token
       },
       body: JSON.stringify(updatedData),
     })
@@ -387,14 +417,17 @@
     .then(data => {
       console.log('카드가 성공적으로 수정되었습니다:', data);
       closeModal(); // 수정 완료 후 모달 닫기
-
-      window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
+      window.location.reload();
     })
     .catch(error => {
+      alert("접근권한이 없습니다.");
       console.error('카드 수정 중 오류 발생:', error);
       // 오류 처리, 오류 메시지 표시 등
     });
-
+  }
+  function redirectToBoard() {
+    // 보드 페이지로 리다이렉트
+    history.back();
   }
 </script>
 </body></html>

@@ -42,7 +42,7 @@ public class AuthService {
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
 
-        Optional<User> checkUser = Optional.ofNullable(findByUsername(username));
+        Optional<User> checkUser =  userRepository.findByUsername(username);
         // 중복 사용자 확인
         if (checkUser.isPresent()) {
             throw new CustomException(ErrorEnum.DUPLICATE_USER);
