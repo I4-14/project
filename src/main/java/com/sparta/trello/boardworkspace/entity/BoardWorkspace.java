@@ -28,11 +28,4 @@ public class BoardWorkspace extends Timestamped {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @Enumerated(value = EnumType.STRING)
-    private InvitationEnum status;
-
-
-    public void editStatus(InvitationEnum status) {
-        this.status = status;
-    }
 }
