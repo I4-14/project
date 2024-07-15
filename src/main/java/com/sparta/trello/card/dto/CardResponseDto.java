@@ -28,7 +28,7 @@ public class CardResponseDto {
     this.content = card.getContent();
     this.dueDate = card.getDueDate();
     this.cardStatus = card.getCardStatus();
-    this.username = card.getUser().getUsername();
+    this.username = card.getUser().getName();
   }
 
 }

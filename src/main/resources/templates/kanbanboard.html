@@ -21,7 +21,7 @@
     margin: 0;
   }
   .invite-btn {
-    background-color: #4CAF50;
+    background-color: #0593ec;
     border: none;
     color: white;
     padding: 10px 20px;
@@ -34,7 +34,7 @@
     border-radius: 4px;
   }
   .edit-btn {
-    background-color: #4CAF50;
+    background-color: #f83104;
     border: none;
     color: white;
     padding: 10px 20px;
@@ -98,6 +98,15 @@
     font-size: 14px;
     color: #666;
   }
+  .task-assignee {
+    font-size: 12px;
+    color: #faf8f8;
+    padding: 3px 8px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    display: inline-block;
+    background-color: #faac05;
+  }
   .modal {
     display: none;
     position: fixed;
@@ -131,7 +140,7 @@
     text-decoration: none;
     cursor: pointer;
   }
-  .add-column-btn, .add-card-btn, .edit-column-btn, .reorder-column-btn {
+  .add-column-btn, .add-card-btn, .edit-column-btn, .reorder-column-btn, .filter-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -145,15 +154,18 @@
     border-radius: 4px;
   }
   .add-column-btn {
+    background-color: #b602f3;
     display: block;
     margin: 20px auto;
     font-size: 18px;
   }
   .add-card-btn {
+    background-color: #0623dc;
     width: 100%;
     margin-top: auto;
   }
   .edit-column-btn {
+    background-color: #06c9b2;
     width: 80px;
     font-size: 12px;
     margin-top: auto;
@@ -163,13 +175,35 @@
     font-size: 12px;
     margin-top: auto;
   }
-  .reorder-card-btn {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    text-align: center;
-    font-size: 16px;
+  /*.reorder-card-btn {*/
+  /*  background-color: #4CAF50;*/
+  /*  border: none;*/
+  /*  color: white;*/
+  /*  text-align: center;*/
+  /*  font-size: 16px;*/
+  /*}*/
+  .filter-dropdown {
+    position: relative;
+    display: inline-block;
   }
+  .filter-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  .filter-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  .filter-content a:hover {
+    background-color: #f1f1f1;
+  }
+
 </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head><body>
@@ -179,6 +213,16 @@
       <div>
         <button id="edit-btn" class="edit-btn">Edit</button>
         <button class="invite-btn">Invite Team Members</button>
+        <div class="filter-dropdown">
+          <button class="filter-btn">Filter by Team Member</button>
+          <div id="filterDropdown" class="filter-content">
+            <a href="#" data-member="all">All Members</a>
+            <a href="#" data-member="john">John</a>
+            <a href="#" data-member="sarah">Sarah</a>
+            <a href="#" data-member="mike">Mike</a>
+            <a href="#" data-member="emily">Emily</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="board" id="board">
@@ -289,6 +333,7 @@
                               <div id="card-id${j}" style="display: none">${card.id}</div>
                               <div class="task-title">${card.title}</div>
                               <div class="task-description">${card.content}</div>
+                              <div class="task-assignee">${card.username}</div>
                             </a>
                           </div>
                           <div id="reorder-card-module${card.id}" style="display: none"><input type="text" id="card-new-position${card.id}"><button onclick="reorderCardApi(${card.id})">앞으로 이동</button></div>
@@ -372,6 +417,7 @@
       });
     });
 
+
     // Modal close functionality
     const modal = document.getElementById('taskModal');
     const span = document.getElementsByClassName('close')[0];
@@ -453,10 +499,121 @@
       });
     }
 
-    // Add event listeners to all add-card buttons
-    // document.querySelectorAll('.add-card-btn').forEach(btn => {
-    //   btn.addEventListener('click', addNewCard);
-    // });
+    // // 작성자별 조회 필터
+    // $(document).ready(function() {
+    //   $.ajax({
+    //     type: 'GET',
+    //     url: `/api/columns/cards`,
+    //     success: function (response) {
+    //       var cards = response.data; // 카드 데이터 배열
+    //
+    //       // Initialize columnsMap to group cards by columnId
+    //       var columnsMap = {};
+    //
+    //       // Group cards by columnId
+    //       cards.forEach(function(card) {
+    //         if (!columnsMap[card.columnId]) {
+    //           columnsMap[card.columnId] = [];
+    //         }
+    //         columnsMap[card.columnId].push(card);
+    //       });
+    //
+    //       // Convert columnsMap to columnsList array
+    //       var columnsList = Object.keys(columnsMap).map(function(columnId) {
+    //         return {
+    //           columnId: parseInt(columnId),
+    //           cards: columnsMap[columnId]
+    //         };
+    //       });
+    //
+    //       console.log('Columns List:', columnsList);
+    //
+    //       // Render columnsList on the UI
+    //       renderColumns(columnsList);
+    //     },
+    //     error: function (xhr, status, error) {
+    //       console.error('Failed to fetch board data:', status, error);
+    //     }
+    //   });
+    //
+    //   $(".filter-btn").click(function () {
+    //     $("#filterDropdown").toggleClass("show");
+    //   });
+    //
+    //   // Close the dropdown if the user clicks outside of it
+    //   $(window).click(function (event) {
+    //     if (!event.target.matches('.filter-btn')) {
+    //       var dropdowns = $(".filter-content");
+    //       dropdowns.each(function () {
+    //         if ($(this).hasClass('show')) {
+    //           $(this).removeClass('show');
+    //         }
+    //       });
+    //     }
+    //   });
+    //
+    //   // Filter tasks by team member
+    //   $("#filterDropdown a").click(function (e) {
+    //     e.preventDefault();
+    //     var member = $(this).data('member');
+    //     if (member === 'all') {
+    //       $(".task").show();
+    //     } else {
+    //       $(".task").hide();
+    //       $(".task[data-member='" + member + "']").show();
+    //     }
+    //     $("#filterDropdown").removeClass("show");
+    //   });
+    // })
+    //
+    // function renderColumns(columnsList) {
+    //   columnsList.forEach(function(column, columnIndex) {
+    //     var columnHtml = `
+    //   <div class="column">
+    //     <div class="column-header">
+    //       <span id="column-id${columnIndex}" style="display: none">${column.columnId}</span>
+    //       ${column.category}
+    //       <div>
+    //         <button id="edit-column-button${columnIndex}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${column.columnId}'">Edit Column</button>
+    //         <button id="reorder-column-button${columnIndex}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${column.columnId})" style="display: none">Reorder</button>
+    //       </div>
+    //     </div>
+    //     <div id="reorder-column-module${column.columnId}" style="display: none">
+    //       <input type="text" id="column-new-position${column.columnId}">
+    //       <button onclick="reorderColumnApi(${column.columnId})">앞으로 이동</button>
+    //     </div>
+    //     <div class="cards" id="cards-column${columnIndex}">`;
+    //
+    //     column.cards.forEach(function(card, cardIndex) {
+    //       var cardHtml = `
+    //     <div>
+    //       <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">Reorder</button>
+    //       <div class="task" draggable="true" data-id="${card.id}" id="card${card.id}">
+    //         <a class="card" id="read-href${card.id}" href="/view/read/card/${card.id}">
+    //           <div id="card-id${cardIndex}" style="display: none">${card.id}</div>
+    //           <div class="task-title">${card.title}</div>
+    //           <div class="task-description">${card.content}</div>
+    //         </a>
+    //       </div>
+    //       <div id="reorder-card-module${card.id}" style="display: none">
+    //         <input type="text" id="card-new-position${card.id}">
+    //         <button onclick="reorderCardApi(${card.id})">앞으로 이동</button>
+    //       </div>
+    //     </div>
+    //   `;
+    //       columnHtml += cardHtml;
+    //     });
+    //
+    //     columnHtml += `
+    //     </div>
+    //     <button class="add-card-btn" onclick="window.location.href = '/view/columns/${column.columnId}/create/card'">+ Add Card</button>
+    //   </div>
+    // `;
+    //
+    //     $('#board').append(columnHtml);
+    //   });
+    // }
+
 
     // Invite button functionality (you can customize this as needed)
     document.querySelector('.invite-btn').addEventListener('click', () => {
