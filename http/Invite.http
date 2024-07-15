@@ -11,17 +11,7 @@ Authorization: {{accessToken}}
 GET localhost:8080/api/boards/1/member
 Content-Type: application/json
 
-### 보드 초대 복록
-GET localhost:8080/api/invite
-Content-Type: application/json
-Authorization: {{accessToken}}
-
-### 보드 초대 승락
-PUT localhost:8080/api/accept/invite/1
-Content-Type: application/json
-Authorization: {{accessToken}}
-
-### 보드 초대 거절
-PUT localhost:8080/api/reject/invite/1
+### 보드 사용자 삭제
+DELETE localhost:8080/api/boards/1/users/1
 Content-Type: application/json
 Authorization: {{accessToken}}
