@@ -2,8 +2,11 @@ package com.sparta.trello.boardworkspace.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.trello.auth.entity.User;
+import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.board.entity.QBoard;
 import com.sparta.trello.boardworkspace.dto.InvitationListDto;
+import com.sparta.trello.boardworkspace.dto.MemberDto;
 import com.sparta.trello.boardworkspace.entity.InvitationEnum;
 import com.sparta.trello.boardworkspace.entity.QBoardWorkspace;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +39,32 @@ public class BoardWorkspaceRepositoryImpl implements BoardWorkspaceRepositoryCus
     }
 
     @Override
-    public List<String> findUsernamesByBoardId(Long boardId) {
+    public List<MemberDto> findUsernamesByBoardId(Long boardId) {
         QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
 
         return jpaQueryFactory
-                .select(qBoardWorkspace.user.username)
+                .select(Projections.constructor(MemberDto.class,
+                        qBoardWorkspace.user.id,
+                        qBoardWorkspace.user.username))
                 .from(qBoardWorkspace)
                 .where(qBoardWorkspace.board.id.eq(boardId)
                         .and(qBoardWorkspace.status.eq(InvitationEnum.ACCEPTED)))
                 .fetch();
+    }
+
+    @Override
+    public boolean existsByBoardAndUser(Board board, User user) {
+        QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
+
+        long count = jpaQueryFactory
+                .selectFrom(qBoardWorkspace)
+                .where(
+                        qBoardWorkspace.board.eq(board)
+                                .and(qBoardWorkspace.user.eq(user))
+                                .and(qBoardWorkspace.status.eq(InvitationEnum.ACCEPTED))
+                )
+                .fetchCount();
+
+        return count > 0;
     }
 }
