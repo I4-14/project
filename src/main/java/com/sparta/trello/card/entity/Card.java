@@ -77,10 +77,11 @@ public class Card extends Timestamped {
     this.user = user;
   }
 
-  public void updateCard(CardUpdateRequestDto requestDto) {
+  public void updateCard(CardUpdateRequestDto requestDto, User user) {
     this.title = requestDto.getTitle();
     this.content = requestDto.getContent();
     this.dueDate = requestDto.getDueDate();
+    this.user = user;
   }
 
   public void updateCardStatus(Columns column, CardUpdateCardStatusRequestDto requestDto) {
