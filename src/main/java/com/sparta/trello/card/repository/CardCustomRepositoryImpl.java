@@ -54,6 +54,6 @@ public class CardCustomRepositoryImpl implements CardCustomRepository{
     if(searchCond.getUsername().isEmpty()){
       throw new CustomException(ErrorEnum.USER_NOT_FOUND);
     }
-    return result = card.user.name.eq(searchCond.getUsername());
+    return result = card.user.username.eq(searchCond.getUsername());
   }
 }
