@@ -80,21 +80,6 @@
             border-radius: 4px;
         }
 
-        .view-invitations {
-            background-color: #008CBA;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 4px;
-            position: absolute;
-            top: 10px;
-            right: 100px;
-        }
 
         .search-bar {
             display: flex;
@@ -265,7 +250,6 @@
 <body>
 <div class="container">
     <button class="logout" onclick="logout()">Logout</button>
-    <a href="http://localhost:8080/view/user/invitation" class="view-invitations">View Invitations</a>
     <h1>Your Kanban Boards</h1>
 
     <div class="search-bar">
@@ -478,7 +462,10 @@
                     console.log(board);
                     const card = document.createElement('div');
                     card.classList.add('board-card');
-                    card.setAttribute('data-href', `http://localhost:8080/view/board/${board.id}`);
+                    if(board.member){
+                        card.setAttribute('data-href', `http://localhost:8080/view/board/${board.id}`);
+                        card.style.border = '2px solid #2ecc71'; // board.member가 true일 때 연두색 테두리 설정
+                    }
                     card.setAttribute('data-board-id', board.id);
                     card.innerHTML = `
                 <h2 class="board-title">${board.title}</h2>
@@ -499,8 +486,14 @@
                 // 여기에 board-card 클릭 이벤트 리스너 추가
                 document.querySelectorAll('.board-card').forEach(card => {
                     card.addEventListener('click', function (event) {
+                        // editMode가 false이고, edit-buttons 클래스를 갖는 요소 내에서 발생한 클릭이 아닌 경우에만 처리
                         if (!editMode && !event.target.closest('.edit-buttons')) {
-                            window.location.href = card.getAttribute('data-href');
+                            const href = card.getAttribute('data-href');
+                            if (href) {
+                                window.location.href = href; // data-href 속성이 있을 때만 리다이렉트
+                            } else {
+                                event.preventDefault(); // data-href 속성이 없는 경우 클릭 이벤트 무시
+                            }
                         }
                     });
                 });
