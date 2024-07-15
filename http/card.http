@@ -10,7 +10,7 @@ Authorization: {{accessToken}}
 }
 
 ### 카드 전체 조회
-GET localhost:8080/api/columns/cards
+PUT localhost:8080/api/columns/cards
 Content-Type: application/json
 Authorization: {{accessToken}}
 
