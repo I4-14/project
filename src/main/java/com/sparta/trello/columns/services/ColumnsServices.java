@@ -81,11 +81,11 @@ public class ColumnsServices {
     public Board findBoardById(Long id) {
         return boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorEnum.BOARD_NOT_FOUND));
     }
-    public ColumnsListResponseDto getColumnsList(Long id) {
+    public ColumnsListResponseDto getColumnsList(Long id, User user) {
         Board board = findBoardById(id);
         List<Card> cards = new ArrayList<>();
         List<Columns> columnList = board.getColumnsList().stream().sorted(Comparator.comparing(Columns::getOrderNum)).toList();
-        //columnList.get(0).checkUser(user);
+        columnList.get(0).checkUser(user);
         List<CardResponseDto> cardResponseDtos = new ArrayList<>();
         List<CategoryAndCardsResponseData> columns = new ArrayList<>();
         for (int i = 0; i < columnList.size(); i++) {

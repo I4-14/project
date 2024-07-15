@@ -22,7 +22,7 @@ public class CardResponseDto {
   private String username;
 
   public CardResponseDto(Card card) {
-    this.boardId = card.getBoard().getId();
+    this.boardId = card.getColumns().getBoard().getId();
     this.id = card.getId();
     this.columnId = card.getColumns().getId();
     this.position = card.getPosition();

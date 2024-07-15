@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class ColumnsController {
     private final ColumnsServices columnsServices;
     @GetMapping("/boards/{id}")
-    public ResponseEntity<ApiResponse<ColumnsListResponseDto>> getColumnsList(@PathVariable("id") Long id) {
-        ColumnsListResponseDto responseDto = columnsServices.getColumnsList(id);
+    public ResponseEntity<ApiResponse<ColumnsListResponseDto>> getColumnsList(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnsListResponseDto responseDto = columnsServices.getColumnsList(id, userDetails.getUser());
         ApiResponse<ColumnsListResponseDto> response = new ApiResponse<>("컬럼, 카드조회 성공", HttpStatus.OK.value() + "", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
