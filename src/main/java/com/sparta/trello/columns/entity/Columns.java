@@ -1,5 +1,7 @@
 package com.sparta.trello.columns.entity;
 
+import com.sparta.trello.auth.entity.Role;
+import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.board.entity.Board;
 import com.sparta.trello.card.entity.Card;
 import com.sparta.trello.columns.dto.ColumnsRequestDto;
@@ -50,5 +52,10 @@ public class Columns extends Timestamped {
     @OneToMany(mappedBy = "columns", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Card> cards = new ArrayList<>();
 
+    public boolean checkUser(User user) {
+        if (!user.getRole().equals(Role.MANAGER)) {
+            throw new IllegalArgumentException("해당 컬럼에 접근 권한이 없는 유저입니다.");
+        } return true;
+    }
 }
 
