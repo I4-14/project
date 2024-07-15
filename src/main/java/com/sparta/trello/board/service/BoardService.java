@@ -1,5 +1,6 @@
 package com.sparta.trello.board.service;
 
+import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.auth.repository.UserRepository;
 import com.sparta.trello.board.dto.BoardRequestDto;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,16 +29,39 @@ public class BoardService {
     private final UserRepository userRepository;
     private final BoardWorkspaceRepository boardWorkspaceRepository;
 
-    private int PAGE_SIZE = 5;
+    private int PAGE_SIZE = 8;
 
-    public List<BoardResponseDto> getBoardList(int page, String sortBy) {
+    /**
+     * 보드 리스트 불러오기
+     * @param page  페이지
+     * @param sortBy 기준
+     * @return
+     */
+    public List<BoardResponseDto> getBoardList(int page, String sortBy, User user) {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
-        Page<BoardResponseDto> boards = boardRepository.findAll(pageable).map(BoardResponseDto::new);
-        List<BoardResponseDto> boardList = boards.getContent();
+        Page<Board> boards = boardRepository.findAll(pageable);
+        List<BoardResponseDto> boardList;
+        if(user.getRole().equals(Role.MANAGER)) {
+            boardList = boards.getContent().stream().map(board -> {
+                boolean isMember = true;
+                return new BoardResponseDto(board, isMember);
+            }).collect(Collectors.toList());
+        }else{
+            boardList = boards.getContent().stream().map(board -> {
+                boolean isMember = boardWorkspaceRepository.existsByBoardAndUser(board, user);
+                return new BoardResponseDto(board, isMember);
+            }).collect(Collectors.toList());
+        }
+
         return boardList;
     }
 
+    /**
+     * 보드 생성
+     * @param boardRequestDto
+     * @return
+     */
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto boardRequestDto) {
         Board boardEntity = new Board(boardRequestDto);
@@ -44,16 +70,21 @@ public class BoardService {
 
     }
 
+    /**
+     * 보드 업데이트
+     * @param boardId
+     * @param boardRequestDto
+     * @return
+     */
     @Transactional
     public BoardResponseDto updateBoard(Long boardId, BoardRequestDto boardRequestDto) {
-        Board boardEntity = boardRepository.findById(boardId).orElse(null);
-        if (boardEntity != null) {
-            boardEntity.update(boardRequestDto);
-            boardRepository.save(boardEntity);
-            return new BoardResponseDto(boardEntity);
+        Optional<Board> boardEntity = boardRepository.findById(boardId);
+        if (boardEntity.isPresent()) {
+            boardEntity.get().update(boardRequestDto);
+            boardRepository.save(boardEntity.get());
+            return new BoardResponseDto(boardEntity.get());
         } else {
-            // todo board가 없는 경우 예외처리
-            return null;
+            throw new CustomException(ErrorEnum.NON_EXISTENT_ELEMENT);
         }
     }
 
@@ -61,14 +92,12 @@ public class BoardService {
     /**
      * 보드 삭제
      * @param boardId 보드 id
-     * @param temUser 유저
      */
-    public void deleteBoard(Long boardId, User temUser) {
-        Board boardEntity = boardRepository.findById(boardId).orElse(null);
-        if (boardEntity != null) {
-            boardRepository.delete(boardEntity);
-            System.out.println(true);
-
+    @Transactional
+    public void deleteBoard(Long boardId) {
+        Optional<Board> boardEntity = boardRepository.findById(boardId);
+        if (boardEntity.isPresent()) {
+            boardRepository.delete(boardEntity.get());
         }else{
             throw new CustomException(ErrorEnum.NON_EXISTENT_ELEMENT);
         }
