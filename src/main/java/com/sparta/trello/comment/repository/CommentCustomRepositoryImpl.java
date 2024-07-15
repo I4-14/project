@@ -1,15 +1,16 @@
 package com.sparta.trello.comment.repository;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.trello.card.entity.QCard;
 import com.sparta.trello.comment.dto.CommentResponseDto;
-import com.sparta.trello.comment.entity.QComment;
-import java.util.List;
+import com.sparta.trello.comment.entity.Comment;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.sparta.trello.auth.entity.QUser.user;
+import static com.sparta.trello.comment.entity.QComment.comment;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,22 +19,18 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
   private final JPAQueryFactory queryFactory;
 
   public List<CommentResponseDto> findCommentByCardIdOrderByCreatedAtDesc(int page, int amount, Long cardId) {
-    Pageable pageable = PageRequest.of(page, amount);
-    QCard card = QCard.card;
-    QComment comment = QComment.comment;
+    List<Comment> commentList = queryFactory
+            .select(comment)
+            .from(comment)
+            .join(comment.user, user)
+            .where(comment.card.id.eq(cardId))
+            .orderBy(comment.createdAt.desc())
+            .offset(page * amount)
+            .limit(amount)
+            .fetch();
 
-    List<CommentResponseDto> commentList = queryFactory
-        .select(Projections.constructor(CommentResponseDto.class,
-            comment,
-            comment.user))
-        .from(comment)
-        .where(comment.card.id.eq(cardId))
-        .leftJoin(comment.card, card)
-        .orderBy(comment.createdAt.desc())
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .fetch();
-
-    return commentList;
+    return commentList.stream()
+            .map(c -> new CommentResponseDto(c, c.getUser()))
+            .collect(Collectors.toList());
   }
 }
