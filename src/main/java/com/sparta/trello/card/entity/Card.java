@@ -89,7 +89,7 @@ public class Card extends Timestamped {
   }
 
   public boolean checkUser(User user) {
-    if (!this.user.getRole().equals(Role.MANAGER) && !this.user.getId().equals(user.getId())) {
+    if (!user.getRole().equals(Role.MANAGER) && !this.user.getId().equals(user.getId())) {
       throw new IllegalArgumentException("해당 카드의 수정/삭제 권한이 없는 유저입니다.");
     } return true;
   }

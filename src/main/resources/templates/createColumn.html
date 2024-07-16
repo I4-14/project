@@ -68,6 +68,7 @@
   }
 </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 </head><body>
   <div class="container">
     <h1>Add New Column</h1>
@@ -86,7 +87,14 @@
   <script>
     const columnForm = document.getElementById('columnForm');
     const categoryInput = document.getElementById('category');
-
+    let token;
+    document.addEventListener('DOMContentLoaded', function () {
+      token = Cookies.get('Authorization');
+      if (!token) {
+        window.location.href = 'http://localhost:8080/';
+        return;
+      }
+    });
     columnForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const category = categoryInput.value.trim();
@@ -100,13 +108,16 @@
           type: "POST",
           url: `/api/boards/[[${id}]]/columns`,
           contentType: "application/json",
+          headers: {
+            'Authorization': token
+          },
           data: JSON.stringify(data),
           success: function (response) {
             alert('msg : ' + response.msg + '\n' +
                   'statuscode : ' + response.statuscode + '\n' +
                   'data : ' + '\n' +
                   'category : ' + response.data.category);
-            window.location.href = `/view/board/[[${id}]]`;
+            window.location.href = document.referrer;
           }
 
         });

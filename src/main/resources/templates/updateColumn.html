@@ -68,6 +68,7 @@
   }
 </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 </head><body>
   <div class="container">
     <h1>Edit Column</h1>
@@ -87,10 +88,19 @@
   <script>
     const columnForm = document.getElementById('columnForm');
     const categoryInput = document.getElementById('category');
+    let token;
     $(document).ready(function () {
+      token = Cookies.get('Authorization');
+      if (!token) {
+        window.location.href = 'http://localhost:8080/';
+        return;
+      }
       $.ajax({
         type: 'GET',
         url: `/api/columns/[[${id}]]`,
+        headers: {
+          'Authorization': token
+        },
         success: function (response) {
           var result = {
             'columnsList': response.data.category
@@ -105,6 +115,9 @@
         $.ajax({
           type: 'DELETE',
           url: `/api/columns/[[${id}]]`,
+          headers: {
+            'Authorization': token
+          },
           success: function (response) {
             alert('msg : ' + response.msg + '\n' +
                     'statuscode : ' + response.statuscode + '\n');
@@ -129,6 +142,9 @@
           type: "PUT",
           url: `/api/columns/[[${id}]]`,
           contentType: "application/json",
+          headers: {
+            'Authorization': token
+          },
           data: JSON.stringify(data),
           success: function (response) {
             alert('msg : ' + response.msg + '\n' +
