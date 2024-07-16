@@ -110,7 +110,7 @@
       })
     });
     $('#delete').click(function () {
-      let answer = confirm("정말로 삭제하시겠습니까?(삭제하면 컬럼의 모든 카드가 삭제됩니다.)")
+      let answer = confirm("정말로 삭제하시겠습니까?(삭제하면 컬럼의 모든 카드가 삭제됩니다.)");
       if (answer === true) {
         $.ajax({
           type: 'DELETE',
@@ -118,13 +118,17 @@
           headers: {
             'Authorization': token
           },
-          success: function (response) {
-            alert('msg : ' + response.msg + '\n' +
-                    'statuscode : ' + response.statuscode + '\n');
+          success: function (response, textStatus, jqXHR) {
+            if (jqXHR.status === 204) {
+              alert('삭제가 완료되었습니다.');
+            } else {
+              alert('msg : ' + response + '\n' +
+                      'statuscode : ' + jqXHR.status + '\n');
+            }
             history.back();
           },
-          error:function(jqXHR, textStatus, errorThrown) {
-            alert("code:" + jqXHR.statuscode + "\n" + "message:" + jqXHR.msg + "\n");
+          error: function (jqXHR, textStatus, errorThrown) {
+            alert("code:" + jqXHR.status + "\n" + "message:" + jqXHR.responseJSON.msg + "\n");
           }
         });
       }
