@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="https://websim.ai"/>
+  <title>KanbanFlow - Card Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .card-details {
+      margin-bottom: 30px;
+    }
+    .detail-item {
+      margin-bottom: 15px;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+    }
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .status-in-progress {
+      background-color: #ffd700;
+      color: #000;
+    }
+    .comments-section {
+      margin-top: 30px;
+    }
+    .comment {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .comment-username {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .comment-createdAt {
+      font-size: 12px;
+      color: #777;
+    }
+    .new-comment {
+      margin-top: 20px;
+    }
+    input[type="text"],
+    textarea,
+    select,
+    input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea {
+      width: 98%;
+      height: 100px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .button-container {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn {
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .submit-comment {
+      background-color: #4CAF50;
+    }
+    .submit-comment:hover {
+      background-color: #45a049;
+    }
+    .back-btn {
+      background-color: #2196F3;
+    }
+    .back-btn:hover {
+      background-color: #0b7dda;
+    }
+    .edit-btn {
+      background-color: #FFA500;
+    }
+    .edit-btn:hover {
+      background-color: #FF8C00;
+    }
+    .delete-btn {
+      background-color: #f44336;
+    }
+    .delete-btn:hover {
+      background-color: #d32f2f;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px 40px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 5px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    form-group{margin-bottom: 20px}
+    label{display:block;margin-bottom:5px;font-weight:bold;color:#555}
+    input[type="text"],input[type="date"],select,textarea{width:95%;padding:10px 20px;border:1px solid #ddd;border-radius:4px;font-size:16px}
+    textarea{height:100px;resize:vertical}
+
+    .modal-content ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .modal-content li {
+      margin-bottom: 15px;
+    }
+
+    .modal-content label {
+      margin-top: 10px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .modal-content input[type="text"],
+    .modal-content input[type="date"],
+    .modal-content textarea {
+      width: 98%;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+
+    .modal-content .submit-edit {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .modal-content .submit-edit:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Card Details</h1>
+  <div class="card-details">
+    <div class="detail-item">
+      <span class="detail-label">Title:</span>
+      <span id="cardTitle"></span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Content:</span>
+      <p id="cardContent"></p>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Assignee:</span>
+      <span id="cardAssignee"></span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Status:</span>
+      <span id="cardStatus"></span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Due Date:</span>
+      <span id="cardDueDate"></span>
+    </div>
+  </div>
+
+  <div class="comments-section">
+    <h2>Comments</h2>
+    <div id="commentsContainer">
+    </div>
+    <div class="new-comment">
+      <h3>Add a Comment</h3>
+      <textarea id="newCommentText" placeholder="Type your comment here..."></textarea>
+      <div class="button-container">
+        <button class="btn submit-comment" onclick="addComment()">Submit Comment</button>
+        <button class="btn edit-btn" onclick="editCard()">Edit Card</button>
+        <button class="btn delete-btn" onclick="deleteCard()">Delete Card</button>
+        <button class="btn back-btn" onclick="redirectToBoard()">Back to Board</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Card Modal -->
+  <div id="editCardModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Edit Card</h2>
+      <label for="editCardTitle">Title:</label>
+      <input type="text" id="editCardTitle" placeholder="Enter card title">
+
+      <label for="editCardContent">Content:</label>
+      <textarea id="editCardContent" placeholder="Enter card content"></textarea>
+
+      <label for="editAssignee">Assignee:</label>
+      <select id="editAssignee" name="assignee">
+        <option value="">Select an assignee</option>
+        <option value="user1">User 1</option>
+        <option value="user2">User 2</option>
+        <option value="user3">User 3</option>
+        <!-- Add more options as needed -->
+      </select>
+
+      <label for="editCardDueDate">Due Date:</label>
+      <input type="date" id="editCardDueDate">
+
+
+      <button class="btn submit-edit" onclick="submitEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script>
+
+  function getCardIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('cardId');
+  }
+  const cardId = getCardIdFromURL();
+  let boardId;
+
+  const token = Cookies.get('Authorization');
+
+  fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    // 받은 데이터를 UI에 반영
+    boardId = data.data.boardId;
+    document.getElementById('cardTitle').textContent = data.data.title;
+    document.getElementById('cardContent').textContent = data.data.content;
+    document.getElementById('cardStatus').textContent = data.data.cardStatus;
+    document.getElementById('cardDueDate').textContent = data.data.dueDate;
+    document.getElementById('cardAssignee').textContent = data.data.username;
+
+    // 댓글 리스트를 불러오는 API 호출
+  return fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments?page=1&amount=5`, {
+    headers: {
+      'Authorization': token
+    }
+  })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log(data); // Verify the structure of 'data' received
+    const comments = data.data; // Assuming 'data' contains 'data' array with comments
+
+    const commentsContainer = document.getElementById('commentsContainer');
+    comments.forEach(comment => {
+      const newComment = document.createElement('div');
+      newComment.className = 'comment';
+      newComment.innerHTML = `
+        <div class="comment-username">${comment.username}</div>
+        <div class="comment-content">${comment.message}</div>
+        <div class="comment-createdAt">${comment.createdAt}</div>
+      `;
+      commentsContainer.appendChild(newComment);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching or parsing comments:', error);
+    // Handle errors appropriately
+  });
+  function addComment(cardId) {
+    const commentText = document.getElementById('newCommentText').value;
+    if (commentText.trim() === '') return;
+
+    const newCommentData = {
+      message: commentText
+    };
+
+    // 댓글 추가를 위한 POST 요청 보내기
+    fetch(`http://localhost:8080/api/cards/[[${cardId}]]/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(newCommentData),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('댓글 추가에 실패했습니다');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert('댓글이 성공적으로 추가되었습니다.');
+      // 서버에서 받은 새로운 댓글을 UI에 추가
+      window.location.href = `http://localhost:8080/view/read/card/[[${cardId}]]`;
+    })
+    .catch(error => {
+      alert("댓글 추가 실패");
+      console.error('댓글 추가 중 오류 발생:', error);
+      // 오류 처리
+    });
+  }
+  // 카드 삭제 DELETE 요청 보내기
+  function deleteCard(cardId) {
+    // 사용자에게 삭제 확인 메시지를 보여줍니다
+    if (confirm('삭제하는 경우 작성한 데이터가 전부 삭제됩니다. 정말 삭제하시겠습니까?')) {
+      fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': token
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('카드 삭제에 실패했습니다');
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert('카드가 성공적으로 삭제되었습니다:');
+        console.log('카드가 성공적으로 삭제되었습니다:', data);
+        // 보드 페이지로 리다이렉트
+        window.location = document.referrer;
+      })
+      .catch(error => {
+        alert("접근권한이 없습니다.");
+        console.error('카드 삭제 중 오류 발생:', error);
+        // 오류 처리, 오류 메시지 표시 등
+      });
+    } else {
+      // 사용자가 취소를 선택한 경우 아무 동작도 하지 않습니다
+      alert('카드 삭제가 취소되었습니다.');
+    }
+  }
+
+  // 카드 수정 버튼 실행
+  function editCard() {
+    // 모달 창 띄우기
+    const modal = document.getElementById('editCardModal');
+    modal.style.display = 'block';
+    const board = parseInt(boardId);
+    if (isNaN(board)) {
+      console.error('Invalid boardId:', boardId);
+      return;
+    }
+    fetchBoardMembers(board);
+  }
+
+  function fetchBoardMembers(board) {
+    fetch(`http://localhost:8080/api/boards/${board}/member`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('보드 멤버를 가져오는 데 실패했습니다');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // 가져온 데이터로 드롭다운을 채우는 함수 호출
+      populateAssigneeDropdown(data.data); // data.data가 멤버 배열을 가정합니다
+    })
+    .catch(error => {
+      console.error('보드 멤버를 가져오는 중 오류 발생:', error);
+      // 오류 처리 (예: 알림 표시)
+    });
+  }
+  function populateAssigneeDropdown(members) {
+    const assigneeDropdown = document.getElementById('editAssignee');
+
+    // 기존 옵션 초기화
+    assigneeDropdown.innerHTML = '';
+
+    // 기본 옵션 추가
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '담당자 선택';
+    assigneeDropdown.appendChild(defaultOption);
+
+    // 각 멤버에 대한 옵션 추가
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member.id;
+        option.textContent = member.username;
+        assigneeDropdown.appendChild(option);
+
+    });
+  }
+
+  // 모달 닫기
+  function closeModal() {
+    const modal = document.getElementById('editCardModal');
+    modal.style.display = 'none';
+  }
+
+  // 수정된 카드 정보를 서버로 전송
+  function submitEdit(cardId) {
+      // 페이지의 모든 리소스가 완전히 로드된 후 실행되는 코드
+    const selectedUserId = document.getElementById('editAssignee').value;
+    console.log(selectedUserId);
+    const updatedData = {
+        title: document.getElementById('editCardTitle').value,
+        content: document.getElementById('editCardContent').value,
+        userId: Number(selectedUserId),
+        dueDate: document.getElementById('editCardDueDate').value,
+    };
+
+    fetch(`http://localhost:8080/api/columns/cards/[[${cardId}]]`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(updatedData),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('카드 수정에 실패했습니다');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert("카드가 성공적으로 수정되었습니다");
+      console.log('카드가 성공적으로 수정되었습니다:', data);
+      closeModal(); // 수정 완료 후 모달 닫기
+      window.location.reload();
+    })
+    .catch(error => {
+      alert("카드 수정 실패하였습니다.");
+      console.error('카드 수정 중 오류 발생:', error);
+      // 오류 처리, 오류 메시지 표시 등
+    });
+
+  }
+  function redirectToBoard() {
+    // 보드 페이지로 리다이렉트
+    history.back();
+  }
+</script>
+</body></html>

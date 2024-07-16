@@ -1,0 +1,671 @@
+  <html><head><title>KanbanFlow - Your Board</title><style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  h1 {
+    color: #333;
+    margin: 0;
+  }
+  .invite-btn {
+    background-color: #0593ec;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .edit-btn {
+    background-color: #f83104;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .board {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    min-height: 600px;
+  }
+  .column {
+    background-color: #ebecf0;
+    border-radius: 4px;
+    width: 300px;
+    min-width: 300px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  .card{
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 텍스트 색상 상속 */
+    display: block; /* 블록 요소로 표시 */
+  }
+  .cards {
+    justify-content: center;
+  }
+  .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+  }
+  .task {
+    background-color: white;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: move;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+  .task:hover {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+  .task-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .task-description {
+    font-size: 14px;
+    color: #666;
+  }
+  .task-assignee {
+    font-size: 12px;
+    color: #faf8f8;
+    padding: 3px 8px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    display: inline-block;
+    background-color: #faac05;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 4px;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .add-column-btn, .add-card-btn, .edit-column-btn, .reorder-column-btn, .filter-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .add-column-btn {
+    background-color: #b602f3;
+    display: block;
+    margin: 20px auto;
+    font-size: 18px;
+  }
+  .add-card-btn {
+    background-color: #0623dc;
+    width: 100%;
+    margin-top: auto;
+  }
+  .edit-column-btn {
+    background-color: #06c9b2;
+    width: 80px;
+    font-size: 12px;
+    margin-top: auto;
+  }
+  .reorder-column-btn {
+    width: 80px;
+    font-size: 12px;
+    margin-top: auto;
+  }
+  /*.reorder-card-btn {*/
+  /*  background-color: #4CAF50;*/
+  /*  border: none;*/
+  /*  color: white;*/
+  /*  text-align: center;*/
+  /*  font-size: 16px;*/
+  /*}*/
+  .filter-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .filter-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  .filter-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  .filter-content a:hover {
+    background-color: #f1f1f1;
+  }
+  .show {
+    display: block;
+  }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+  </head><body>
+  <div class="container">
+    <div class="header">
+      <h1 id="boardTitle">Create New Board</h1>
+      <div>
+        <button id="edit-btn" class="edit-btn">Edit</button>
+        <button class="invite-btn" th:onclick="|window.location.href = '@{/view/invite/board/{id}(id=${id})}'|">Invite Team Members</button>
+        <div class="filter-dropdown">
+          <button class="filter-btn">Filter by Team Member</button>
+          <div id="filterDropdown" class="filter-content">
+            <a href="#" data-member="all">All Members</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="board" id="board">
+
+    </div>
+    <button class="add-column-btn" th:onclick="|window.location.href = '@{/view/board/{id}/column(id=${id})}'|">+ Add Column</button>
+  </div>
+
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <p id="modalDescription"></p>
+      <p id="modalStatus"></p>
+    </div>
+  </div>
+
+  <script>
+    var url = window.location.pathname;
+    console.log(url);
+    var segments = url.split('/');
+    var boardname = decodeURIComponent(segments.pop() || segments.pop());
+    console.log(boardname);
+    document.getElementById('boardTitle').textContent = boardname;
+
+    // Drag and drop functionality
+    let draggedTask = null;
+    let token;
+    let result;
+    document.querySelectorAll('.task').forEach(task => {
+      task.addEventListener('dragstart', (e) => {
+        draggedTask = e.target;
+        e.dataTransfer.setData('text/plain', e.target.id);
+        setTimeout(() => {
+          e.target.style.display = 'none';
+        }, 0);
+      });
+
+      task.addEventListener('dragend', (e) => {
+        e.target.style.display = 'block';
+      });
+
+      // Click to view details
+      task.addEventListener('click', (e) => {
+        const modal = document.getElementById('taskModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalStatus = document.getElementById('modalStatus');
+
+        modalTitle.textContent = e.currentTarget.querySelector('.task-title').textContent;
+        modalDescription.textContent = e.currentTarget.querySelector('.task-description').textContent;
+        modalStatus.textContent = 'Status: ' + e.currentTarget.closest('.column').querySelector('.column-header').textContent;
+
+        modal.style.display = 'block';
+      });
+    });
+
+    $(document).ready(function () {
+      token = Cookies.get('Authorization');
+      if (!token) {
+        window.location.href = 'http://localhost:8080/'; // 토큰이 없으면 로그인 페이지로 리다이렉트
+        return;
+      }
+      $.ajax({
+        type: 'GET',
+        url: `/api/boards/[[${id}]]`,
+        headers: {
+          'Authorization': token
+        },
+        success: function (response) {
+          result = {
+            'columnsList': response.data.columnsList
+          }
+          addCardColumnHTML(result);
+        }
+      })
+      var boardContainer = document.querySelector('.board');
+      // Event listener for drop operation
+      boardContainer.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+
+      boardContainer.addEventListener('drop', function (event) {
+        event.preventDefault();
+        var taskId = event.dataTransfer.getData('text/plain');
+        var targetTask = event.target.closest('.task');
+        console.log(taskId);
+        console.log(targetTask);
+        if (targetTask) {
+          var newPosition = Array.from(targetTask.parentNode.parentNode.children).indexOf(targetTask.parentNode);
+          // var newPosition = targetTask.getAttribute("data-id"); // 1-based index
+          console.log(newPosition);
+          reorderCardApi(taskId, newPosition);
+        }
+      });
+      $.ajax({
+        type: 'GET',
+        url: `/api/boards/[[${id}]]/member`,
+        success: function (response) {
+          result = {
+            'data': response.data
+          }
+          addInvitedUserHTML(result);
+        }
+      })
+    })
+
+    function addCardColumnHTML(result) {
+      for (let i = 0; i < result.columnsList.length; i++) {
+        let columns = result.columnsList[i];
+        let column_html = `
+                <div class="column">
+                  <div class="column-header"><span id="column-id${i}" style="display: none">${columns.column.id}</span>${columns.column.category}
+                    <div>
+                      <button id="edit-column-button${i}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${columns.column.id}'">Edit Column</button>
+                      <button id="reorder-column-button${i}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${columns.column.id})" style="display: none">reorder</button>
+                    </div>
+                  </div>
+                  <div id="reorder-column-module${columns.column.id}" style="display: none"><input type="text" id="column-new-position${columns.column.id}"><button onclick="reorderColumnApi(${columns.column.id})">앞으로 이동</button></div>
+                  <div class="cards" id="columns${columns.column.id}">
+
+                  </div>
+                  <button class="add-card-btn" onclick="window.location.href = '/view/columns/${columns.column.id}/create/card'">+ Add Card</button>
+                </div>
+                `
+        $('#board').append(column_html);
+        for (let j = 0; j < columns.column.cards.length; j++) {
+          let card = columns.column.cards[j];
+          let card_html = `
+                        <div>
+                          <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">reorder</button>
+                          <div class="task" draggable="false" data-id=${card.id} id="card${card.id}">
+                            <a class="card" id="read-href${card.id}" href="/view/read/card/${card.id}">
+                              <div id="card-id${j}" style="display: none">${card.id}</div>
+                              <div class="task-title">${card.title}</div>
+                              <div class="task-description">${card.content}</div>
+                              <div class="task-assignee">${card.username}</div>
+                            </a>
+                          </div>
+                          <div id="reorder-card-module${card.id}" style="display: none"><input type="text" id="card-new-position${card.id}"><button onclick="reorderCardApi(${card.id})">앞으로 이동</button></div>
+                        </div>
+              `
+          $(`#columns${columns.column.id}`).append(card_html);
+          var cardElement = document.getElementById(`card${card.id}`);
+          cardElement.addEventListener('dragstart', function (event) {
+            event.dataTransfer.setData('text/plain', card.id.toString());
+          })
+        }
+      }
+    }
+
+    function addInvitedUserHTML(result) {
+      result.data.forEach(row => {
+        let invitedUserTag = `<a href="#" onclick="getCardsByUsername('${row.username}')" data-member="all">${row.username}</a>`
+        $('#filterDropdown').append(invitedUserTag);
+      })
+    }
+
+    $('#edit-btn').click(function () {
+      for (let i = 0; i < result.columnsList.length; i++) {
+        let columns = result.columnsList[i];
+        for (let j = 0; j < columns.column.cards.length; j++) {
+          let card = columns.column.cards[j];
+          $(`#card-id${j}`).toggle();
+          if ($(`#card${card.id}`).attr("draggable") === "false") {
+            $(`#card${card.id}`).attr("draggable", "true");
+            $(`#read-href${card.id}`).bind('click', false);
+          } else if ($(`#card${card.id}`).attr("draggable") === "true") {
+            $(`#card${card.id}`).attr("draggable", "false");
+            $(`#read-href${card.id}`).unbind('click', false);
+          }
+          $(`#reorder-btn${card.id}`).toggle();
+        }
+        $(`#column-id${i}`).toggle();
+        $(`#edit-column-button${i}`).toggle();
+        $(`#reorder-column-button${i}`).toggle();
+      }
+
+    })
+
+    function toggleReorderCardModule(id) {
+      $(`#reorder-card-module${id}`).toggle();
+    }
+
+    function toggleReorderColumnModule(id) {
+      $(`#reorder-column-module${id}`).toggle();
+    }
+
+    function reorderCardApi(id, newPosition) {
+      $.ajax({
+        type: 'PUT',
+        url: `/api/columns/cards/${id}/position?newPosition=${newPosition}`,
+        headers: {
+          'Authorization': token
+        },
+        success: function (response) {
+          alert('msg : ' + response.msg + '\n' +
+                  'statuscode : ' + response.statuscode);
+          window.location.reload();
+        }
+      })
+    }
+
+    function reorderColumnApi(id) {
+      let destinationId = $(`#column-new-position${id}`).val();
+      $.ajax({
+        type: 'POST',
+        url: `/api/columns/${id}/order/${destinationId}`,
+        headers: {
+          'Authorization': token
+        },
+        success: function (response) {
+          alert('msg : ' + response.msg + '\n' +
+                'statuscode : ' + response.statuscode);
+          window.location.reload();
+        }
+      })
+    }
+
+    document.querySelectorAll('.column').forEach(column => {
+      column.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      column.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedTask) {
+          e.target.closest('.column').insertBefore(draggedTask, e.target.closest('.column').querySelector('.add-card-btn'));
+        }
+      });
+    });
+
+
+    // Modal close functionality
+    const modal = document.getElementById('taskModal');
+    const span = document.getElementsByClassName('close')[0];
+
+    span.onclick = function() {
+      modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Add new column functionality
+    document.querySelector('.add-column-btn').addEventListener('click', () => {
+      const board = document.querySelector('.board');
+      const newColumn = document.createElement('div');
+      newColumn.className = 'column';
+      newColumn.innerHTML = `
+        <div class="column-header">New Column</div>
+        <button class="add-card-btn">+ Add Card</button>
+      `;
+      board.insertBefore(newColumn, document.querySelector('.add-column-btn'));
+
+      // Add event listeners to the new column
+      newColumn.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      newColumn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedTask) {
+          e.target.closest('.column').insertBefore(draggedTask, e.target.closest('.column').querySelector('.add-card-btn'));
+        }
+      });
+
+      // Add event listener to the new add-card button
+      newColumn.querySelector('.add-card-btn').addEventListener('click', addNewCard);
+    });
+
+    // Add new card functionality
+    function addNewCard(e) {
+      const column = e.target.closest('.column');
+      const newTask = document.createElement('div');
+      newTask.className = 'task';
+      newTask.draggable = true;
+      newTask.dataset.id = Date.now();  // Use timestamp as a simple unique id
+      newTask.innerHTML = `
+        <div class="task-title">New Task</div>
+        <div class="task-description">Add description here</div>
+      `;
+      column.insertBefore(newTask, e.target);
+
+      // Add event listeners to the new task
+      newTask.addEventListener('dragstart', (e) => {
+        draggedTask = e.target;
+        e.dataTransfer.setData('text/plain', e.target.id);
+        setTimeout(() => {
+          e.target.style.display = 'none';
+        }, 0);
+      });
+
+      newTask.addEventListener('dragend', (e) => {
+        e.target.style.display = 'block';
+      });
+
+      newTask.addEventListener('click', (e) => {
+        const modal = document.getElementById('taskModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalStatus = document.getElementById('modalStatus');
+
+        modalTitle.textContent = e.currentTarget.querySelector('.task-title').textContent;
+        modalDescription.textContent = e.currentTarget.querySelector('.task-description').textContent;
+        modalStatus.textContent = 'Status: ' + e.currentTarget.closest('.column').querySelector('.column-header').textContent;
+
+        modal.style.display = 'block';
+      });
+    }
+
+    // // 작성자별 조회 필터
+    function getCardsByUsername(username) {
+      let searchCond = {
+        'username' : username
+      }
+      console.log(searchCond);
+      $.ajax({
+        type: 'PUT',
+        url: `/api/columns/cards`,
+        contentType: "application/json",
+        headers: {
+          'Authorization': token
+        },
+        data: JSON.stringify(searchCond),
+        success: function (response) {
+          var cards = response.data; // 카드 데이터 배열
+
+          // Initialize columnsMap to group cards by columnId
+          var columnsMap = {};
+
+          // Group cards by columnId
+          cards.forEach(function(card) {
+            if (!columnsMap[card.columnId]) {
+              columnsMap[card.columnId] = [];
+            }
+            columnsMap[card.columnId].push(card);
+          });
+
+          // Convert columnsMap to columnsList array
+          var columnsList = Object.keys(columnsMap).map(function(columnId) {
+            return {
+              columnId: parseInt(columnId),
+              cards: columnsMap[columnId]
+            };
+          });
+
+          console.log('Columns List:', columnsList);
+
+          // Render columnsList on the UI
+          renderColumns(columnsList);
+        },
+        error: function (xhr, status, error) {
+          console.error('Failed to fetch board data:', status, error);
+        }
+      });
+    }
+
+
+      $(".filter-btn").click(function () {
+        $("#filterDropdown").toggleClass("show");
+      });
+
+      // Close the dropdown if the user clicks outside of it
+      $(window).click(function (event) {
+        if (!event.target.matches('.filter-btn')) {
+          var dropdowns = $(".filter-content");
+          dropdowns.each(function () {
+            if ($(this).hasClass('show')) {
+              $(this).removeClass('show');
+            }
+          });
+        }
+      });
+
+      // Filter tasks by team member
+      $("#filterDropdown a").click(function (e) {
+        e.preventDefault();
+        var member = $(this).data('member');
+        if (member === 'all') {
+          $(".task").show();
+        } else {
+          $(".task").hide();
+          $(".task[data-member='" + member + "']").show();
+        }
+        $("#filterDropdown").removeClass("show");
+      });
+
+    function renderColumns(columnsList) {
+      $('#board').text(' ')
+      columnsList.forEach(function(column, columnIndex) {
+        var columnHtml = `
+      <div class="column">
+        <div class="column-header">
+          <span id="column-id${columnIndex}" style="display: none">${column.cardStatus}</span>
+          ${column.cards[0].cardStatus}
+          <div>
+            <button id="edit-column-button${columnIndex}" class="edit-column-btn" style="display: none" onclick="window.location.href = '/view/column/${column.columnId}'">Edit Column</button>
+            <button id="reorder-column-button${columnIndex}" class="reorder-column-btn" onclick="toggleReorderColumnModule(${column.columnId})" style="display: none">Reorder</button>
+          </div>
+        </div>
+        <div id="reorder-column-module${column.columnId}" style="display: none">
+          <input type="text" id="column-new-position${column.columnId}">
+          <button onclick="reorderColumnApi(${column.columnId})">앞으로 이동</button>
+        </div>
+        <div class="cards" id="cards-column${columnIndex}">`;
+
+        column.cards.forEach(function(card, cardIndex) {
+          var cardHtml = `
+        <div>
+          <button id="reorder-btn${card.id}" class="reorder-card-btn" onclick="toggleReorderCardModule(${card.id})" style="display: none">Reorder</button>
+          <div class="task" draggable="true" data-id="${card.id}" id="card${card.id}">
+            <a class="card" id="read-href${card.id}" href="/view/read/card/${card.id}">
+              <div id="card-id${cardIndex}" style="display: none">${card.id}</div>
+              <div class="task-title">${card.title}</div>
+              <div class="task-description">${card.content}</div>
+            </a>
+          </div>
+          <div id="reorder-card-module${card.id}" style="display: none">
+            <input type="text" id="card-new-position${card.id}">
+            <button onclick="reorderCardApi(${card.id})">앞으로 이동</button>
+          </div>
+        </div>
+      `;
+          columnHtml += cardHtml;
+        });
+
+        columnHtml += `
+        </div>
+        <button class="add-card-btn" onclick="window.location.href = '/view/columns/${column.columnId}/create/card'">+ Add Card</button>
+      </div>
+    `;
+
+        $('#board').append(columnHtml);
+      });
+    }
+
+
+    // Invite button functionality (you can customize this as needed)
+    document.querySelector('.invite-btn').addEventListener('click', () => {
+      alert('Invite functionality will be implemented here!');
+    });
+  </script>
+</body></html>

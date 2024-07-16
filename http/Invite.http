@@ -1,0 +1,17 @@
+### 보드 초대
+POST localhost:8080/api/boards/1/users
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "userName": "user1234"
+}
+
+### 보드 사용자 목록
+GET localhost:8080/api/boards/1/member
+Content-Type: application/json
+
+### 보드 사용자 삭제
+DELETE localhost:8080/api/boards/1/users/1
+Content-Type: application/json
+Authorization: {{accessToken}}

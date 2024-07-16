@@ -1,0 +1,171 @@
+<html><head><title>KanbanFlow - Add New Column</title><style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .column-form {
+    display: flex;
+    flex-direction: column;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  .btn {
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+    color: white;
+  }
+  .add-btn {
+    background-color: #4CAF50;
+  }
+  .add-btn:hover {
+    background-color: #45a049;
+  }
+  .back-btn {
+    background-color: #2196F3;
+  }
+  .back-btn:hover {
+    background-color: #0b7dda;
+  }
+</style>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+</head><body>
+  <div class="container">
+    <h1>Edit Column</h1>
+    <form class="column-form" id="columnForm">
+      <div class="form-group">
+        <label for="category">Column Category:</label>
+        <input type="text" id="category" name="category" required placeholder="Enter column category">
+      </div>
+      <div class="button-container">
+        <button type="submit" class="btn add-btn">Edit Column</button>
+        <button type="button" class="btn add-btn" id="delete">Delete Column</button>
+        <button type="button" class="btn back-btn" onclick="history.back()">Back to Board</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const columnForm = document.getElementById('columnForm');
+    const categoryInput = document.getElementById('category');
+    let token;
+    $(document).ready(function () {
+      token = Cookies.get('Authorization');
+      if (!token) {
+        window.location.href = 'http://localhost:8080/';
+        return;
+      }
+      $.ajax({
+        type: 'GET',
+        url: `/api/columns/[[${id}]]`,
+        headers: {
+          'Authorization': token
+        },
+        success: function (response) {
+          var result = {
+            'columnsList': response.data.category
+          }
+          $('#category').val(result.columnsList)
+        }
+      })
+    });
+    $('#delete').click(function () {
+      let answer = confirm("정말로 삭제하시겠습니까?(삭제하면 컬럼의 모든 카드가 삭제됩니다.)");
+      if (answer === true) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/columns/[[${id}]]`,
+          headers: {
+            'Authorization': token
+          },
+          success: function (response, textStatus, jqXHR) {
+            if (jqXHR.status === 204) {
+              alert('삭제가 완료되었습니다.');
+            } else {
+              alert('msg : ' + response + '\n' +
+                      'statuscode : ' + jqXHR.status + '\n');
+            }
+            history.back();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            alert("code:" + jqXHR.status + "\n" + "message:" + jqXHR.responseJSON.msg + "\n");
+          }
+        });
+      }
+    });
+    columnForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const category = categoryInput.value.trim();
+
+      if (category) {
+        let data = {
+          'category' : category
+        }
+        // Here you would typically send this data to your backend
+        $.ajax({
+          type: "PUT",
+          url: `/api/columns/[[${id}]]`,
+          contentType: "application/json",
+          headers: {
+            'Authorization': token
+          },
+          data: JSON.stringify(data),
+          success: function (response) {
+            alert('msg : ' + response.msg + '\n' +
+                  'statuscode : ' + response.statuscode + '\n' +
+                  'data : ' + '\n' +
+                  'category : ' + response.data.category);
+            history.back();
+          }
+        });
+        // console.log('New column category:', category);
+        //
+        // // For demonstration, we'll just show an alert
+        // alert('Column added successfully!');
+        //
+        // // Clear the form
+        // columnForm.reset();
+      }
+    });
+  </script>
+</body></html>

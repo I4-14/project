@@ -1,0 +1,38 @@
+### 컬럼의 카드 조회
+GET localhost:8080/api/boards/1
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+
+### 컬럼 생성
+POST localhost:8080/api/boards/1/columns
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "category": "BackLog"
+}
+
+### 컬럼 조회
+GET localhost:8080/api/columns/1
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+### 컬럼 수정
+PUT localhost:8080/api/columns/1
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+  "category": "InProgress"
+}
+
+### 컬럼 삭제
+DELETE localhost:8080/api/columns/2
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+### 컬럼 순서 변경
+POST localhost:8080/api/columns/1/order/2
+Content-Type: application/json
+Authorization: {{accessToken}}

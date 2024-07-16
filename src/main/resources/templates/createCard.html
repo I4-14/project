@@ -1,0 +1,83 @@
+<html><head><base href="https://websim.ai/kanban-board"/>
+  <title>KanbanFlow - Create New Card</title>
+  <style>
+    body{font-family:Arial,sans-serif;background-color:#f0f2f5;margin:0;padding:0}
+    .container{max-width:600px;margin:40px auto;padding:20px;background-color:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+    h1{color:#333;text-align:center;margin-bottom:30px}
+    .card-form{display:flex;flex-direction:column}
+    .form-group{margin-bottom:20px}
+    label{display:block;margin-bottom:5px;font-weight:bold;color:#555}
+    input[type="text"],input[type="date"],select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:16px}
+    textarea{height:100px;resize:vertical}
+    .create-btn{background-color:#4CAF50;border:none;color:white;padding:12px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;border-radius:4px;align-self:flex-start}
+    .create-btn:hover{background-color:#45a049}
+    .back-btn{background-color:#2196F3;border:none;color:white;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:20px 0;cursor:pointer;border-radius:4px}
+    .back-btn:hover{background-color:#0b7dda}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Create New Card</h1>
+  <form class="card-form" id="cardForm" method="GET" action="">
+    <div class="form-group">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required placeholder="Enter card title">
+    </div>
+    <div class="form-group">
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" required placeholder="Enter card content"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="dueDate">Due Date:</label>
+      <input type="date" id="dueDate" name="dueDate" required>
+    </div>
+    <button type="submit" class="create-btn">Create Card</button>
+  </form>
+
+  <a href="#" class="back-btn">Back to Board</a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script>
+  document.getElementById('cardForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents the form from submitting normally
+
+    // Extracts form data
+    const formData = new FormData(this);
+    const cardData = Object.fromEntries(formData); // Converts FormData to a plain object
+
+    // Example using fetch():
+    const token = Cookies.get('Authorization');
+
+    fetch(`http://localhost:8080/api/columns/[[${id}]]/cards`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(cardData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      alert('카드가 성공적으로 추가되었습니다.');
+
+      window.location = document.referrer;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var backButton = document.querySelector('.back-btn');
+    if (backButton) {
+      backButton.addEventListener('click', function(event) {
+        event.preventDefault(); // 기본 이벤트 동작(링크 이동)을 막습니다.
+        history.back(); // 브라우저의 이전 페이지로 돌아갑니다.
+      });
+    }
+  });
+
+</script>
+
+</body></html>
