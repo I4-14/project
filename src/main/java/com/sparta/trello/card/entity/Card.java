@@ -27,6 +27,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 
 @Entity
@@ -34,6 +35,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "cards")
+@DynamicUpdate
 public class Card extends Timestamped {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,15 +4,14 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.board.entity.Board;
-import com.sparta.trello.board.entity.QBoard;
-import com.sparta.trello.boardworkspace.dto.InvitationListDto;
 import com.sparta.trello.boardworkspace.dto.MemberDto;
 import com.sparta.trello.boardworkspace.entity.BoardWorkspace;
-import com.sparta.trello.boardworkspace.entity.QBoardWorkspace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
+import static com.sparta.trello.boardworkspace.entity.QBoardWorkspace.boardWorkspace;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,26 +22,24 @@ public class BoardWorkspaceRepositoryImpl implements BoardWorkspaceRepositoryCus
 
     @Override
     public List<MemberDto> findUsernamesByBoardId(Long boardId) {
-        QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
 
         return jpaQueryFactory
                 .select(Projections.constructor(MemberDto.class,
-                        qBoardWorkspace.user.id,
-                        qBoardWorkspace.user.username))
-                .from(qBoardWorkspace)
-                .where(qBoardWorkspace.board.id.eq(boardId))
+                        boardWorkspace.user.id,
+                        boardWorkspace.user.username))
+                .from(boardWorkspace)
+                .where(boardWorkspace.board.id.eq(boardId))
                 .fetch();
     }
 
     @Override
     public boolean existsByBoardAndUser(Board board, User user) {
-        QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
 
         long count = jpaQueryFactory
-                .selectFrom(qBoardWorkspace)
+                .selectFrom(boardWorkspace)
                 .where(
-                        qBoardWorkspace.board.eq(board)
-                                .and(qBoardWorkspace.user.eq(user))
+                        boardWorkspace.board.eq(board)
+                                .and(boardWorkspace.user.eq(user))
                 )
                 .fetchCount();
 
@@ -51,12 +48,10 @@ public class BoardWorkspaceRepositoryImpl implements BoardWorkspaceRepositoryCus
 
     @Override
     public BoardWorkspace findByBoardIdAndUserId(Long boardId, Long userId) {
-        QBoardWorkspace qBoardWorkspace = QBoardWorkspace.boardWorkspace;
-
-        return jpaQueryFactory.selectFrom(qBoardWorkspace)
+        return jpaQueryFactory.selectFrom(boardWorkspace)
                 .where(
-                        qBoardWorkspace.board.id.eq(boardId)
-                                .and(qBoardWorkspace.user.id.eq(userId))
+                        boardWorkspace.board.id.eq(boardId)
+                                .and(boardWorkspace.user.id.eq(userId))
                 )
                 .fetchOne();
 

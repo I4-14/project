@@ -27,7 +27,7 @@ public class ColumnsCustomRepositoryImpl implements ColumnsCustomRepository{
         Long result = jpaQueryFactory.select(columns.orderNum)
                 .from(columns)
                 .where(columns.id.eq(id))
-                .fetch().get(0);
+                .fetchOne();
         return Optional.ofNullable(result);
     }
 

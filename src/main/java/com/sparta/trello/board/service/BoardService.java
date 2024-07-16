@@ -2,7 +2,6 @@ package com.sparta.trello.board.service;
 
 import com.sparta.trello.auth.entity.Role;
 import com.sparta.trello.auth.entity.User;
-import com.sparta.trello.auth.repository.UserRepository;
 import com.sparta.trello.board.dto.BoardRequestDto;
 import com.sparta.trello.board.dto.BoardResponseDto;
 import com.sparta.trello.board.entity.Board;
@@ -13,9 +12,6 @@ import com.sparta.trello.common.exception.ErrorEnum;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,10 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
     private final BoardWorkspaceRepository boardWorkspaceRepository;
-
-    private int PAGE_SIZE = 8;
 
     /**
      * 보드 리스트 불러오기
@@ -38,10 +31,9 @@ public class BoardService {
      * @return
      */
     public List<BoardResponseDto> getBoardList(int page, String sortBy, User user) {
-        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
-        Page<Board> boards = boardRepository.findAll(pageable);
+        Page<Board> boards = boardRepository.getBoardList(page, sortBy);
         List<BoardResponseDto> boardList;
+
         if(user.getRole().equals(Role.MANAGER)) {
             boardList = boards.getContent().stream().map(board -> {
                 boolean isMember = true;

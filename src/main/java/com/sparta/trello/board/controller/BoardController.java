@@ -1,6 +1,5 @@
 package com.sparta.trello.board.controller;
 
-import com.sparta.trello.auth.entity.User;
 import com.sparta.trello.auth.security.UserDetailsImpl;
 import com.sparta.trello.board.dto.BoardRequestDto;
 import com.sparta.trello.board.dto.BoardResponseDto;
